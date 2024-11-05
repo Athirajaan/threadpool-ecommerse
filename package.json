@@ -10,9 +10,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
     "express": "^4.21.1",
+    "express-session": "^1.18.1",
     "mongoose": "^8.7.3",
+    "nodemailer": "^6.9.16",
     "nodemon": "^3.1.7"
   }
 }
