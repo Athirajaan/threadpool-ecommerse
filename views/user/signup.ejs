@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+
+
+  <!-- Navbar -->
+  <header class="flex justify-between items-center p-5  bg-white sticky top-0 z-50">
+    <div class="flex items-center space-x-2">
+        <div class="text-xl md:text-2xl font-bold text-gray-800 font-serif shadow-md">
+            THREAD<span class="text-yellow-500">P</span>OOL
+    </div>
+    </div>
+    <div class="flex space-x-2 md:space-x-4">
+      <button class="py-1 px-2 md:py-2 md:px-4 border border-gray-400 rounded text-gray-800 text-sm md:text-base">Login</button>
+      <button class="py-1 px-2 md:py-2 md:px-4 bg-yellow-500 text-white font-semibold rounded text-sm md:text-base">Sign Up</button>
+    </div>
+  </header> 
+
+  <!-- Main Content -->
+  <div class="flex flex-col md:flex-row h-screen">
+    <!-- Left Image Section -->
+    <div class="md:w-1/2 bg-gray-300">
+      <img src="./images/group1.jpg" alt="Sign Up Image" class="w-full h-full object-cover">
+    </div>
+
+    <!-- Right Form Section -->
+    <div class="md:w-1/2 flex items-center justify-center bg-white p-8">
+      <div class="w-full max-w-md">
+        <h2 class="text-3xl font-semibold mb-4">Create an account</h2>
+        <p class="text-gray-600 mb-6">Enter your details below</p>
+        
+        <form id="signform" method="post" action="/signup" class="space-y-4">
+          <div class="space-y-4">
+            <div>
+              <input type="text" placeholder="Name" class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500" name="name" id="name">
+              <div id="error1" class="error-msg text-red-500 text-xs mt-1"></div>
+            </div>
+          
+            <div>
+              <input type="text" placeholder="Phone Number" class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500" name="phone" id="phone">
+              <div id="error2" class="error-msg text-red-500 text-xs mt-1"></div>
+            </div>
+          
+            <div>
+              <input type="email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500" name="email" id="email">
+              <div id="error3" class="error-msg text-red-500 text-xs mt-1"></div>
+            </div>
+          
+            <div>
+              <input type="password" placeholder="Password" class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500" name="password" id="password">
+              <div id="error4" class="error-msg text-red-500 text-xs mt-1"></div>
+            </div>
+          
+            <div>
+              <input type="password" placeholder="Confirm Password" class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500" name="cpassword" id="cpassword">
+              <div id="error5" class="error-msg text-red-500 text-xs mt-1"></div>
+            </div>
+          </div>
+          <button type="submit" class="w-full py-3 bg-yellow-500 text-white font-semibold rounded hover:bg-yellow-600">Create Account</button>
+        </form>                                   
+
+        <button class="flex items-center justify-center w-full mt-4 py-3 border border-gray-300 rounded hover:bg-gray-100">
+          <img src="./images/google.png" alt="Google Icon" class="w-5 h-5 mr-2">
+          Sign up with Google
+        </button>
+
+        <p class="text-center text-gray-600 mt-6">Already have an account? <a href="#" class="text-blue-500 hover:underline">Log in</a></p>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const nameid = document.getElementById("name");
+      const phoneid = document.getElementById("phone");
+      const emailid = document.getElementById("email");
+      const passid = document.getElementById("password");
+      const cpassid = document.getElementById("cpassword");
+  
+      const error1 = document.getElementById("error1");
+      const error2 = document.getElementById("error2");
+      const error3 = document.getElementById("error3");
+      const error4 = document.getElementById("error4");
+      const error5 = document.getElementById("error5");
+      const signform = document.getElementById("signform");
+  
+      // Validation Functions
+      function nameValidateChecking() {
+        const nameval = nameid.value.trim();
+        const namepattern = /^[A-Za-z\s]+$/;
+  
+        if (!nameval) {
+          error1.classList.remove("hidden");
+          error1.innerHTML = "Please enter a valid name";
+          return false;
+        } else if (!namepattern.test(nameval)) {
+          error1.classList.remove("hidden");
+          error1.innerHTML = "Name can only contain alphabets and spaces";
+          return false;
+        } else {
+          error1.classList.add("hidden");
+          error1.innerHTML = "";
+          return true;
+        }
+      }
+  
+      function emailValidateChecking() {
+        const emailval = emailid.value.trim();
+        const emailpattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+  
+        if (!emailpattern.test(emailval)) {
+          error3.classList.remove("hidden");
+          error3.innerHTML = "Invalid email format";
+          return false;
+        } else {
+          error3.classList.add("hidden");
+          error3.innerHTML = "";
+          return true;
+        }
+      }
+  
+      function phoneValidateChecking() {
+        const phoneval = phoneid.value.trim();
+  
+        if (!phoneval) {
+          error2.classList.remove("hidden");
+          error2.innerHTML = "Please enter a valid phone number";
+          return false;
+        } else if (phoneval.length !== 10) {
+          error2.classList.remove("hidden");
+          error2.innerHTML = "Phone number must be 10 digits";
+          return false;
+        } else {
+          error2.classList.add("hidden");
+          error2.innerHTML = "";
+          return true;
+        }
+      }
+  
+      function passValidateChecking() {
+        const passval = passid.value;
+        const cpassval = cpassid.value;
+        const alpha = /[a-zA-Z]/;
+        const digit = /\d/;
+  
+        if (passval.length < 8) {
+          error4.classList.remove("hidden");
+          error4.innerHTML = "Password should contain at least 8 characters";
+          return false;
+        } else if (!alpha.test(passval) || !digit.test(passval)) {
+          error4.classList.remove("hidden");
+          error4.innerHTML = "Password should contain both letters and numbers";
+          return false;
+        } else {
+          error4.classList.add("hidden");
+          error4.innerHTML = "";
+        }
+  
+        if (passval !== cpassval) {
+          error5.classList.remove("hidden");
+          error5.innerHTML = "Passwords do not match";
+          return false;
+        } else {
+          error5.classList.add("hidden");
+          error5.innerHTML = "";
+          return true;
+        }
+      }
+  
+      // Add event listeners for real-time validation
+      nameid.addEventListener("input", nameValidateChecking);
+      emailid.addEventListener("input", emailValidateChecking);
+      phoneid.addEventListener("input", phoneValidateChecking);
+      passid.addEventListener("input", passValidateChecking);
+      cpassid.addEventListener("input", passValidateChecking);
+  
+      // Form Submission Validation
+      signform.addEventListener("submit", function(e) {
+        if (
+          !nameValidateChecking() ||
+          !emailValidateChecking() ||
+          !phoneValidateChecking() ||
+          !passValidateChecking()
+        ) {
+          e.preventDefault();
+        }
+      });
+    });
+  </script>
+  
+
+</body>
+</html>

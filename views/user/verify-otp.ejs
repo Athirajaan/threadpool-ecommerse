@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+
+
+  <!-- Navbar -->
+  <header class="flex justify-between items-center p-5  bg-white sticky top-0 z-50">
+    <div class="flex items-center space-x-2">
+        <div class="text-xl md:text-2xl font-bold text-gray-800 font-serif ">
+            THREAD<span class="text-yellow-500">P</span>OOL
+    </div>
+    </div>
+    <div class="flex space-x-2 md:space-x-4">
+      <button class="py-1 px-2 md:py-2 md:px-4 border border-gray-400 rounded text-gray-800 text-sm md:text-base">Login</button>
+      <button class="py-1 px-2 md:py-2 md:px-4 bg-yellow-500 text-white font-semibold rounded text-sm md:text-base">Sign Up</button>
+    </div>
+  </header> 
+
+  <!-- Main Content -->
+  <div class="flex flex-col md:flex-row h-screen">
+    <!-- Left Image Section -->
+    <div class="md:w-1/2 bg-gray-300">
+      <img src="./images/group1.jpg" alt="Sign Up Image" class="w-full h-full object-cover">
+    </div>
+    <!-- Right Form Section -->
+    <div class="md:w-1/2 flex items-top justify-center bg-white p-8">
+      <div class="w-full max-w-md">
+        <div class="w-full max-w-xs p-5 bg-white shadow-md rounded-md mt-20 sm:mt-30 md:mt-38 lg:mt-45">
+          <!-- Title -->
+          <div class="max-w-md mx-auto bg-white p-6 shadow-md rounded-md">
+            <h2 class="text-center text-xl font-semibold text-gray-900 mb-6 bg-gray-200 py-2 rounded-md">OTP Verification</h2>
+          
+            <!-- OTP Input Boxes -->
+            <form id="otpForm" action="/verify-otp" method="post" onsubmit="return validateOTPForm()">
+              <div class="flex justify-center space-x-2 mb-6">
+                <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+                <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+                <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+                <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+              </div>
+          
+              <!-- Verify Button -->
+              <button type="submit" class="w-full py-3 bg-yellow-500 text-white font-semibold rounded-md hover:bg-yellow-600 mb-4">Verify OTP</button>
+            </form>
+          
+            <!-- Resend OTP Button and Timer -->
+            <div class="text-center text-gray-500">
+              <button id="resendOtpButton" onclick="resendOtp()" class="text-gray-400 font-semibold" disabled>Resend OTP</button>
+              <span id="timerValue" class="text-blue-500 font-semibold ml-2">60</span>
+            </div>
+          </div>
+          
+          <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+          <script>
+
+            let timeLeft = 60;
+            const timerDisplay = document.getElementById("timerValue");
+            const resendOtpButton = document.getElementById("resendOtpButton");
+          
+            // Timer countdown function
+            function startOtpTimer() {
+              const timer = setInterval(() => {
+                timeLeft -= 1;
+                timerDisplay.textContent = timeLeft;
+          
+                if (timeLeft <= 0) {
+                  clearInterval(timer);
+                  timerDisplay.textContent = "";
+                  resendOtpButton.disabled = false;
+                  resendOtpButton.classList.remove("text-gray-400");
+                  resendOtpButton.classList.add("text-blue-500", "hover:underline");
+                }
+              }, 1000);
+            }
+          
+            // Resend OTP function
+            function resendOtp() {
+              timeLeft = 60;
+              resendOtpButton.disabled = true;
+              resendOtpButton.classList.remove("text-blue-500", "hover:underline");
+              resendOtpButton.classList.add("text-gray-400");
+              startOtpTimer();
+          
+              // Simulate OTP resend logic
+              fetch('/resend-otp', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.success) {
+                    alert("OTP resent successfully");
+                  } else {
+                    alert("Failed to resend OTP");
+                  }
+                })
+                .catch(error => {
+                  console.error("Error resending OTP:", error);
+                });
+            }
+          
+            // Start the timer on page load
+            startOtpTimer();
+            
+            function getOtp() {
+              const otpInputs = document.querySelectorAll('.otp-input');
+               let otp = '';
+                 otpInputs.forEach(input => {
+              otp += input.value;
+                });
+              return otp;
+              }
+
+            function validateOTPForm(){
+              const otpValue = getOtp();
+              
+             $.ajax({
+              type:"POST",
+              url:"verify-otp",
+              data:{otp:otpValue},
+              success:function(response){
+                if(response.success){
+                   Swal.fire({
+                    icon:"success",
+                    title:"OTP Verified Successfully",
+                    showConfirmBotton:false,
+                    timer:1500,
+                   }).then(()=>{
+                    window.location.href=response.redirectUrl;
+                   }) 
+                }else {
+                  Swal.fire({
+                    icon:"error",
+                    title:"Error",
+                    text:response.message,
+                  })
+                }
+              },
+              error:function(){
+                Swal.fire({
+                  icon:"Error",
+                  title:"Invalid OTP",
+                  text:"Please try again"
+                })
+              }
+             })
+             return false
+            }
+          </script>
+          
+      </div>
+    </div>
+  </div>
+
+
+</body>
+</html>
