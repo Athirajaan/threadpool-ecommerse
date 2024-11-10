@@ -2,6 +2,7 @@ const express=require('express');
 const app=express();
 const env=require('dotenv').config();
 const session=require('express-session');
+const passport=require('./config/passport');
 const connectDb=require('./config/databse');
 const path=require('path');
 const userRouter=require("./routes/userRouter");
@@ -21,6 +22,11 @@ app.use(session({
         maxAge:72*60*60*1000
     }
 }))
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 app.use((req,res,next)=>{
     res.set('cache-control','no-store')
     next();

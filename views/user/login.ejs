@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+  
+    <!-- Navbar -->
+    <header class="flex justify-between items-center p-5  bg-white sticky top-0 z-50">
+        <div class="flex items-center space-x-2">
+            <div class="text-xl md:text-2xl font-bold text-gray-800 font-serif shadow-md">
+                THREAD<span class="text-yellow-500">P</span>OOL
+        </div>
+        </div> 
+        <div class="flex space-x-2 md:space-x-4">
+            <button onclick="window.location.href='/login'" class="w-40 md:w-45 py-1 px-2 md:py-2 md:px-4 bg-yellow-500 text-white font-semibold rounded text-sm md:text-base">
+              Login
+            </button>
+            <button onclick="window.location.href='/signup'" class="w-40 md:w-45 py-1 px-2 md:py-2 md:px-4 border border-gray-400 rounded text-gray-800 text-sm md:text-base">
+              Sign Up
+            </button>
+          </div>  
+      </header> 
+  
+  <!-- Main Content -->
+  <div class="flex flex-col md:flex-row h-screen">
+    <!-- Left Image Section -->
+    <div class="md:w-1/2 h-64 md:h-full bg-cover bg-center" style="background-image: url('');">
+      <!-- Responsive background image in div -->
+    </div>
+    
+    <!-- Right Form Section -->
+    <div class="md:w-1/2 flex  justify-center bg-white p-8 ">
+      <div class="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
+        <h2 class="text-3xl font-bold text-gray-800 text-center mb-4">Sign In Page</h2>
+
+        <!-- Google Sign In Button -->
+        <div class="mb-4">
+          <button class="w-full flex items-center justify-center py-2 border border-gray-300 rounded-lg hover:bg-gray-100">
+            <img src="https://img.icons8.com/color/24/000000/google-logo.png" alt="Google Logo" class="mr-2">
+            <span class="text-gray-700 font-semibold">Continue with Google</span>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-center mb-4">
+          <hr class="flex-grow border-gray-300">
+          <span class="px-2 text-gray-500">OR</span>
+          <hr class="flex-grow border-gray-300">
+        </div>
+        
+        <!-- Form Fields -->
+        <form  action="/login" method="POST" class="space-y-4">
+          <div>
+            <input type="text" id="userIdentifier" name="email" placeholder=" email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          </div>
+          <div class="relative">
+            <input type="password" id="password" name="password" placeholder="Password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <button type="button" class="absolute inset-y-0 right-3 flex items-center text-gray-500">Hide</button>
+          </div>
+
+          <div class="flex justify-end">
+            <a href="#" class="text-sm text-yellow-600 hover:underline">Forgot your password?</a>
+          </div>
+
+          <button type="submit" class="w-full py-2 mt-2 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50">
+            Sign In
+          </button>
+        </form>
+
+        <p class="text-center text-gray-600 mt-4">
+          Don't have an account? 
+          <a href="#" class="text-yellow-600 hover:underline">Sign up</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

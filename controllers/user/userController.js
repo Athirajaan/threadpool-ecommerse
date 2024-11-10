@@ -1,8 +1,15 @@
-
 const User=require("../../models/userSchema")
 const env=require('dotenv').config();
 const nodemailer=require('nodemailer');
-const bcrypt=require('bcrypt')
+const bcrypt=require('bcrypt');
+
+const pageNotFound=async (req,res)=>{
+    try {
+        res.render('page-404')
+    } catch (error) {
+        res.redirect('/pageNotFound')
+    }
+}
 
 const loadSignup=async (req,res)=>{
     try {
@@ -13,6 +20,16 @@ const loadSignup=async (req,res)=>{
         res.status(500).send("server error")
     }
 }
+
+const loadVerifyOtpPage=async (req,res)=>{
+  try {
+       return res.render("verify-otp");
+  }
+  catch(error) {
+      console.log("homepage not found")
+      res.status(500).send("server error")
+  }
+}
 const loadHomepage=async (req,res)=>{
     try {
          return res.render("homepage");
@@ -21,6 +38,16 @@ const loadHomepage=async (req,res)=>{
         console.log("homepage not found")
         res.status(500).send("server error")
     }
+}
+
+
+const loadLoginPage=async (req,res)=>{
+  try {
+      return res.render("login");
+  } catch (error) {
+      console.log("login page not found")
+      res.status(500).send("server error")
+  }
 }
 
 
@@ -101,7 +128,7 @@ const securePassword =async (password)=>{
         
     }
 }
-const varifyOtp = async (req,res)=>{
+const verifyOtp = async (req,res)=>{
     try {
         
         const {otp}=req.body;
@@ -115,8 +142,7 @@ const varifyOtp = async (req,res)=>{
               name:user.name,
               email:user.email,
               phone:user.phone,
-              
-              password:passwordHash,
+             password:passwordHash,
             })
 
             await saveUserData.save();
@@ -133,12 +159,14 @@ const varifyOtp = async (req,res)=>{
 const resendOtp = async (req, res) => {
     try {
         const newOtp = generateOtp();
-        req.session.userOtp = newOtp;
+        req.session.userOtp = newOtp;                        
 
         const emailSent = await sendVerificationEmail(req.session.userData.email, newOtp);
 
         if (emailSent) {
+            console.log("Resent otp:",newOtp);
             res.json({ success: true, message: 'OTP resent successfully' });
+    
         } else {
             res.status(500).json({ success: false, message: 'Failed to send OTP' });
         }
@@ -148,10 +176,62 @@ const resendOtp = async (req, res) => {
     }
 };
 
+
+const login=async (req,res)=>{
+    try {
+        console.log(req.body);
+        const {email,password}=req.body;
+        const findUser=await User.findOne({email:email});
+        console.log("User found:", findUser);
+
+        if(!findUser){
+            console.log("User not found");
+            return res.render("login",{message:"User not found"});
+        }
+        if(findUser.isBlocked){
+            return res.render("login",{message :"User is blocked by admin"});
+        }
+
+        const passwordMatch=await bcrypt.compare(password,findUser.password);
+
+        if(!passwordMatch){
+            return res.render("login",{message:"Incorrect password"});
+        }
+
+        req.session.user=findUser._id;
+        res.redirect("/")
+
+    } catch (error) {
+        console.error("login error");
+        res.render("login",{message :"Please try again later"});
+    }
+}
+
+
+
 module.exports={
     loadHomepage,
     loadSignup,
+    loadLoginPage,
     signup,
-    varifyOtp,
-    resendOtp
+    loadVerifyOtpPage,
+    verifyOtp,
+    resendOtp,
+    pageNotFound,
+    login,
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

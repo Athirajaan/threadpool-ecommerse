@@ -13,23 +13,41 @@ const productSchema =new Schema({
     category:{
         type:Schema.Types.ObjectId,
         ref:"Category",
-        required:true
+        required:true,
     },
     regularPrice:{
         type:Number,
-        required:true
+        required:true,
     },
-    salePrice:{
+    sellingPrice:{
         type:Number,
-        default:0
+        required:true,
     },
     productOffer:{
         type:Number,
         default:0
     },
-    quantity:{
-        type:Number,
-        default:true
+    stock: {
+        small: {
+            type: Number,
+            default: 0,
+            min: 0
+        },
+        medium: {
+            type: Number,
+            default: 0,
+            min: 0
+        },
+        large: {
+            type: Number,
+            default: 0,
+            min: 0
+        },
+        extraLarge: {
+            type: Number,
+            default: 0,
+            min: 0
+        }
     },
     color:{
         type:String,

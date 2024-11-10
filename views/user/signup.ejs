@@ -17,9 +17,13 @@
     </div>
     </div>
     <div class="flex space-x-2 md:space-x-4">
-      <button class="py-1 px-2 md:py-2 md:px-4 border border-gray-400 rounded text-gray-800 text-sm md:text-base">Login</button>
-      <button class="py-1 px-2 md:py-2 md:px-4 bg-yellow-500 text-white font-semibold rounded text-sm md:text-base">Sign Up</button>
-    </div>
+      <button onclick="window.location.href='/login'" class="w-40 md:w-45 py-1 px-2 md:py-2 md:px-4 border border-gray-400 rounded text-gray-800 text-sm md:text-base">
+        Login
+      </button>
+      <button onclick="window.location.href='/signup'" class="w-40 md:w-45 py-1 px-2 md:py-2 md:px-4 bg-yellow-500 text-white font-semibold rounded text-sm md:text-base">
+        Sign Up
+      </button>
+    </div>  
   </header> 
 
   <!-- Main Content -->
@@ -65,10 +69,10 @@
           <button type="submit" class="w-full py-3 bg-yellow-500 text-white font-semibold rounded hover:bg-yellow-600">Create Account</button>
         </form>                                   
 
-        <button class="flex items-center justify-center w-full mt-4 py-3 border border-gray-300 rounded hover:bg-gray-100">
+        <a  href="/auth/google" class="flex items-center justify-center w-full mt-4 py-3 border border-gray-300 rounded hover:bg-gray-100">
           <img src="./images/google.png" alt="Google Icon" class="w-5 h-5 mr-2">
           Sign up with Google
-        </button>
+        </a>
 
         <p class="text-center text-gray-600 mt-6">Already have an account? <a href="#" class="text-blue-500 hover:underline">Log in</a></p>
       </div>

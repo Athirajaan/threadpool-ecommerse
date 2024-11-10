@@ -10,7 +10,8 @@ const addressSchema = new Schema({
     address : [{
         addressType:{
             type:String,
-            required:true
+            required:true,
+            enum: ['Home', 'Work', 'Office', 'Other'],
         },
         name: {
             type:String,
@@ -49,6 +50,6 @@ const addressSchema = new Schema({
 
 
 
-const Address=mongoose.model("Adress",addressSchema);
+const Address=mongoose.model("Address",addressSchema);
 
 module.exports=Address;

@@ -87,23 +87,30 @@
               resendOtpButton.classList.remove("text-blue-500", "hover:underline");
               resendOtpButton.classList.add("text-gray-400");
               startOtpTimer();
-          
-              // Simulate OTP resend logic
-              fetch('/resend-otp', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                  if (data.success) {
-                    alert("OTP resent successfully");
-                  } else {
-                    alert("Failed to resend OTP");
+                $.ajax({
+                type:"POST",
+                url:"/resend-otp",
+                success:function(response){
+                  if(response.success){
+                    Swal.fire({
+                    icon:"success",
+                    title:"OTP Resend Successfully",
+                    showConfirmBotton:false,
+                    timer:1500,
+                   })
                   }
-                })
-                .catch(error => {
-                  console.error("Error resending OTP:", error);
-                });
-            }
-          
-            // Start the timer on page load
+                  else{
+                    Swal.fire({
+                      icon:"error",
+                      title:"error",
+                      text:"An error occurd while resending OTP. Please try again"
+                    })
+                  }
+                }
+               })
+               return false;
+              }
+             
             startOtpTimer();
             
             function getOtp() {
