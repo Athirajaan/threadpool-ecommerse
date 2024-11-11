@@ -181,7 +181,7 @@ const login=async (req,res)=>{
     try {
         console.log(req.body);
         const {email,password}=req.body;
-        const findUser=await User.findOne({email:email});
+        const findUser=await User.findOne({isAdmin:false,email:email});
         console.log("User found:", findUser);
 
         if(!findUser){

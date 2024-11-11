@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="min-h-screen flex flex-col lg:flex-row">
+
+        <div class="lg:hidden p-4 bg-white flex justify-between items-center border-b">
+            <img src="/images/bgremove-logo.png" alt="Logo" class="h-10">
+            <button id="menu-toggle" class="text-black text-2xl focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <aside id="sidebar" class="bg-white w-full lg:w-1/5 p-4 border-r lg:block hidden">
+            <div class="hidden lg:flex items-center space-x-2 mb-10">
+                <img src="/images/bgremove-logo.png" alt="Logo" class="h-12">
+            </div>
+
+            <nav class="space-y-2">
+                <a href="/admin" class="flex items-center p-2 hover:bg-gray-200 rounded-lg" data-link="dashboard">
+                    <i class="fas fa-tachometer-alt mr-3 text-black text-xl"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/Products" class="flex items-center p-2 hover:bg-gray-200 rounded-lg" data-link="products">
+                    <i class="fas fa-box mr-3 text-black text-xl"></i>
+                    <span>All Products</span>
+                </a>
+                <a href="/admin/customers" class="flex items-center p-2 hover:bg-gray-200 rounded-lg" data-link="customers">
+                    <i class="fas fa-users mr-3 text-black text-xl"></i>
+                    <span>Customers</span>
+                </a>
+                <a href="/admin/order" class="flex items-center p-2 hover:bg-gray-200 rounded-lg" data-link="orders">
+                    <i class="fas fa-shopping-cart mr-3 text-black text-xl"></i>
+                    <span>Order List</span>
+                </a>
+                <a href="/admin/category" class="flex items-center p-2 hover:bg-gray-200 rounded-lg" data-link="category">
+                    <i class="fas fa-list mr-3 text-black text-xl"></i>
+                    <span>Category</span>
+                </a>
+                <a href="/admin/coupon" class="flex items-center p-2 hover:bg-gray-200 rounded-lg" data-link="coupon">
+                    <i class="fas fa-tag mr-3 text-black text-xl"></i>
+                    <span>Coupon</span>
+                </a>
+                <a href="/admin/banner" class="flex items-center p-2 hover:bg-gray-200 rounded-lg" data-link="banner">
+                    <i class="fas fa-image mr-3 text-black text-xl"></i>
+                    <span>Banner</span>
+                </a>
+                <a href="/admin/offer" class="flex items-center p-2 hover:bg-gray-200 rounded-lg" data-link="offer">
+                    <i class="fas fa-gift mr-3 text-black text-xl"></i>
+                    <span>Offer</span>
+                </a>
+                <a href="/admin/logout" class="flex items-center p-2 hover:bg-gray-200 rounded-lg" data-link="logout">
+                    <i class="fas fa-sign-out-alt mr-3 text-black text-xl"></i>
+                    <span>Logout</span>
+                </a>
+            </nav></aside> 

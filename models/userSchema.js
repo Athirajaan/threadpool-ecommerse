@@ -31,6 +31,10 @@ const userSchema = new Schema({
           partialFilterExpression: { googleId: { $exists: true } }
         }
     },
+    isAdmin : {
+        type:Boolean,
+        default:false,
+    },
     isBlocked : {
         type:Boolean,
         default:false
