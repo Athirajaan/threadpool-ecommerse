@@ -1,0 +1,96 @@
+<%- include('../partials/admin/header') %> 
+<!-- Include header from partials -->
+
+<!-- Main Content Area -->
+<main class="flex-1 p-8 lg:ml-0 transition-all duration-300">
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-800">Customer Details</h1>
+        
+            <form action="/admin/customers" method="get" class="relative w-full lg:w-72">
+                <div class="flex items-center">
+                    <input 
+                        type="text" 
+                        name="query" 
+                        id="search" 
+                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full" 
+                        placeholder="Search by name or email" 
+                        required
+                    />
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600"></i>
+                    <button 
+                        type="submit" 
+                        class="hidden"
+                    >
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Customer Table -->
+        <div class="overflow-x-auto bg-white rounded-lg shadow-md mt-6">
+            <table class="min-w-full table-auto">
+                <thead class="bg-yellow-500 text-white">
+                    <tr>
+                        <th class="py-3 px-4 text-left text-sm font-semibold">No.</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold">Name</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold">Email</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold">Phone</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for (let i = 0; i < data.length; i++) { %>
+                    <!-- Sample Row (Repeat this row for each customer) -->
+                    <tr class="border-b hover:bg-gray-100">
+                        <td class="py-3 px-4 text-sm text-gray-700"><%= i + 1 %></td>
+                        <td class="py-3 px-4 text-sm text-gray-700"><%= data[i].name %></td>
+                        <td class="py-3 px-4 text-sm text-gray-700"><%= data[i].email %></td>
+                        <td class="py-3 px-4 text-sm text-gray-700"><%= data[i].phone %></td>
+                        <td class="py-3 px-4 text-sm text-gray-700">
+                            <% if (data[i].isBlocked === false) { %>
+                            <button class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition duration-200">
+                               <a href="/admin/blockCustomer?id=<%= data[i].id %>"> Block </a> 
+                            </button>
+                            <% } else { %>
+                            <button class="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 transition duration-200 ml-2">
+                                <a href="/admin/unblockCustomer?id=<%= data[i].id %>"> Unblock </a>
+                            </button>
+                            <% } %>
+                        </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-between items-center mt-6">
+            <div class="flex space-x-2">
+                <!-- Previous Button -->
+                <a href="/admin/customers?page=<%= currentPage - 1 %>" 
+                   class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-200" 
+                   <% if (currentPage === 1) { %> class="cursor-not-allowed opacity-50" <% } %> 
+                   aria-disabled="true">Previous</a>
+
+                <!-- Page Numbers -->
+                <% for (let page = 1; page <= totalPages; page++) { %>
+                <a href="/admin/customers?page=<%= page %>" 
+                   class="px-4 py-2 text-sm font-semibold text-gray-700 rounded-lg hover:bg-gray-200 transition duration-200 
+                   <%= currentPage === page ? 'bg-yellow-500 text-white' : 'bg-white' %>">
+                    <%= page %>
+                </a>
+                <% } %>
+
+                <!-- Next Button -->
+                <a href="/admin/customers?page=<%= currentPage + 1 %>" 
+                   class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-200" 
+                   <% if (currentPage === totalPages) { %> class="cursor-not-allowed opacity-50" <% } %> 
+                   aria-disabled="true">Next</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<%- include('../partials/admin/footer') %>

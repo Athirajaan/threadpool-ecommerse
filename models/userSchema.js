@@ -23,14 +23,14 @@ const userSchema = new Schema({
             return !this.googleId;
           }, 
     },
-    googleId: {
+      googleId: {
         type: String,
         sparse: true,
         index: {
           unique: true,
-          partialFilterExpression: { googleId: { $exists: true } }
-        }
-    },
+          partialFilterExpression: { googleId: { $exists: true } },
+        },
+      },
     isAdmin : {
         type:Boolean,
         default:false,

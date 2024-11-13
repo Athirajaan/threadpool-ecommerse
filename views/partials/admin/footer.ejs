@@ -2,12 +2,12 @@
 </div> <!-- Close the flex container -->
 
 <!-- JavaScript for Sidebar Toggle and Active Link Highlighting -->
-<script>
+<!-- <script>
     const menuToggle = document.getElementById('menu-toggle');
     const sidebar = document.getElementById('sidebar');
 
     menuToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('hidden');
+        sidebar.classList.toggle('-translate-x-full');
     });
 
     const currentPath = window.location.pathname;
@@ -19,7 +19,36 @@
         } else {
             link.classList.remove('bg-yellow-100', 'text-yellow-500', 'font-semibold');
         }
-    });
-</script>
+    }); -->
+
+    <script>
+        // Get the current URL path
+        const path = window.location.pathname;
+    
+        // Define the mapping of paths to the corresponding sidebar links
+        const pageMap = {
+            '/admin': 'dashboard-link',
+            '/admin/products': 'products-link',
+            '/admin/customers': 'customers-link',
+            '/admin/order': 'order-link',
+            '/admin/category': 'category-link',
+            '/admin/coupon': 'coupon-link',
+            '/admin/banner': 'banner-link',
+            '/admin/offer': 'offer-link',
+        };
+    
+        // Remove 'active' class from all links first
+        Object.values(pageMap).forEach(linkId => {
+            document.getElementById(linkId).classList.remove('bg-yellow-100', 'text-gray-900');
+        });
+    
+        // Add 'active' class to the correct link based on the current path
+        const activeLinkId = pageMap[path];
+        if (activeLinkId) {
+            document.getElementById(activeLinkId).classList.add('bg-yellow-100', 'text-gray-900');
+        }
+    </script>
+    
+    
 </body>
 </html>

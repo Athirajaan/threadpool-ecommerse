@@ -27,7 +27,12 @@ passport.use(new GoogleStrategy({
         }
      }
      catch(error){
-        return done(error,null);
+        if (error.code === 11000 && error.keyPattern.googleId) {
+            // Handle the duplicate key error
+            return done(null, false, { message: 'A user with this Google account already exists.' });
+          } else {
+            return done(error, null);
+          }
      }
  }
 

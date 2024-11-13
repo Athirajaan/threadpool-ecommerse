@@ -33,11 +33,40 @@ const coustomerInfo = async (req,res)=>{
             ],
         }).countDocuments();
 
-        res.render('customers')
-
-
+        res.render('customers',{
+            data:userData,
+            totalPages:Math.ceil(count/limit),
+            currentPage:page
+        })
 
     } catch (error) {
-        
+        res.redirect('/pageerror');
     }
+};
+
+
+const customerBlocked=async(req,res)=>{
+    try {
+        let id=req.query.id;
+        await User.updateOne({_id:id},{$set:{isBlocked:true}});
+        res.redirect('/admin/customers')
+    } catch (error) {
+        res.redirect('/pageerror');
+    }
+};
+
+const customerunBlocked=async (req,res)=>{
+    try {
+        let id=req.query.id;
+        await User.updateOne({_id:id},{$set:{isBlocked:false}});
+        res.redirect('/admin/customers');
+    } catch (error) {
+        res.redirect('/pageerror');
+    }
+};
+
+module.exports={
+    coustomerInfo,
+    customerBlocked,
+    customerunBlocked
 }

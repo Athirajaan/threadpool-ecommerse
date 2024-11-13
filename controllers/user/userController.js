@@ -96,7 +96,7 @@ const signup=async (req,res)=>{
        }
        const findUser=await User.findOne({email});
        if(findUser){
-        return res.render("signup",{message:"User with this emailalready exists"});
+        return res.render("signup",{message:"User with this email already exists"});
        }
 
        const otp=generateOtp();
@@ -156,6 +156,7 @@ const verifyOtp = async (req,res)=>{
         res.status(500).json({success:false,message:"An error occured"})
     }
 }
+
 const resendOtp = async (req, res) => {
     try {
         const newOtp = generateOtp();

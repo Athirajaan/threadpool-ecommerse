@@ -9,14 +9,19 @@
 <body class="bg-gray-100 font-sans antialiased">
 
   <!-- Header -->
-<!-- Header -->
-<!-- Header -->
-<header class="shadow-md bg-white p-5">
+<header class=" bg-white p-5">
     <div class="container mx-auto flex justify-between items-center px-4 md:px-10">
         <!-- Logo -->
-        <div class="flex items-center flex-shrink-0">
-            <img src="path/to/your-logo.png" alt="Logo" class="h-8 md:h-12">
-        </div>
+        <div class="flex items-center space-x-4">
+          <!-- Logo -->
+          <img src="images/Logo.jpg" alt="Logo" class="h-10">
+          <div>
+              <h1 class="text-xl md:text-2xl font-bold text-gray-800 font-serif" >
+                  Thread<span class="text-yellow-500">p</span>ool
+              </h1>
+              <p class="text-sm font-medium text-gray-500">Strength — Fashion</p>
+          </div>
+      </div>
 
         <!-- Navbar Links -->
         <div class="hidden md:flex items-center space-x-6 flex-grow justify-end">
@@ -150,6 +155,8 @@
         </div>
     </div>
   </div>
-
+    
+<%- include('../partials/user/userfooter') %> 
+<!-- Include footer from partials -->
 </body>
 </html>

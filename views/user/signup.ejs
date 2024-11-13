@@ -36,6 +36,11 @@
     <!-- Right Form Section -->
     <div class="md:w-1/2 flex items-center justify-center bg-white p-8">
       <div class="w-full max-w-md">
+        <% if (message) { %>
+          <div class="bg-red-500 text-white p-4 rounded-md mb-4 w-full text-center">
+            <%= message %>
+          </div>
+        <% } %>
         <h2 class="text-3xl font-semibold mb-4">Create an account</h2>
         <p class="text-gray-600 mb-6">Enter your details below</p>
         
