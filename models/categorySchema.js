@@ -5,13 +5,14 @@ const categorySchema = new Schema({
     name: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true 
     },
     description: {
         type: String,
         required: true,
     },
-    parentCategory: {
+    gender: {
         type: String,
         enum: ['Men', 'Women'],  
         required: true
@@ -19,10 +20,6 @@ const categorySchema = new Schema({
     isListed: {
         type: Boolean,
         default: true
-    },
-    categoryOffer: {
-        type: Number,
-        default: 0
     },
     createdAt: {
         type: Date,

@@ -12,9 +12,17 @@
   <!-- Navbar -->
   <header class="flex justify-between items-center p-5  bg-white sticky top-0 z-50">
     <div class="flex items-center space-x-2">
-        <div class="text-xl md:text-2xl font-bold text-gray-800 font-serif shadow-md">
-            THREAD<span class="text-yellow-500">P</span>OOL
+      <div class="flex items-center space-x-4">
+        <!-- Logo -->
+        <img src="images/Logo.jpg" alt="Logo" class="h-10">
+        <div>
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800 font-serif" >
+                Thread<span class="text-yellow-500">p</span>ool
+            </h1>
+            <p class="text-sm font-medium text-gray-500">Strength — Fashion</p>
+        </div>
     </div>
+
     </div>
     <div class="flex space-x-2 md:space-x-4">
       <button onclick="window.location.href='/login'" class="w-40 md:w-45 py-1 px-2 md:py-2 md:px-4 border border-gray-400 rounded text-gray-800 text-sm md:text-base">
@@ -30,17 +38,18 @@
   <div class="flex flex-col md:flex-row h-screen">
     <!-- Left Image Section -->
     <div class="md:w-1/2 bg-gray-300">
-      <img src="./images/group1.jpg" alt="Sign Up Image" class="w-full h-full object-cover">
+      <img src="./images/signup.jpg" alt="Sign Up Image" class="w-full h-full object-cover">
     </div>
 
     <!-- Right Form Section -->
     <div class="md:w-1/2 flex items-center justify-center bg-white p-8">
       <div class="w-full max-w-md">
-        <% if (message) { %>
-          <div class="bg-red-500 text-white p-4 rounded-md mb-4 w-full text-center">
-            <%= message %>
+        <% if (typeof message !== 'undefined' && message) { %>
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+              <span class="block sm:inline"><%= message %></span>
           </div>
         <% } %>
+
         <h2 class="text-3xl font-semibold mb-4">Create an account</h2>
         <p class="text-gray-600 mb-6">Enter your details below</p>
         
@@ -75,7 +84,7 @@
         </form>                                   
 
         <a  href="/auth/google" class="flex items-center justify-center w-full mt-4 py-3 border border-gray-300 rounded hover:bg-gray-100">
-          <img src="./images/google.png" alt="Google Icon" class="w-5 h-5 mr-2">
+          <img src="https://img.icons8.com/color/24/000000/google-logo.png" alt="Google Icon" class="w-5 h-5 mr-2">
           Sign up with Google
         </a>
 
@@ -135,16 +144,25 @@
   
       function phoneValidateChecking() {
         const phoneval = phoneid.value.trim();
+        const isNumeric = /^\d+$/.test(phoneval);
+        
   
         if (!phoneval) {
           error2.classList.remove("hidden");
           error2.innerHTML = "Please enter a valid phone number";
           return false;
-        } else if (phoneval.length !== 10) {
+        } 
+        else if (!isNumeric) {
+        error2.classList.remove("hidden");
+        error2.innerHTML = "Phone number must contain only digits";
+        return false;
+       }
+       else if (phoneval.length !== 10) {
           error2.classList.remove("hidden");
           error2.innerHTML = "Phone number must be 10 digits";
           return false;
-        } else {
+        }
+         else {
           error2.classList.add("hidden");
           error2.innerHTML = "";
           return true;

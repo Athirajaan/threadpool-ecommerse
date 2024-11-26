@@ -10,6 +10,10 @@ const productSchema =new Schema({
         type:String,
         required:true
     },
+    gender:{
+        type:String,
+        required:true
+    },
     category:{
         type:Schema.Types.ObjectId,
         ref:"Category",
@@ -49,10 +53,6 @@ const productSchema =new Schema({
             min: 0
         }
     },
-    color:{
-        type:String,
-        required:true
-    },
     productImage:{
         type:[String],
         required:true
@@ -63,7 +63,7 @@ const productSchema =new Schema({
     },
     status:{
         type:String,
-        enum:["Available","out of stock","Discountinued"],
+        enum:["Available","out of stock"],
         default:"Available"
     }
 },{timestamps:true});

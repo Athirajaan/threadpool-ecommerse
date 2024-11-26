@@ -1,0 +1,391 @@
+<%- include('../partials/admin/header') %> 
+<!-- Include header from partials -->
+
+      <!-- main body -->
+<div class="flex-1">
+    <div class="mb-6 flex flex-col md:flex-row items-start justify-between">
+        <!-- Breadcrumbs -->
+        <nav class="text-sm text-gray-500 mb-4 md:mb-0">
+            <a href="#" class="hover:text-yellow-500">Dashboard</a> &gt;
+            <a href="#" class="hover:text-yellow-500">All Products</a> &gt;
+            <a href="#" class="text-gray-800">Add Product</a>
+        </nav>
+    
+    </div>
+  
+    <div class="container mx-auto flex justify-center">
+        <!-- Add Product Form Section -->
+        <div class="w-full max-w-5xl bg-white rounded-lg shadow-lg p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+             <div class="mb-6">
+               <label class="block text-sm font-medium text-gray-600">Product Name</label>
+                    <input type="text" id="productName" placeholder="Enter product name"
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400" />
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-600">Select Gender</label>
+                    <select id="gender" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400">
+                        <option value="">Choose...</option>
+                        <option value="Men">Men</option>
+                        <option value="Women">Women</option>
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-600">Category</label>
+                    <select id="category" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400">
+                        <option value="">Choose...</option>
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-600">Description</label>
+                    <textarea
+                        id="description"
+                        rows="3"
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
+                        placeholder="Write a compelling description..."
+                    ></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Regular Price</label>
+                        <input
+                            type="number"  id="regularPrice" placeholder="0.00"
+                            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Sale Price</label>
+                        <input type="number" id="salePrice" placeholder="0.00"
+                            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"/>
+                    </div>
+                </div>
+
+                <!-- Size Variants -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-600">Size Variants</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600">S</label>
+                            <input type="number" id="sizeSQty" placeholder="Qty"
+                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400" />
+                            <input type="number" id="sizeSIncrement" placeholder="Increment"
+                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"/>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600">M</label>
+                            <input type="number" id="sizeMQty" placeholder="Qty"
+                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"/>
+                            <input type="number" id="sizeMIncrement" placeholder="Increment"
+                               class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600">L</label>
+                            <input type="number"
+                                id="sizeLQty"
+                                placeholder="Qty"
+                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+                            />
+                            <input
+                                type="number"
+                                id="sizeLIncrement"
+                                placeholder="Increment"
+                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600">XL</label>
+                            <input
+                                type="number"
+                                id="sizeXLQty"
+                                placeholder="Qty"
+                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+                            />
+                            <input
+                                type="number"
+                                id="sizeXLIncrement"
+                                placeholder="Increment"
+                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uploaded Images Section -->
+            <div class="max-w-md p-4 bg-white border rounded shadow-md">
+                <!-- File Input -->
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-gray-500">
+                    <input type="file" id="imageInput" class="hidden" accept="image/*" multiple />
+                    <label for="imageInput" class="cursor-pointer flex flex-col items-center">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-10 w-10 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3 15a4 4 0 11.88-7.9m6.12 0A4 4 0 1115 15m6-2v6m0 0H9m12 0l-3-3m0 0l-3 3"
+                            />
+                        </svg>
+                        <p class="mt-2 text-sm font-medium">Drop your images here, or <span class="text-blue-500">browse</span></p>
+                        <p class="text-xs">JPEG, PNG files are allowed</p>
+                    </label>
+                </div>
+
+                <!-- Uploaded Images Section -->
+                <div id="imageList" class="mt-4 space-y-2"></div>
+                <div class="mt-6">
+                    <button
+                        type="submit"
+                        id="submitButton"
+                        class="w-full bg-yellow-500 text-white font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+                    >
+                        Submit Product
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  
+      <!-- JavaScript -->
+      <script>
+        let imageFiles = []; // Store uploaded images here
+        let selectedThumbnailFile = null; // To track the selected thumbnail image
+      
+        document.getElementById("submitButton").addEventListener("click", () => {
+        const productName = document.getElementById("productName").value;
+        const gender = document.getElementById("gender").value;
+        const category = document.getElementById("category").value;
+        const description = document.getElementById("description").value;
+        const regularPrice = document.getElementById("regularPrice").value;
+        const salePrice = document.getElementById("salePrice").value;
+  
+        if (!productName || !gender || !category || !description) {
+  Swal.fire({
+    toast: true,                
+    position: 'top',       
+    icon: 'error',          
+    title: 'Please fill in all required fields.',
+    showConfirmButton: false,    
+    timer: 3000,                
+    timerProgressBar: true,     
+    background: '#f8d7da',      
+    color: '#721c24'          
+  });
+  return;
+}
+
+
+
+  const formData = new FormData();
+  formData.append("productName", productName);
+  formData.append("gender", gender);
+  formData.append("category", category);
+  formData.append("description", description);
+  formData.append("regularPrice", regularPrice);
+  formData.append("salePrice", salePrice);
+
+  // Append images
+  imageFiles.forEach((file) => formData.append("images", file));
+
+  // Add selected thumbnail
+  if (selectedThumbnailFile) {
+    formData.append("thumbnail", selectedThumbnailFile);
+  }
+
+  // Send form data to the server
+  fetch("your-server-endpoint", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      alert("Product added successfully!");
+      console.log(data);
+    })
+    .catch((error) => {
+      console.error("Error submitting form:", error);
+      alert("There was an error adding the product.");
+    });
+});
+
+
+
+
+
+        // Handle image file selection
+        function handleImageUpload(event) {
+          const files = event.target.files;
+          const previewContainer = document.getElementById("photoPreview");
+          previewContainer.innerHTML = ""; // Clear existing previews
+      
+          // Validate image files
+          for (const file of files) {
+            if (!file.type.startsWith("image/")) {
+              alert("Please upload only image files.");
+              return;
+            }
+      
+            // Create image preview
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const img = document.createElement("img");
+              img.src = e.target.result;
+              img.classList.add("w-20", "h-20", "object-cover", "rounded-lg");
+      
+              const previewWrapper = document.createElement("div");
+              previewWrapper.classList.add("relative", "inline-block", "space-x-2");
+      
+              // Add delete button
+              const deleteButton = document.createElement("button");
+              deleteButton.textContent = "Delete";
+              deleteButton.classList.add(
+                "absolute",
+                "top-0",
+                "right-0",
+                "bg-red-500",
+                "text-white",
+                "px-2",
+                "py-1",
+                "rounded"
+              );
+              deleteButton.onclick = function () {
+                deleteImage(previewWrapper, file);
+              };
+      
+              previewWrapper.appendChild(img);
+              previewWrapper.appendChild(deleteButton);
+              previewContainer.appendChild(previewWrapper);
+      
+              imageFiles.push(file);
+            };
+      
+            reader.readAsDataURL(file);
+          }
+        }
+
+
+
+        const imageInput = document.getElementById("imageInput");
+const imageList = document.getElementById("imageList");
+
+imageInput.addEventListener("change", (event) => {
+  const files = event.target.files;
+
+  // Loop through selected files
+  Array.from(files).forEach((file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageSrc = e.target.result;
+
+      // Create image row
+      const imageRow = document.createElement("div");
+      imageRow.className =
+        "flex items-center justify-between p-2 border rounded shadow-sm";
+      imageRow.innerHTML = `
+        <div class="flex items-center space-x-2">
+          <img src="${imageSrc}" alt="Uploaded Thumbnail" class="w-10 h-10 rounded object-cover">
+          <p class="text-sm font-medium truncate">${file.name}</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button class="text-green-500 hover:text-green-700 set-thumbnail">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+          <button class="text-red-500 hover:text-red-700 delete-image">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      `;
+
+      // Add delete functionality
+      imageRow.querySelector(".delete-image").addEventListener("click", () => {
+        imageRow.remove();
+      });
+
+      // Add set thumbnail functionality
+      imageRow.querySelector(".set-thumbnail").addEventListener("click", () => {
+        // Remove 'thumbnail' class from previous thumbnails
+        document.querySelectorAll(".thumbnail").forEach((el) =>
+          el.classList.remove("thumbnail")
+        );
+
+        // Mark current image as thumbnail
+        imageRow.classList.add("thumbnail");
+        imageRow.style.borderColor = "yellow";
+      });
+
+      // Append to image list
+      imageList.appendChild(imageRow);
+    };
+
+    // Read the image file
+    reader.readAsDataURL(file);
+  });
+});
+        // Delete an image from the preview and file list
+        function deleteImage(previewWrapper, file) {
+          // Remove image from file list
+          imageFiles = imageFiles.filter((imgFile) => imgFile !== file);
+          previewWrapper.remove();
+      
+          // If the deleted image was the selected thumbnail, reset the thumbnail box
+          if (selectedThumbnailFile === file) {
+            selectedThumbnailFile = null;
+            updateThumbnailBox();
+          }
+        }
+      
+        // Select a thumbnail image from the preview and display it in the selected thumbnail box
+        function selectThumbnail(file) {
+          selectedThumbnailFile = file;
+          updateThumbnailBox();
+        }
+      
+        // Update the thumbnail box with the selected image
+        function updateThumbnailBox() {
+          const selectedThumbnailBox = document.getElementById("selectedThumbnail");
+          selectedThumbnailBox.innerHTML = ""; // Clear previous thumbnail
+      
+          if (selectedThumbnailFile) {
+            const thumbnail = document.createElement("img");
+            thumbnail.src = URL.createObjectURL(selectedThumbnailFile);
+            thumbnail.classList.add("w-full", "h-full", "object-cover", "rounded-lg");
+            selectedThumbnailBox.appendChild(thumbnail);
+          } else {
+            selectedThumbnailBox.innerHTML = "<span class='text-gray-500'>No Thumbnail Selected</span>";
+          }
+        }
+      
+        // Add event listener to select thumbnail when clicking on an image
+        document.getElementById("photoPreview").addEventListener("click", function (e) {
+          if (e.target.tagName === "IMG") {
+            const selectedFile = imageFiles.find(
+              (file) => file.name === e.target.src.split("/").pop()
+            );
+            selectThumbnail(selectedFile);
+          }
+        });
+      </script>
+      
+      </div>
+    </div>
+  </div>
+
+
+</div>
+ 
+<%- include('../partials/admin/footer') %> 
+ <!-- Include footer from partials -->

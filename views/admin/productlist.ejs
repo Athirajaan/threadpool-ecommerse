@@ -1,0 +1,161 @@
+<%- include('../partials/admin/header') %>  
+ <!-- Include header from partials -->
+
+      <!-- Main Content Area -->
+   
+    
+      <!-- Main Content Area (centered) -->
+      <div class="flex-1 p-6">
+        <div class="mb-4 flex items-center justify-between">
+          <nav class="text-sm text-gray-500">
+            <a href="#" class="hover:text-yellow-500">Dashboard</a> >
+            <a href="#" class="text-gray-800">All Products</a>
+          </nav>
+          <a href="/admin/addProducts" class="px-4 py-2 text-white bg-yellow-500 rounded hover:bg-yellow-600">
+            Add New Product
+          </a>
+               
+        </div>
+    
+        <!-- Search Bar -->
+        <div class="mb-4">
+          <input type="text" placeholder="Search products..." class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+        </div>
+    
+        <!-- Responsive Table -->
+        <div class="overflow-x-auto bg-white rounded-lg shadow">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="p-4">Name</th>
+                <th class="p-4">Gender</th>
+                <th class="p-4">Category</th>
+                <th class="p-4">Status</th>
+                <th class="p-4">Price</th>
+                <th class="p-4">Variants</th>
+                <th class="p-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for (let i = data.length - 1; i >= 0; i--) { %>
+                <tr class="border-b hover:bg-gray-100">
+                  <td class="p-4"><%= data[i].productName %></td>
+                  <td class="p-4"><%= data[i].gender %></td>
+                  <td class="p-4"><%= data[i].category %></td>
+                  <td class="p-4 text-orange-500">Low Stock</td>
+                  <td class="p-4"><%= data[i].salePrice %></td>
+                  <td class="p-4">
+                    <button 
+                      onclick="openModal(event, '<%= data[i].productName %>')" 
+                      class="px-3 py-1 text-yellow-600 border border-yellow-500 rounded hover:bg-yellow-500 hover:text-white">
+                      View
+                    </button>
+                  </td>
+                  <td class="p-4 flex space-x-2">
+                    <button class="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600">
+                      Edit
+                    </button>
+                    <button class="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-600">
+                      Block
+                    </button>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+            
+          </table>
+        </div>
+    
+        <!-- Pagination -->
+        <div class="flex items-center justify-center mt-4 space-x-2">
+          <!-- Previous Button -->
+          <a href="?page=<%= currentPage - 1 %>" 
+             class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= (currentPage === 1) ? 'cursor-not-allowed opacity-50' : '' %>">
+            &laquo;
+          </a>
+        
+          <!-- Page Numbers -->
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <a href="?page=<%= i %>"
+               class="px-4 py-2 text-gray-700 rounded hover:bg-yellow-500 hover:text-white <%= (i === currentPage) ? 'bg-yellow-500 text-white' : 'bg-gray-200' %>">
+              <%= i %>
+            </a>
+          <% } %>
+        
+          <!-- Next Button -->
+          <a href="?page=<%= currentPage + 1 %>" 
+             class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= (currentPage === totalPages) ? 'cursor-not-allowed opacity-50' : '' %>">
+            &raquo;
+          </a>
+        </div>
+        
+    
+        <!-- Modal -->
+        <div id="variantModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 hidden z-50">
+          <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-1/2 p-6 fade-in">
+            <h2 class="text-lg font-bold text-yellow-600 mb-4" id="productTitle"></h2>
+            <table class="w-full text-left">
+              <thead class="bg-gray-200">
+                <tr>
+                  <th class="p-2">Size</th>
+                  <th class="p-2">Quantity</th>
+                  <th class="p-2">price</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Example Sizes -->
+                <tr>
+                  <td class="p-2">S</td>
+                  <td class="p-2">50</td>
+                  <td class="p-2">1999 Rs</td>
+                </tr>
+                <tr>
+                  <td class="p-2">M</td>
+                  <td class="p-2">89</td>
+                  <td class="p-2">1900 Rs</td>
+                </tr>
+                <tr>
+                  <td class="p-2">L</td>
+                  <td class="p-2">45</td>
+                  <td class="p-2">1999 Rs</td>
+                </tr>
+                <tr>
+                  <td class="p-2">XL</td>
+                  <td class="p-2">30</td>
+                  <td class="p-2">1999 Rs</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="mt-4 text-right">
+              <button onclick="closeModal()" class="px-4 py-2 text-yellow-600 border border-yellow-500 rounded hover:bg-yellow-500 hover:text-white">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // Function to open the modal
+      function openModal(event, productName) {
+        const modal = document.getElementById('variantModal');
+        const title = document.getElementById('productTitle');
+        
+        // Set modal title
+        title.innerText = `Variants for ${productName}`;
+        
+        // Show modal
+        modal.classList.remove('hidden');
+      }
+    
+      // Function to close the modal
+      function closeModal() {
+        document.getElementById('variantModal').classList.add('hidden');
+      }
+    </script>
+    
+
+</div>
+ 
+<%- include('../partials/admin/footer') %> 

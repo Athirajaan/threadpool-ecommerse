@@ -3,6 +3,7 @@ const env=require('dotenv').config();
 const nodemailer=require('nodemailer');
 const bcrypt=require('bcrypt');
 
+//pageNotFound
 const pageNotFound=async (req,res)=>{
     try {
         res.render('page-404')
@@ -11,6 +12,7 @@ const pageNotFound=async (req,res)=>{
     }
 }
 
+//loadSignUp
 const loadSignup=async (req,res)=>{
     try {
          return res.render("signup");
@@ -21,6 +23,7 @@ const loadSignup=async (req,res)=>{
     }
 }
 
+//load verify otp page
 const loadVerifyOtpPage=async (req,res)=>{
   try {
        return res.render("verify-otp");
@@ -30,6 +33,8 @@ const loadVerifyOtpPage=async (req,res)=>{
       res.status(500).send("server error")
   }
 }
+
+// load home page
 const loadHomepage=async (req,res)=>{
     try {
          return res.render("homepage");
@@ -40,7 +45,7 @@ const loadHomepage=async (req,res)=>{
     }
 }
 
-
+//load login page
 const loadLoginPage=async (req,res)=>{
   try {
       return res.render("login");
@@ -50,10 +55,11 @@ const loadLoginPage=async (req,res)=>{
   }
 }
 
-
+// function to generate otp
 function generateOtp(){
     return Math.floor(1000 + Math.random()*9000).toString();
 }
+
 
 async function sendVerificationEmail(email,otp){
     try {
@@ -97,7 +103,7 @@ const signup=async (req,res)=>{
        const findUser=await User.findOne({email});
        if(findUser){
         return res.render("signup",{message:"User with this email already exists"});
-       }
+         }
 
        const otp=generateOtp();
 
@@ -107,10 +113,11 @@ const signup=async (req,res)=>{
        }
 
        req.session.userOtp=otp;
-       req.session.userData={name,phone,email,password};
+       req.session.userData={name,phone,email,password}
 
-       res.render("verify-otp");
-       console.log("OTP send",otp)
+       res.render("verify-otp", { message: "" }); 
+       console.log("OTP sent", otp);
+
     }
     catch(error){
        console.error("signup error",error);

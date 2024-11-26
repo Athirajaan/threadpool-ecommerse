@@ -1,0 +1,282 @@
+<%- include('../partials/admin/header') %>  <!-- Include header from partials -->
+<style>
+  /* Hide modal by default */
+  #addCategoryModal {
+    display: none;
+  }
+</style>
+<div class="flex-1">
+  <!-- Sidebar -->
+
+  <!-- Main content area -->
+  <div class="flex-1 p-6">
+    <!-- Title and button row -->
+    <div class="mb-4 flex items-center justify-between">
+      <h1 class="text-xl font-bold text-gray-800">Category Management</h1>
+      <button onclick="openModal()" class="px-4 py-2 text-white bg-yellow-500 rounded hover:bg-yellow-600">
+        Add Category
+      </button>
+    </div>
+
+    <!-- Search Bar and Dropdown Filters -->
+    <div class="mb-4 flex items-center justify-between flex-wrap gap-4">
+      <!-- Search Bar -->
+      <input type="text" placeholder="Search categories..." 
+        class="w-full md:w-1/2 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+    
+      <!-- Dropdown Filter -->
+      <div class="relative">
+        <select id="filterDropdown" onchange="filterCategories(this.value)" 
+          class="p-3 w-full md:w-48 text-gray-700  border border-yellow-500 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <option value="All">All</option>
+          <option value="Men">Men</option>
+          <option value="Women">Women</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Table and Other Content -->
+    <div class="overflow-x-auto bg-white rounded-lg shadow">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-yellow-100 border-b-2 border-yellow-500">
+          <tr>
+            <th class="p-4">no.</th>
+            <th class="p-4">Name</th>
+            <th class="p-4">Description</th>
+            <th class="p-4">Gender</th>
+            <th class="p-4">Status</th>
+            <th class="p-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="categoryTable">
+          <% cat.reverse().forEach((category, index) => { %>
+            <tr class="border-b hover:bg-yellow-50">
+              <td class="p-4"><%= index + 1 %></td>
+              <td class="p-4"><%= category.name %></td>
+              <td class="p-4"><%= category.description %></td>
+              <td class="p-4"><%= category.gender %></td>
+              <td class="p-4">
+                <button 
+                  onclick="toggleStatus(this)" 
+                  class="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600">
+                  Active
+                </button>
+              </td>
+              <td class="p-4">
+                <button class="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600">
+                  Edit
+                </button>
+              </td>
+            </tr>
+          <% }) %>
+          <% if (cat.length === 0) { %>
+            <tr>
+              <td colspan="5" class="text-center p-4">No categories found</td>
+            </tr>
+          <% } %>
+          
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <!-- <div class="flex items-center justify-center mt-4 space-x-2">
+      <button class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">&laquo;</button>
+      <button class="px-4 py-2 text-gray-700 bg-yellow-500 text-white rounded hover:bg-yellow-600">1</button>
+      <button class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">2</button>
+      <button class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">3</button>
+      <button class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">&raquo;</button>
+    </div> -->
+   
+    <div class="pagination-container">
+      <% if (currentPage > 1) { %>
+      <a href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
+      <% } %> <% for (let i = 1; i <= totalPages; i++) { %> <% if (i ===
+      currentPage) { %>
+      <span class="current-page"><%= i %></span>
+      <% } else { %>
+      <a href="?page=<%= i %>"><%= i %></a>
+      <% } %> <% } %> <% if (currentPage < totalPages) { %>
+      <a href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+      <% } %>
+      </div>
+
+
+
+
+  </div>
+</div>
+
+<!-- Add Category Modal -->
+<div id="addCategoryModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-xl font-bold text-yellow-500 mb-4">Add Category</h2>
+    
+    <!-- Form -->
+    <form method="post" action="/admin/addCategory" id="addCategoryForm" onsubmit="return handleFormSubmit(event)">
+      <div class="mb-4">
+        <label for="Name" class="block text-gray-700 font-medium">Category Name</label>
+        <input type="text" id="Name" placeholder="Enter category name" 
+          class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <div id="name-error" class="error-message"></div>
+      </div>
+      <div class="mb-4">
+        <label for="Description" class="block text-gray-700 font-medium">Description</label>
+        <textarea id="Description" placeholder="Enter description" rows="3" 
+          class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
+          <div id="description-error" class="error-message"></div>
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">Gender</label>
+        <div class="flex space-x-4">
+          <label>
+            <input type="radio" name="gender" value="Men" class="mr-2"> Men
+          </label>
+          <label>
+            <input type="radio" name="gender" value="Women" class="mr-2"> Women
+          </label>
+          <div id="gender-error" class="error-message"></div>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+          Cancel
+        </button>
+        <button type="submit" class="ml-3 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+  <script>
+    // Open modal
+    function openModal() {
+      document.getElementById('addCategoryModal').style.display = 'flex';
+    }
+
+    // Close modal
+    function closeModal() {
+      document.getElementById('addCategoryModal').style.display = 'none';
+    }
+
+    // Default Filter: All
+    function filterCategories(filter) {
+      console.log(`Filter selected: ${filter}`);
+    }
+
+    // Toggle Status Button
+    function toggleStatus(button) {
+      button.innerText = button.innerText === 'Active' ? 'Block' : 'Active';
+      button.classList.toggle('bg-green-500');
+      button.classList.toggle('bg-red-500');
+    }
+
+    
+    function handleFormSubmit(event){
+      event.preventDefault();
+
+      if(!validateForm){
+        return
+      }
+      const name= document.getElementById("Name").value.trim();
+      const description = document.getElementById("Description").value.trim();
+      const genderElement = document.querySelector('input[name="gender"]:checked');
+      const gender = genderElement ? genderElement.value : null;
+
+      fetch('/admin/addCategory',{
+        method:'POST',
+        headers:{
+          'content-type':'application/json'
+        },
+        body:JSON.stringify({name,description,gender})
+      })
+      .then(response=>{
+        if(!response.ok){
+          return respone.json().then(err=>{
+
+            throw new Error(err.error);
+
+          })
+        }
+        return response.json();
+      })
+      .then(data=>{
+          location.reload()
+      })
+
+    .catch(error=>{
+      if(error.message ==="category already exists"){
+        Swal.fire({
+          icon:'error',
+          title:"Oops",
+          text:'category already exists'
+        })
+      }else {
+        Swal.fire({
+          icon:"error",
+          title:'Oops',
+          text:'An error occured while adding the category'
+        })
+      }
+    })
+    }
+
+
+    function validateForm() {
+      clearErrorMessage();
+      const name = document.getElementById("Name").value.trim(); 
+      const description = document.getElementById("Description").value.trim(); 
+      const gender = document.querySelector('input[name="gender"]:checked');
+      let isValid = true;
+
+      if (!name) {
+        displayErrorMessage("name-error","Name is required");
+        isValid = false;
+      } else if (name.length < 3) {
+        displayErrorMessage("name-error","Name must be at least 3 characters long");
+        isValid = false;
+      } else if(!/^[a-zA-Z\s]+$/.test(name)){
+        displayErrorMessage("name-error","category name should contin only alphabetic characters");
+        isValid = false;
+      }
+
+
+      if (!description) {
+         displayErrorMessage("description-error","Description is required");
+         isValid = false;
+       } else if (description.length < 5) {
+         displayErrorMessage("description-error","Description must be at least 10 characters long");
+         isValid = false;
+       }
+
+       if (!gender) {
+       displayErrorMessage("gender-error","Please select a gender");
+       isValid = false;
+       }
+
+       return isValid;
+    }
+
+
+    function displayErrorMessage(elementId,message){
+      var errorElement = document.getElementById(elementId);
+      errorElement.innerHTML=message;
+      errorElement.style.display = "block";
+        }
+
+
+        function clearErrorMessage(){
+           const errorElements = document.getElementsByClassName("error-message");
+           Array.from(errorElements).forEach((element)=>{
+             element.innerText="";
+             element.style.display="none"
+           });
+        }
+  </script>
+
+</div>
+ 
+<%- include('../partials/admin/footer') %> 

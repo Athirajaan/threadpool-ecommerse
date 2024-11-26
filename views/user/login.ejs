@@ -10,11 +10,19 @@
   
     <!-- Navbar -->
     <header class="flex justify-between items-center p-5  bg-white sticky top-0 z-50">
-        <div class="flex items-center space-x-2">
-            <div class="text-xl md:text-2xl font-bold text-gray-800 font-serif shadow-md">
-                THREAD<span class="text-yellow-500">P</span>OOL
-        </div>
-        </div> 
+      <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-4">
+          <!-- Logo -->
+          <img src="images/Logo.jpg" alt="Logo" class="h-10">
+          <div>
+              <h1 class="text-xl md:text-2xl font-bold text-gray-800 font-serif" >
+                  Thread<span class="text-yellow-500">p</span>ool
+              </h1>
+              <p class="text-sm font-medium text-gray-500">Strength — Fashion</p>
+          </div>
+      </div>
+  
+      </div>
         <div class="flex space-x-2 md:space-x-4">
             <button onclick="window.location.href='/login'" class="w-40 md:w-45 py-1 px-2 md:py-2 md:px-4 bg-yellow-500 text-white font-semibold rounded text-sm md:text-base">
               Login
@@ -28,13 +36,19 @@
   <!-- Main Content -->
   <div class="flex flex-col md:flex-row h-screen">
     <!-- Left Image Section -->
-    <div class="md:w-1/2 h-64 md:h-full bg-cover bg-center" style="background-image: url('');">
+    <div class="md:w-1/2 h-64 md:h-full bg-cover bg-center">
+      <img src="./images/login.jpg" alt="Sign Up Image" class="w-full h-full object-cover">
       <!-- Responsive background image in div -->
     </div>
     
     <!-- Right Form Section -->
     <div class="md:w-1/2 flex  justify-center bg-white p-8 ">
       <div class="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
+        <% if (typeof message !== 'undefined' && message) { %>
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+              <span class="block sm:inline"><%= message %></span>
+          </div>
+        <% } %>
         <h2 class="text-3xl font-bold text-gray-800 text-center mb-4">Sign In Page</h2>
 
         <!-- Google Sign In Button -->
