@@ -1,391 +1,607 @@
 <%- include('../partials/admin/header') %> 
-<!-- Include header from partials -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
-      <!-- main body -->
-<div class="flex-1">
+
+
+  <div class="flex-1">
     <div class="mb-6 flex flex-col md:flex-row items-start justify-between">
-        <!-- Breadcrumbs -->
-        <nav class="text-sm text-gray-500 mb-4 md:mb-0">
-            <a href="#" class="hover:text-yellow-500">Dashboard</a> &gt;
-            <a href="#" class="hover:text-yellow-500">All Products</a> &gt;
-            <a href="#" class="text-gray-800">Add Product</a>
-        </nav>
-    
-    </div>
+      <!-- Breadcrumbs -->
+      <nav class="text-sm text-gray-500 mb-4 md:mb-0">
+          <a href="#" class="hover:text-yellow-500">Dashboard</a> &gt;
+          <a href="#" class="hover:text-yellow-500">All Products</a> &gt;
+          <a href="#" class="text-gray-800">Add Product</a>
+      </nav>
   
-    <div class="container mx-auto flex justify-center">
-        <!-- Add Product Form Section -->
-        <div class="w-full max-w-5xl bg-white rounded-lg shadow-lg p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-             <div class="mb-6">
-               <label class="block text-sm font-medium text-gray-600">Product Name</label>
-                    <input type="text" id="productName" placeholder="Enter product name"
-                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400" />
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-600">Select Gender</label>
-                    <select id="gender" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400">
-                        <option value="">Choose...</option>
-                        <option value="Men">Men</option>
-                        <option value="Women">Women</option>
-                    </select>
-                </div>
-
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-600">Category</label>
-                    <select id="category" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400">
-                        <option value="">Choose...</option>
-                    </select>
-                </div>
-
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-600">Description</label>
-                    <textarea
-                        id="description"
-                        rows="3"
-                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
-                        placeholder="Write a compelling description..."
-                    ></textarea>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Regular Price</label>
-                        <input
-                            type="number"  id="regularPrice" placeholder="0.00"
-                            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"/>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Sale Price</label>
-                        <input type="number" id="salePrice" placeholder="0.00"
-                            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"/>
-                    </div>
-                </div>
-
-                <!-- Size Variants -->
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-600">Size Variants</label>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600">S</label>
-                            <input type="number" id="sizeSQty" placeholder="Qty"
-                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400" />
-                            <input type="number" id="sizeSIncrement" placeholder="Increment"
-                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"/>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600">M</label>
-                            <input type="number" id="sizeMQty" placeholder="Qty"
-                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"/>
-                            <input type="number" id="sizeMIncrement" placeholder="Increment"
-                               class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1" />
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600">L</label>
-                            <input type="number"
-                                id="sizeLQty"
-                                placeholder="Qty"
-                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
-                            />
-                            <input
-                                type="number"
-                                id="sizeLIncrement"
-                                placeholder="Increment"
-                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
-                            />
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600">XL</label>
-                            <input
-                                type="number"
-                                id="sizeXLQty"
-                                placeholder="Qty"
-                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
-                            />
-                            <input
-                                type="number"
-                                id="sizeXLIncrement"
-                                placeholder="Increment"
-                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Uploaded Images Section -->
-            <div class="max-w-md p-4 bg-white border rounded shadow-md">
-                <!-- File Input -->
-                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-gray-500">
-                    <input type="file" id="imageInput" class="hidden" accept="image/*" multiple />
-                    <label for="imageInput" class="cursor-pointer flex flex-col items-center">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-10 w-10 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M3 15a4 4 0 11.88-7.9m6.12 0A4 4 0 1115 15m6-2v6m0 0H9m12 0l-3-3m0 0l-3 3"
-                            />
-                        </svg>
-                        <p class="mt-2 text-sm font-medium">Drop your images here, or <span class="text-blue-500">browse</span></p>
-                        <p class="text-xs">JPEG, PNG files are allowed</p>
-                    </label>
-                </div>
-
-                <!-- Uploaded Images Section -->
-                <div id="imageList" class="mt-4 space-y-2"></div>
-                <div class="mt-6">
-                    <button
-                        type="submit"
-                        id="submitButton"
-                        class="w-full bg-yellow-500 text-white font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-                    >
-                        Submit Product
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-  
-      <!-- JavaScript -->
-      <script>
-        let imageFiles = []; // Store uploaded images here
-        let selectedThumbnailFile = null; // To track the selected thumbnail image
-      
-        document.getElementById("submitButton").addEventListener("click", () => {
-        const productName = document.getElementById("productName").value;
-        const gender = document.getElementById("gender").value;
-        const category = document.getElementById("category").value;
-        const description = document.getElementById("description").value;
-        const regularPrice = document.getElementById("regularPrice").value;
-        const salePrice = document.getElementById("salePrice").value;
-  
-        if (!productName || !gender || !category || !description) {
-  Swal.fire({
-    toast: true,                
-    position: 'top',       
-    icon: 'error',          
-    title: 'Please fill in all required fields.',
-    showConfirmButton: false,    
-    timer: 3000,                
-    timerProgressBar: true,     
-    background: '#f8d7da',      
-    color: '#721c24'          
-  });
-  return;
-}
-
-
-
-  const formData = new FormData();
-  formData.append("productName", productName);
-  formData.append("gender", gender);
-  formData.append("category", category);
-  formData.append("description", description);
-  formData.append("regularPrice", regularPrice);
-  formData.append("salePrice", salePrice);
-
-  // Append images
-  imageFiles.forEach((file) => formData.append("images", file));
-
-  // Add selected thumbnail
-  if (selectedThumbnailFile) {
-    formData.append("thumbnail", selectedThumbnailFile);
-  }
-
-  // Send form data to the server
-  fetch("your-server-endpoint", {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      alert("Product added successfully!");
-      console.log(data);
-    })
-    .catch((error) => {
-      console.error("Error submitting form:", error);
-      alert("There was an error adding the product.");
-    });
-});
-
-
-
-
-
-        // Handle image file selection
-        function handleImageUpload(event) {
-          const files = event.target.files;
-          const previewContainer = document.getElementById("photoPreview");
-          previewContainer.innerHTML = ""; // Clear existing previews
-      
-          // Validate image files
-          for (const file of files) {
-            if (!file.type.startsWith("image/")) {
-              alert("Please upload only image files.");
-              return;
-            }
-      
-            // Create image preview
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              const img = document.createElement("img");
-              img.src = e.target.result;
-              img.classList.add("w-20", "h-20", "object-cover", "rounded-lg");
-      
-              const previewWrapper = document.createElement("div");
-              previewWrapper.classList.add("relative", "inline-block", "space-x-2");
-      
-              // Add delete button
-              const deleteButton = document.createElement("button");
-              deleteButton.textContent = "Delete";
-              deleteButton.classList.add(
-                "absolute",
-                "top-0",
-                "right-0",
-                "bg-red-500",
-                "text-white",
-                "px-2",
-                "py-1",
-                "rounded"
-              );
-              deleteButton.onclick = function () {
-                deleteImage(previewWrapper, file);
-              };
-      
-              previewWrapper.appendChild(img);
-              previewWrapper.appendChild(deleteButton);
-              previewContainer.appendChild(previewWrapper);
-      
-              imageFiles.push(file);
-            };
-      
-            reader.readAsDataURL(file);
-          }
-        }
-
-
-
-        const imageInput = document.getElementById("imageInput");
-const imageList = document.getElementById("imageList");
-
-imageInput.addEventListener("change", (event) => {
-  const files = event.target.files;
-
-  // Loop through selected files
-  Array.from(files).forEach((file) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const imageSrc = e.target.result;
-
-      // Create image row
-      const imageRow = document.createElement("div");
-      imageRow.className =
-        "flex items-center justify-between p-2 border rounded shadow-sm";
-      imageRow.innerHTML = `
-        <div class="flex items-center space-x-2">
-          <img src="${imageSrc}" alt="Uploaded Thumbnail" class="w-10 h-10 rounded object-cover">
-          <p class="text-sm font-medium truncate">${file.name}</p>
-        </div>
-        <div class="flex items-center space-x-2">
-          <button class="text-green-500 hover:text-green-700 set-thumbnail">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </button>
-          <button class="text-red-500 hover:text-red-700 delete-image">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      `;
-
-      // Add delete functionality
-      imageRow.querySelector(".delete-image").addEventListener("click", () => {
-        imageRow.remove();
-      });
-
-      // Add set thumbnail functionality
-      imageRow.querySelector(".set-thumbnail").addEventListener("click", () => {
-        // Remove 'thumbnail' class from previous thumbnails
-        document.querySelectorAll(".thumbnail").forEach((el) =>
-          el.classList.remove("thumbnail")
-        );
-
-        // Mark current image as thumbnail
-        imageRow.classList.add("thumbnail");
-        imageRow.style.borderColor = "yellow";
-      });
-
-      // Append to image list
-      imageList.appendChild(imageRow);
-    };
-
-    // Read the image file
-    reader.readAsDataURL(file);
-  });
-});
-        // Delete an image from the preview and file list
-        function deleteImage(previewWrapper, file) {
-          // Remove image from file list
-          imageFiles = imageFiles.filter((imgFile) => imgFile !== file);
-          previewWrapper.remove();
-      
-          // If the deleted image was the selected thumbnail, reset the thumbnail box
-          if (selectedThumbnailFile === file) {
-            selectedThumbnailFile = null;
-            updateThumbnailBox();
-          }
-        }
-      
-        // Select a thumbnail image from the preview and display it in the selected thumbnail box
-        function selectThumbnail(file) {
-          selectedThumbnailFile = file;
-          updateThumbnailBox();
-        }
-      
-        // Update the thumbnail box with the selected image
-        function updateThumbnailBox() {
-          const selectedThumbnailBox = document.getElementById("selectedThumbnail");
-          selectedThumbnailBox.innerHTML = ""; // Clear previous thumbnail
-      
-          if (selectedThumbnailFile) {
-            const thumbnail = document.createElement("img");
-            thumbnail.src = URL.createObjectURL(selectedThumbnailFile);
-            thumbnail.classList.add("w-full", "h-full", "object-cover", "rounded-lg");
-            selectedThumbnailBox.appendChild(thumbnail);
-          } else {
-            selectedThumbnailBox.innerHTML = "<span class='text-gray-500'>No Thumbnail Selected</span>";
-          }
-        }
-      
-        // Add event listener to select thumbnail when clicking on an image
-        document.getElementById("photoPreview").addEventListener("click", function (e) {
-          if (e.target.tagName === "IMG") {
-            const selectedFile = imageFiles.find(
-              (file) => file.name === e.target.src.split("/").pop()
-            );
-            selectThumbnail(selectedFile);
-          }
-        });
-      </script>
-      
-      </div>
-    </div>
   </div>
 
 
-</div>
+    <!-- Add Product Form -->
+    <div class="w-full max-w-5xl bg-white rounded-lg shadow-lg p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+      <!-- Left Side -->
+      <div>
+        <form method="post" action="/admin/addProducts" enctype="multipart/form-data" onsubmit="return validateForm(event)">
+        <!-- Product Name -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-600">Product Name</label>
+          <input
+            type="text"
+            id="productName"
+            placeholder="Enter product name"
+            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
+          />
+          <div id="productName-error" class="text-red-500 text-sm mt-1 error-message"></div>
+        </div>
+  
+        <!-- Gender Selection -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-600">Select Gender</label>
+          <select id="gender" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400">
+            <option value="">Choose...</option>
+            <option value="Men">Men</option>
+            <option value="Women">Women</option>
+          </select>
+          <div id="gender-error" class="text-red-500 text-sm mt-1 error-message"></div>
+        </div>
+  
+        <!-- category -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-600">Category</label>
+          <select id="category" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400" disabled>
+            <option value="" disabled selected>Choose category...</option>
+          </select>
+          <div id="category-error" class="text-red-500 text-sm mt-1 error-message"></div>
+        </div>
+      
+  
+        <!-- Description -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-600">Description</label>
+          <textarea
+            id="description"
+            rows="3"
+            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
+            placeholder="Write a compelling description..."
+          ></textarea>
+          <div id="description-error" class="text-red-500 text-sm mt-1 error-message"></div>
+        </div>
+  
+        <!-- Pricing Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600">Regular Price</label>
+            <input
+              type="number"
+              id="regularPrice"
+              placeholder="0.00"
+              class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
+            />
+            <div id="regularPrice-error" class="text-red-500 text-sm mt-1 error-message"></div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600">Sale Price</label>
+            <input
+              type="number"
+              id="salePrice"
+              placeholder="0.00"
+              class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
+            />
+            <div id="salePrice-error" class="text-red-500 text-sm mt-1 error-message"></div>
+          </div>
+        </div>
+  
+        <!-- Size Variants -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-600">Size Variants</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <!-- Size Fields  S-->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">S</label>
+              <input
+                type="number"
+                id="sizeSQty"
+                placeholder="Qty"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+              />
+              <div id="sizeSQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+              <!-- <input
+                type="number"
+                id="sizeSIncrement"
+                placeholder="Increment"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
+              />
+              <div id="sizeSIncrement-error" class="text-red-500 text-sm mt-1 error-message"></div> -->
+            </div>
+            <!-- M -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">M</label>
+              <input
+                type="number"
+                id="sizeMQty"
+                placeholder="Qty"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+              />
+              <div id="sizeSQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+              <!-- <input
+                type="number"
+                id="sizeMIncrement"
+                placeholder="Increment"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
+              />
+              <div id="sizeSIncrement-error" class="text-red-500 text-sm mt-1 error-message"></div> -->
+            </div>
+
+            <!-- L -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">L</label>
+              <input
+                type="number"
+                id="sizeLQty"
+                placeholder="Qty"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+              />
+              <div id="sizeLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+              <!-- <input
+                type="number"
+                id="sizeLIncrement"
+                placeholder="Increment"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
+              />
+              <div id="sizeLIncrement-error" class="text-red-500 text-sm mt-1 error-message"></div> -->
+            </div>
+            <!-- XL -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">XL</label>
+              <input
+                type="number"
+                id="sizeXLQty"
+                placeholder="Qty"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+              />
+              <div id="sizeXLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+              <!-- <input
+                type="number"
+                id="sizeXLIncrement"
+                placeholder="Increment"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
+              />
+              <div id="sizeXLIncrement-error" class="text-red-500 text-sm mt-1 error-message"></div> -->
+            </div>
+         
+          </div>
+        </div>
+      </div>
  
+  
+      <!-- Uploaded Images Section -->
+      <div class="max-w-md p-4 bg-white border rounded shadow-md">
+        <!-- File Input -->
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-gray-500">
+          <input type="file" id="imageInput" class="hidden" accept="image/*" multiple />
+          <label for="imageInput" class="cursor-pointer flex flex-col items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-10 w-10 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 15a4 4 0 11.88-7.9m6.12 0A4 4 0 1115 15m6-2v6m0 0H9m12 0l-3-3m0 0l-3 3"
+              />
+            </svg>
+            <p class="mt-2 text-sm font-medium">Drop your images here, or <span class="text-blue-500">browse</span></p>
+            <p class="text-xs">JPEG, PNG files are allowed</p>
+          </label>
+        </div>
+     
+         <!-- Cropping Modal -->
+        <div id="cropModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-4 rounded shadow-lg w-full max-w-lg">
+          <div class="w-[500px] h-[400px] overflow-hidden">
+              <img id="cropImage" class="object-contain w-full h-full" />
+          </div>
+          <div class="mt-4 flex justify-between">
+              <button id="cropConfirm" class="bg-blue-500 text-white px-4 py-2 rounded">Crop</button>
+              <button id="cropCancel" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Cancel</button>
+          </div>
+        </div>
+        </div>
+        <!-- Uploaded Images Section -->
+        <div id="imagePreview" class="mt-4 space-y-2"></div>
+        <div class="mt-20">
+          <button
+            type="submit"
+            id="submitButton"
+            class="w-full bg-yellow-500 text-white font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+          >
+            Submit Product
+          </button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+      
+      <!-- JavaScript -->
+      <script>
+        
+       // form validation
+     function validateForm() {
+    clearErrorMessages();
+    console.log("validateForm is triggered.");
+
+    let isValid = true;
+
+    // Get form values
+    const productName = document.getElementById('productName').value.trim();
+    const gender = document.getElementById('gender').value;
+    const category = document.getElementById('category').value;
+    const description = document.getElementById('description').value.trim();
+    const regularPrice = document.getElementById('regularPrice').value.trim();
+    const salePrice = document.getElementById('salePrice').value.trim();
+    const imageInput = document.getElementById('imageInput');
+
+    // Size quantities and increments
+    const sizeFields = ['S', 'M', 'L', 'XL'];
+    const sizeErrors = [];
+
+    // Product Name Validation
+    if (!productName) {
+        displayErrorMessage('productName-error', 'Please enter a product name.');
+         event.preventDefault();
+        isValid = false;
+    } else if (!/^[a-zA-Z\s]+$/.test(productName)) {
+        displayErrorMessage('productName-error', 'Product name should contain only alphabetic characters.');
+        isValid = false;
+    }
+
+    // Gender Validation
+    if (!gender) {
+        displayErrorMessage('gender-error', 'Please select a gender.');
+        isValid = false;
+    }
+
+    // Category Validation
+    if (!category) {
+        displayErrorMessage('category-error', 'Please select a category.');
+        isValid = false;
+    }
+
+    // Description Validation
+    if (!description) {
+        displayErrorMessage('description-error', 'Please enter a product description.');
+        isValid = false;
+    } else if (description.length < 10) {
+        displayErrorMessage('description-error', 'Description must be at least 10 characters long.');
+        isValid = false;
+    }
+
+    // Price Validation
+    if (!/^\d+(\.\d{1,2})?$/.test(regularPrice) || parseFloat(regularPrice) < 0) {
+        displayErrorMessage('regularPrice-error', 'Please enter a valid non-negative price.');
+        isValid = false;
+    }
+    if (!/^\d+(\.\d{1,2})?$/.test(salePrice) || parseFloat(salePrice) < 0) {
+        displayErrorMessage('salePrice-error', 'Please enter a valid non-negative sale price.');
+        isValid = false;
+    }
+    if (parseFloat(regularPrice) <= parseFloat(salePrice)) {
+        displayErrorMessage('regularPrice-error', 'Regular price must be greater than sale price.');
+        isValid = false;
+    }
+
+    // Size Validation
+    sizeFields.forEach(size => {
+        const qty = document.getElementById(`size${size}Qty`).value.trim();
+        const increment = document.getElementById(`size${size}Increment`).value.trim();
+
+        if (qty && (!/^\d+$/.test(qty) || parseInt(qty) < 0)) {
+            displayErrorMessage(`size${size}Qty-error`, `Size ${size} quantity must be a non-negative number.`);
+            sizeErrors.push(false);
+        }
+        if (increment && (!/^\d+$/.test(increment) || parseInt(increment) < 0)) {
+            displayErrorMessage(`size${size}Increment-error`, `Size ${size} increment must be a non-negative number.`);
+            sizeErrors.push(false);
+        }
+    });
+
+    if (sizeErrors.includes(false)) isValid = false;
+
+    // Image Validation
+      if (imageInput.files.length === 0) {
+        displayErrorMessage('imageInput-error', 'Please upload at least one image.');
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+     function displayErrorMessage(elementId, message) {
+       const errorElement = document.getElementById(elementId);
+       errorElement.innerText = message;
+        errorElement.style.display = "block";
+      }
+
+    function clearErrorMessages() {
+        const errorElements = document.getElementsByClassName('error-message');
+        Array.from(errorElements).forEach(element => {
+        element.innerText = '';
+        element.style.display = "none";
+     });
+  }
+
+
+
+
+
+    //Get references to the dropdowns for category menu
+        const genderDropdown = document.getElementById("gender");
+        const categoryDropdown = document.getElementById("category");
+        const categories = <%- JSON.stringify(cat) %>;
+
+         genderDropdown.addEventListener("change", () => {
+         const selectedGender = genderDropdown.value;
+
+         categoryDropdown.innerHTML = '<option value="" disabled selected>Choose category...</option>';
+
+          if (selectedGender) {
+         const filteredCategories = categories.filter(cat => cat.gender === selectedGender);
+
+         filteredCategories.forEach(category => {
+          const option = document.createElement("option");
+          option.value = category.name;
+          option.textContent = category.name;
+          categoryDropdown.appendChild(option);
+          });
+
+         categoryDropdown.disabled = filteredCategories.length === 0;
+        } else {
+         categoryDropdown.disabled = true;
+       }
+     })
+
+
+    
+
+
+        // cropper
+
+         const imageInput = document.getElementById('imageInput');
+         const imagePreview = document.getElementById('imagePreview');
+         const cropModal = document.getElementById('cropModal');
+         const cropImage = document.getElementById('cropImage');
+         const cropConfirm = document.getElementById('cropConfirm');
+         const cropCancel = document.getElementById('cropCancel');
+         let cropper = null;
+         let imageFiles = [];
+        let selectedThumbnail = null;
+        const MAX_IMAGES = 5;
+
+// Event Listener for image input change
+imageInput.addEventListener('change', handleImageInput);
+
+// Event Listener for cancel crop
+cropCancel.addEventListener('click', cancelCrop);
+
+// Event Listener for crop confirm
+cropConfirm.addEventListener('click', confirmCrop);
+
+
+
+// Handle image input
+function handleImageInput(e) {
+    const files = e.target.files;
+    
+    if (files.length + imageFiles.length > MAX_IMAGES) {
+      Swal.fire({
+            icon: 'error',
+            title: 'Limit Exceeded',
+            text: `You can only upload up to ${MAX_IMAGES} images.`,
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+        });
+        return;
+    }
+
+    Array.from(files).forEach(file => {
+        if (!file.type.startsWith("image/")) {
+          Swal.fire({
+                icon: 'error',
+                title: 'Invalid File Type',
+                text: "Please upload only image files.",
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+            });
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageSrc = e.target.result;
+            showCropModal(imageSrc);
+        };
+        reader.readAsDataURL(file);
+    });
+    console.log(imageFiles); 
+}
+
+
+// Show crop modal
+function showCropModal(imageSrc) {
+    cropImage.src = imageSrc;
+    cropModal.classList.remove('hidden');
+
+    cropper = new Cropper(cropImage, {
+        aspectRatio: 1,
+        viewMode: 2,
+        autoCropArea: 0.8,
+        scalable: true,
+        zoomable: true,
+        responsive: true,
+        minCropBoxWidth: 100,
+        minCropBoxHeight: 100,
+    });
+}
+
+// Cancel crop
+function cancelCrop() {
+    cropper.destroy();
+    cropModal.classList.add('hidden');
+}
+
+// Confirm crop
+function confirmCrop(event) {
+    event.preventDefault(); // Prevent form submission or page redirection
+    
+    const canvas = cropper.getCroppedCanvas();
+    canvas.toBlob((blob) => {
+        const fileName = `cropped-${Date.now()}.png`;
+        const file = new File([blob], fileName, { type: "image/png" });
+
+        imageFiles.push(file);
+        addImageToPreview(file);
+        cropModal.classList.add('hidden');
+        cropper.destroy();
+    });
+}
+
+
+// Add image to preview section
+function addImageToPreview(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const imageSrc = e.target.result;
+        const imageRow = createImageRow(imageSrc, file);
+        imagePreview.appendChild(imageRow);
+    };
+    reader.readAsDataURL(file);
+}
+
+// Create image row element
+// Create image row element
+function createImageRow(imageSrc, file) {
+    const imageRow = document.createElement('div');
+    imageRow.classList.add('flex', 'items-center', 'justify-between', 'border', 'rounded-lg', 'p-6', 'bg-gray-50', 'my-3', 'w-full', 'shadow-lg', 'hover:shadow-xl', 'transition-shadow');
+
+    // Left side: Image and file name
+    const imageInfo = document.createElement('div');
+    imageInfo.classList.add('flex', 'items-center', 'space-x-4');  // Increased space between image and name
+
+    const imgElement = document.createElement('img');
+    imgElement.src = imageSrc;
+    imgElement.alt = file.name;
+    imgElement.classList.add('w-12', 'h-12', 'rounded-lg', 'object-cover');  // Larger image size with rounded corners
+
+    const fileName = document.createElement('p');
+    fileName.textContent = file.name;
+    fileName.classList.add('text-base', 'font-medium', 'truncate', 'max-w-[200px]', 'text-gray-800');  // Slightly larger text, better color contrast
+
+    imageInfo.appendChild(imgElement);
+    imageInfo.appendChild(fileName);
+
+    // Right side: Buttons for Set Thumbnail and Delete
+    const buttonContainer = createButtonContainer(imageRow,file);
+
+    imageRow.appendChild(imageInfo);
+    imageRow.appendChild(buttonContainer);
+
+    return imageRow;
+}
+
+
+// Create Set Thumbnail button
+function createButtonContainer(imageRow,file) {
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('flex', 'items-center', 'space-x-4');
+
+    // Set Thumbnail button
+    const setThumbnailButton = document.createElement('button');
+    setThumbnailButton.classList.add('text-green-500', 'hover:text-green-700', 'set-thumbnail', 'transition-colors', 'duration-200');
+    setThumbnailButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+    `;
+    setThumbnailButton.addEventListener('click', () => setThumbnail(setThumbnailButton));
+
+    // Delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('text-red-500', 'hover:text-red-700', 'delete-image', 'transition-colors', 'duration-200');
+    deleteButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    `;
+    deleteButton.addEventListener('click', () => confirmDelete(imageRow,file));
+
+    buttonContainer.appendChild(setThumbnailButton);
+    buttonContainer.appendChild(deleteButton);
+
+    return buttonContainer;
+}
+
+// Create Delete button
+function createDeleteButton(imageRow,file) {
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('text-red-500', 'hover:text-red-700');
+    deleteButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    `;
+    deleteButton.addEventListener('click', () => confirmDelete(imageRow,file));
+    return deleteButton;
+}
+
+// Set thumbnail for selected image
+function setThumbnail(imageRow) {
+    const buttons = document.querySelectorAll('.set-thumbnail');
+    buttons.forEach((btn) => {
+        btn.classList.remove('text-green-500', 'hover:text-green-700');
+        btn.classList.add('text-blue-500', 'hover:text-blue-700');
+    });
+    const setThumbnailButton = imageRow.querySelector('.set-thumbnail');
+    setThumbnailButton.classList.remove('text-blue-500', 'hover:text-blue-700');
+    setThumbnailButton.classList.add('text-green-500', 'hover:text-green-700');
+}
+
+// Confirm delete with SweetAlert
+function confirmDelete(imageRow,file) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to undo this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const indexToDelete = imageFiles.indexOf(file);           
+            if (indexToDelete !== -1) {
+                imageFiles.splice(indexToDelete, 1);
+                console.log(`Image deleted. Remaining files: ${imageFiles.length}`);
+            }
+
+            imageRow.remove();
+            Swal.fire('Deleted!', 'Your image has been deleted.', 'success');
+        }
+    });
+}
+
+      </script>
+      
+      </div>
+
 <%- include('../partials/admin/footer') %> 
- <!-- Include footer from partials -->

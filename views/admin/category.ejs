@@ -21,11 +21,16 @@
     <!-- Search Bar and Dropdown Filters -->
     <div class="mb-4 flex items-center justify-between flex-wrap gap-4">
       <!-- Search Bar -->
-      <input type="text" placeholder="Search categories..." 
-        class="w-full md:w-1/2 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+      <input 
+      type="text" 
+      id="searchBar" 
+      placeholder="Search categories by name..." 
+      class="w-full md:w-1/2 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+    />
+    
     
       <!-- Dropdown Filter -->
-      <div class="relative">
+      <div class="relative" style="display: none;">
         <select id="filterDropdown" onchange="filterCategories(this.value)" 
           class="p-3 w-full md:w-48 text-gray-700  border border-yellow-500 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
           <option value="All">All</option>
@@ -49,66 +54,67 @@
           </tr>
         </thead>
         <tbody id="categoryTable">
-          <% cat.reverse().forEach((category, index) => { %>
-            <tr class="border-b hover:bg-yellow-50">
-              <td class="p-4"><%= index + 1 %></td>
-              <td class="p-4"><%= category.name %></td>
-              <td class="p-4"><%= category.description %></td>
-              <td class="p-4"><%= category.gender %></td>
-              <td class="p-4">
-                <button 
-                  onclick="toggleStatus(this)" 
-                  class="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600">
-                  Active
-                </button>
-              </td>
-              <td class="p-4">
-                <button class="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600">
-                  Edit
-                </button>
-              </td>
-            </tr>
-          <% }) %>
-          <% if (cat.length === 0) { %>
+          <% if (cat.length > 0) { %>
+            <% cat.forEach((category, index) => { %>
+              <tr class="border-b hover:bg-yellow-50">
+                <td class="p-4"><%= (currentPage - 1) * 5 + index + 1 %></td>
+                <td class="p-4"><%= category.name %></td>
+                <td class="p-4"><%= category.description %></td>
+                <td class="p-4"><%= category.gender %></td>
+                <td class="p-4">
+                  <button 
+                    onclick="toggleStatus(this)" 
+                    class="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600">
+                    Active
+                  </button>
+                </td>
+                <td class="p-4">
+                  <button class="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600">
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
             <tr>
               <td colspan="5" class="text-center p-4">No categories found</td>
             </tr>
           <% } %>
-          
         </tbody>
+        
       </table>
     </div>
-
-    <!-- Pagination -->
-    <!-- <div class="flex items-center justify-center mt-4 space-x-2">
-      <button class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">&laquo;</button>
-      <button class="px-4 py-2 text-gray-700 bg-yellow-500 text-white rounded hover:bg-yellow-600">1</button>
-      <button class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">2</button>
-      <button class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">3</button>
-      <button class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">&raquo;</button>
-    </div> -->
    
-    <div class="pagination-container">
-      <% if (currentPage > 1) { %>
-      <a href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
-      <% } %> <% for (let i = 1; i <= totalPages; i++) { %> <% if (i ===
-      currentPage) { %>
-      <span class="current-page"><%= i %></span>
-      <% } else { %>
-      <a href="?page=<%= i %>"><%= i %></a>
-      <% } %> <% } %> <% if (currentPage < totalPages) { %>
-      <a href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+    <div class="flex items-center justify-center mt-4 space-x-2">
+      <!-- Previous Button -->
+      <a 
+        href="?page=<%= currentPage > 1 ? currentPage - 1 : 1 %>" 
+        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= currentPage === 1 ? 'cursor-not-allowed opacity-50' : '' %>">
+        &laquo;
+      </a>
+    
+      <!-- Page Numbers -->
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <a 
+          href="?page=<%= i %>" 
+          class="px-4 py-2 rounded <%= currentPage === i ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+          <%= i %>
+        </a>
       <% } %>
-      </div>
-
-
-
+    
+      <!-- Next Button -->
+      <a 
+        href="?page=<%= currentPage < totalPages ? currentPage + 1 : totalPages %>" 
+        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= currentPage === totalPages ? 'cursor-not-allowed opacity-50' : '' %>">
+        &raquo;
+      </a>
+    </div>
 
   </div>
 </div>
 
 <!-- Add Category Modal -->
-<div id="addCategoryModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+<div id="addCategoryModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
   <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
     <h2 class="text-xl font-bold text-yellow-500 mb-4">Add Category</h2>
     
@@ -152,6 +158,17 @@
 
 
   <script>
+
+
+
+window.onload = function() {
+    const savedFilter = localStorage.getItem('selectedGender');
+    if (savedFilter) {
+      document.getElementById('filterDropdown').value = savedFilter;
+      filterCategories(); // Apply the saved filter when the page loads
+    }
+  }
+
     // Open modal
     function openModal() {
       document.getElementById('addCategoryModal').style.display = 'flex';
@@ -160,12 +177,42 @@
     // Close modal
     function closeModal() {
       document.getElementById('addCategoryModal').style.display = 'none';
+      resetForm();
     }
 
-    // Default Filter: All
-    function filterCategories(filter) {
-      console.log(`Filter selected: ${filter}`);
-    }
+
+   // Function to reset all form fields inside the modal
+function resetForm() {
+  const form = document.getElementById('addCategoryForm');
+  form.reset(); // Reset all input fields to default (empty)
+
+  // Clear error messages if any
+  document.getElementById('name-error').textContent = '';
+  document.getElementById('description-error').textContent = '';
+  document.getElementById('gender-error').textContent = '';
+}
+
+
+  // Filter categories by gender
+  function filterCategories() {
+    const genderFilter = document.getElementById('filterDropdown').value;
+
+    // Save the selected filter to localStorage
+    localStorage.setItem('selectedGender', genderFilter);
+
+    const rows = document.querySelectorAll('#categoryTable tr');
+
+    rows.forEach(row => {
+      const gender = row.cells[3].textContent.trim(); // Get gender from the row
+
+      // If the filter is 'All', show all rows, otherwise show rows matching the selected gender
+      if (genderFilter === 'All' || gender === genderFilter) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
 
     // Toggle Status Button
     function toggleStatus(button) {
@@ -175,54 +222,55 @@
     }
 
     
-    function handleFormSubmit(event){
-      event.preventDefault();
+    function handleFormSubmit(event) {
+  event.preventDefault();
 
-      if(!validateForm){
-        return
+  // Perform validation
+  if (!validateForm()) {
+    return; // Stop if validation fails
+  }
+
+  const name = document.getElementById("Name").value.trim();
+  const description = document.getElementById("Description").value.trim();
+  const genderElement = document.querySelector('input[name="gender"]:checked');
+  const gender = genderElement ? genderElement.value : null;
+
+  fetch('/admin/addCategory', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({ name, description, gender }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        return response.json().then((err) => {
+          throw new Error(err.error); // Pass backend error
+        });
       }
-      const name= document.getElementById("Name").value.trim();
-      const description = document.getElementById("Description").value.trim();
-      const genderElement = document.querySelector('input[name="gender"]:checked');
-      const gender = genderElement ? genderElement.value : null;
-
-      fetch('/admin/addCategory',{
-        method:'POST',
-        headers:{
-          'content-type':'application/json'
-        },
-        body:JSON.stringify({name,description,gender})
-      })
-      .then(response=>{
-        if(!response.ok){
-          return respone.json().then(err=>{
-
-            throw new Error(err.error);
-
-          })
-        }
-        return response.json();
-      })
-      .then(data=>{
-          location.reload()
-      })
-
-    .catch(error=>{
-      if(error.message ==="category already exists"){
-        Swal.fire({
-          icon:'error',
-          title:"Oops",
-          text:'category already exists'
-        })
-      }else {
-        Swal.fire({
-          icon:"error",
-          title:'Oops',
-          text:'An error occured while adding the category'
-        })
-      }
+      return response.json();
     })
-    }
+    .then((data) => {
+    // Success SweetAlert
+    Swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: data.message || 'Category added successfully', // Use backend message
+    }).then(() => {
+      location.reload(); // Reload the page after the alert
+    });
+  })
+   
+  .catch((error) => {
+    // Error SweetAlert
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops',
+      text: error.message || 'An error occurred',
+    });
+  });
+}
+
 
 
     function validateForm() {
@@ -261,11 +309,15 @@
     }
 
 
-    function displayErrorMessage(elementId,message){
-      var errorElement = document.getElementById(elementId);
-      errorElement.innerHTML=message;
-      errorElement.style.display = "block";
-        }
+    function displayErrorMessage(elementId, message) {
+  const errorElement = document.getElementById(elementId);
+  if (errorElement) {
+    errorElement.innerHTML = message;
+    errorElement.style.color = "red"; // Customizing the error text color
+    errorElement.style.display = "block";
+  }
+}
+
 
 
         function clearErrorMessage(){
@@ -275,6 +327,31 @@
              element.style.display="none"
            });
         }
+  
+        // search bar
+      // Function to escape special characters in the search query
+function escapeRegex(string) {
+  return string.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, '\\$&');  // Escape special regex characters
+}
+
+document.getElementById('searchBar').addEventListener('input', function () {
+  const searchValue = this.value.trim();  // Get the search term
+  const escapedSearchValue = escapeRegex(searchValue);  // Escape special characters
+  
+  // Use the Fetch API to send the escaped search query to the server
+  fetch(`/admin/category?search=${encodeURIComponent(escapedSearchValue)}&page=1`)
+    .then(response => response.text())  // Get the response as HTML
+    .then(html => {
+      // Parse the new HTML and update the table body with the new data
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const newTableBody = doc.querySelector('#categoryTable').innerHTML;
+      document.querySelector('#categoryTable').innerHTML = newTableBody;  // Update table
+    })
+    .catch(error => console.error('Error fetching search results:', error));
+});
+
+
   </script>
 
 </div>
