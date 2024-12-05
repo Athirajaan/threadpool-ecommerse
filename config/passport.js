@@ -8,13 +8,13 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/auth/google/callback",
+      callbackURL: "/auth/google/callback", // Ensure this matches your route
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
         let user = await User.findOne({ googleId: profile.id });
         if (user) {
-          return done(null, user);
+          return done(null, user); // User already exists
         } else {
           user = new User({
             name: profile.displayName,
@@ -22,7 +22,7 @@ passport.use(
             googleId: profile.id,
           });
           await user.save();
-          return done(null, user);
+          return done(null, user); // New user created
         }
       } catch (error) {
         if (error.code === 11000 && error.keyPattern.googleId) {
@@ -31,12 +31,13 @@ passport.use(
             message: "A user with this Google account already exists.",
           });
         } else {
-          return done(error, null);
+          return done(error, null); // General error
         }
       }
-    },
-  ),
+    }
+  )
 );
+
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });

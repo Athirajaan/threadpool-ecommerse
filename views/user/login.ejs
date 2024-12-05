@@ -92,5 +92,11 @@
     </div>
   </div>
 
+    <script>
+  // This script ensures the user can't go back to the login page
+  if (window.history.replaceState) {
+    window.history.replaceState(null, '', '/');
+  }
+</script>
 </body>
 </html>

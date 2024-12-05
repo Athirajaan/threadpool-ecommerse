@@ -1,117 +1,101 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ThreadPool Homepage</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 font-sans antialiased">
- 
+<%- include('../partials/user/userheader') %> 
 
-  <!-- Hero Section -->
-  <section class="flex flex-col md:flex-row items-center justify-between p-6 bg-gray-100 mt-8 rounded-lg mx-auto max-w-6xl shadow-md">
-    <div class="flex-1 space-y-4">
-      <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900">
-        LET’S <br>EXPLORE <span class="text-yellow-500">GYM</span> CLOTHES.
-      </h2>
-      <p class="text-gray-700 text-base md:text-lg">Live for Influential and Innovative fashion!</p>
-      <button class="mt-4 px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800">Shop Now</button>
+
+<!-- Hero Section -->
+<section class="flex flex-col md:flex-row items-center justify-between p-6 bg-gray-100 mt-8 rounded-lg mx-auto max-w-full shadow-md h-[200px] md:h-[300px] bg-cover bg-center" style="background-image: url('/images/Screenshot 2024-11-13 094925.png');">
+  <!-- <div class="flex-1 space-y-4 bg-black bg-opacity-50 p-6 rounded-lg">
+    <h2 class="text-4xl md:text-5xl font-extrabold text-white leading-tight">
+      LET’S <br>EXPLORE <span class="text-yellow-500">GYM</span> CLOTHES.
+    </h2>
+    <p class="text-white text-lg md:text-xl">Live for Influential and Innovative fashion!</p>
+    <button class="mt-6 px-8 py-3 bg-yellow-500 text-black rounded-md hover:bg-yellow-400 text-lg md:text-xl">Shop Now</button>
+  </div> -->
+</section>
+
+<h2 class="text-xl md:text-2xl lg:text-3xl font-bold mb-4 my-3 mx-14">Our Top Sellerse</h2>
+<!-- New Arrivals Section -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-5 mx-3">
+  <% for (let i = 0; i < products.length; i++) { %>
+    <!-- Dynamic Product Card -->
+    <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center space-y-4">
+      <!-- Link to Product View -->
+      <a href="/productDetails?id=<%= products[i]._id %>" class="block w-full">
+        <img 
+          src="<%= products[i].productImage[0] %>" 
+          alt="Product Image" 
+          class="w-[90%] h-[300px] object-cover rounded-lg">
+      </a>
+      <a href="/product/<%= products[i]._id %>" class="block text-lg font-semibold text-gray-800 hover:underline">
+        <%= products[i].productName %>
+      </a>
+      <p class="text-gray-600">Explore Now!</p>
     </div>
-    <div class="flex-1">
-      <img src="https://via.placeholder.com/400" alt="Gym Clothing" class="w-full h-auto object-cover rounded-lg">
+  <% } %>
+</section>
+
+
+<!-- Sale Banner -->
+<div class="px-4 md:px-8 lg:px-16 py-8 bg-white">
+  <div class="flex flex-col md:flex-row bg-gray-100 p-4 md:p-8 lg:p-12 rounded-lg shadow-md mb-8">
+    <div class="flex-1 mb-4 md:mb-0">
+      <img src="https://via.placeholder.com/600x400" alt="Sale Banner Image" class="rounded-lg w-full h-full object-cover" />
     </div>
-  </section>
-
-  <!-- New Arrivals Section -->
-  <section class="max-w-6xl mx-auto p-6 mt-10">
-    <h3 class="text-2xl font-bold text-gray-900 mb-6">NEW <span class="text-yellow-500">ARRIVALS</span></h3>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      
-      <!-- Product Card 1 -->
-      <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center space-y-4">
-        <img src="https://via.placeholder.com/200" alt="Hoodies & Sweatshirt" class="w-full h-64 object-cover rounded-lg">
-        <h4 class="text-lg font-semibold text-gray-800">Hoodies & Sweatshirt</h4>
-        <p class="text-gray-600">Explore Now!</p>
-      </div>
-
-      <!-- Product Card 2 -->
-      <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center space-y-4">
-        <img src="https://via.placeholder.com/200" alt="Coats & Parkas" class="w-full h-64 object-cover rounded-lg">
-        <h4 class="text-lg font-semibold text-gray-800">Coats & Parkas</h4>
-        <p class="text-gray-600">Explore Now!</p>
-      </div>
-
-      <!-- Product Card 3 -->
-      <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center space-y-4">
-        <img src="https://via.placeholder.com/200" alt="Tees & T-Shirt" class="w-full h-64 object-cover rounded-lg">
-        <h4 class="text-lg font-semibold text-gray-800">Tees & T-Shirt</h4>
-        <p class="text-gray-600">Explore Now!</p>
-      </div>
-      
-    </div>
-  </section>
-  
-  <div class="px-4 md:px-8 lg:px-16 py-8 bg-white">
-    <!-- Sale Banner -->
-    <div class="flex flex-col md:flex-row bg-gray-100 p-4 md:p-8 lg:p-12 rounded-lg shadow-md mb-8">
-        <div class="flex-1 mb-4 md:mb-0">
-            <img src="https://via.placeholder.com/600x400" alt="Sale Banner Image" class="rounded-lg w-full h-auto object-cover" />
-        </div>
-        <div class="flex-1 md:pl-8 flex flex-col justify-center">
-            <h2 class="text-yellow-400 text-2xl md:text-3xl lg:text-4xl font-bold mb-2">PAYDAY SALE NOW</h2>
-            <p class="text-gray-700 text-md md:text-lg lg:text-xl mb-4">
-                Spend a minimum of $100 to get a 30% off voucher code for your next purchase. <br> 1 Nov - 30 Dec 2024
-            </p>
-            <p class="text-gray-500 text-sm mb-6">*Terms & Conditions apply</p>
-            <button class="bg-black text-white py-2 px-4 rounded hover:bg-gray-800 text-md md:text-lg lg:text-xl">
-                SHOP NOW
-            </button>
-        </div>
-    </div>
-
-    <!-- Collections Section -->
-    <h2 class="text-xl md:text-2xl lg:text-3xl font-bold mb-4 text-gray-800">COLLECTIONS</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Collection Item 1 -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <img src="https://via.placeholder.com/400x400" alt="Product Image 1" class="w-full h-auto object-cover" />
-            <div class="p-4">
-                <p class="text-gray-600 text-sm font-medium">Trending on Instagram</p>
-                <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
-            </div>
-        </div>
-        
-        <!-- Collection Item 2 -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <img src="https://via.placeholder.com/400x400" alt="Product Image 2" class="w-full h-auto object-cover" />
-            <div class="p-4">
-                <p class="text-gray-600 text-sm font-medium">All Under $40</p>
-                <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
-            </div>
-        </div>
-        
-        <!-- Collection Item 3 -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <img src="https://via.placeholder.com/400x400" alt="Product Image 3" class="w-full h-auto object-cover" />
-            <div class="p-4">
-                <p class="text-gray-600 text-sm font-medium">Trending on Instagram</p>
-                <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
-            </div>
-        </div>
-        
-        <!-- Collection Item 4 -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <img src="https://via.placeholder.com/400x400" alt="Product Image 4" class="w-full h-auto object-cover" />
-            <div class="p-4">
-                <p class="text-gray-600 text-sm font-medium">All Under $40</p>
-                <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
-            </div>
-        </div>
+    <div class="flex-1 md:pl-8 flex flex-col justify-center">
+      <h2 class="text-yellow-400 text-2xl md:text-3xl lg:text-4xl font-bold mb-2">PAYDAY SALE NOW</h2>
+      <p class="text-gray-700 text-md md:text-lg lg:text-xl mb-4">
+        Spend a minimum of $100 to get a 30% off voucher code for your next purchase. <br> 1 Nov - 30 Dec 2024
+      </p>
+      <p class="text-gray-500 text-sm mb-6">*Terms & Conditions apply</p>
+      <button class="bg-black text-white py-2 px-4 rounded hover:bg-gray-800 text-md md:text-lg lg:text-xl">
+        SHOP NOW
+      </button>
     </div>
   </div>
-    
+  
+  <!-- Collections Section -->
+  <h2 class="text-xl md:text-2xl lg:text-3xl font-bold mb-4 text-gray-800">COLLECTIONS</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Collection Item 1 -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <img src="https://via.placeholder.com/400x400" alt="Product Image 1" class="w-full h-auto object-cover" />
+      <div class="p-4">
+        <p class="text-gray-600 text-sm font-medium">Trending on Instagram</p>
+        <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
+      </div>
+    </div>
+
+    <!-- Collection Item 2 -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <img src="https://via.placeholder.com/400x400" alt="Product Image 2" class="w-full h-auto object-cover" />
+      <div class="p-4">
+        <p class="text-gray-600 text-sm font-medium">All Under $40</p>
+        <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
+      </div>
+    </div>
+
+    <!-- Collection Item 3 -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <img src="https://via.placeholder.com/400x400" alt="Product Image 3" class="w-full h-auto object-cover" />
+      <div class="p-4">
+        <p class="text-gray-600 text-sm font-medium">Trending on Instagram</p>
+        <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
+      </div>
+    </div>
+
+    <!-- Collection Item 4 -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <img src="https://via.placeholder.com/400x400" alt="Product Image 4" class="w-full h-auto object-cover" />
+      <div class="p-4">
+        <p class="text-gray-600 text-sm font-medium">All Under $40</p>
+        <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
 <%- include('../partials/user/userfooter') %> 
-<!-- Include footer from partials -->
-</body>
-</html>
+

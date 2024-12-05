@@ -1,0 +1,212 @@
+<%- include('../partials/user/userheader') %> 
+
+<style>
+.zoom-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.zoom-image {
+  transition: transform 0.1s ease;
+  transform: scale(1);
+}
+
+.zoom-container:hover .zoom-image {
+  transform: scale(1.5); /* Reduced zoom level */
+}
+
+.zoom-container:hover {
+  cursor: zoom-in;
+}
+</style>
+
+<div class="container mx-auto p-8 space-y-12">
+  <!-- Product Layout -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white shadow-lg rounded-lg overflow-hidden">
+    
+    <!-- Left Section: Images -->
+    <div class="p-6 flex">
+      <!-- Thumbnails -->
+      <div class="flex flex-col gap-4 mr-4">
+        <% product.productImage.forEach((image, index) => { %>
+        <img src="<%= image %>" alt="Thumbnail <%= index + 1 %>" class="w-20 h-20 object-cover rounded-lg border border-gray-300 cursor-pointer" onclick="document.getElementById('main-image').src=this.src"/>
+        <% }) %>
+      </div>
+
+      <!-- Main Product Image with Zoom Effect -->
+      <div class="zoom-container w-full h-full">
+        <img id="main-image" src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="zoom-image w-full h-auto object-cover rounded-lg border border-gray-300"/>
+      </div>
+    </div>
+
+    <!-- Right Section: Product Details -->
+    <div class="p-6 flex flex-col justify-between">
+      <!-- Product Title -->
+      <h1 class="text-4xl font-extrabold text-gray-900 "><%= product.productName %></h1>
+
+      <!-- Rating -->
+      <div class="flex items-center space-x-2 text-yellow-400 ">
+        <div class="flex space-x-1">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star-half-alt"></i>
+        </div>
+        <div class="flex items-center space-x-1">
+          <span class=" text-gray-600">4.2</span>
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div class="mb-2">
+        <p class="text-lg text-gray-500 line-through">₹<%= product.regularPrice %></p>
+        <div class="flex items-center space-x-2">
+          <p class="text-2xl font-semibold text-blue-600">₹<%= product.salePrice %></p>
+          <span class="text-lg text-red-600 font-semibold">70% OFF</span>
+        </div>
+      </div>
+      
+      <!-- Size Selection -->
+   <!-- Size Selection Section -->
+<div class="mb-2">
+  <h3 class="text-sm font-semibold text-gray-800 mb-2">Size</h3>
+  <div class="flex items-center gap-3">
+    <% const sizes = ['S', 'M', 'L', 'XL']; %>
+    <% sizes.forEach(size => { %>
+      <% const isDisabled = !product.stock[size]; %>
+      <button 
+        class="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-100 focus:outline-none 
+          <% if (isDisabled) { %> bg-gray-200 cursor-not-allowed <% } %>"
+        <% if (!isDisabled) { %> onclick="updatePrice('<%= size %>')" <% } %>
+        <% if (isDisabled) { %> disabled <% } %>
+      >
+        <%= size %>
+      </button>
+    <% }) %>
+  </div>
+  <a href="#" class="text-sm text-blue-500 mt-2 inline-block hover:underline">Size Guide</a>
+</div>
+
+
+      <!-- Add to Cart and Wishlist -->
+      <div class="flex items-center gap-4 mb-2">
+        <button class="w-full bg-blue-600 text-white text-sm font-medium px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none">Add to Cart</button>
+        <button class="w-full bg-gray-100 text-gray-600 text-sm font-medium px-6 py-3 rounded-lg hover:bg-gray-200 focus:outline-none">Wishlist</button>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <h3 class="text-sm font-semibold text-gray-800 mb-2">Description</h3>
+        <p class="text-sm text-gray-600">
+          <%= product. description %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="mt-8 bg-gray-50 p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold text-gray-900 mb-4">User Reviews</h2>
+    
+    <!-- Example Review -->
+    <div class="border-t border-gray-300 pt-4 mt-4">
+      <div class="flex items-center space-x-2 text-yellow-400">
+        <div class="flex space-x-1">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="far fa-star"></i>
+        </div>
+        <span class="text-sm text-gray-600">(4.5)</span>
+      </div>
+      <p class="text-sm text-gray-600 mt-2">Great product! The fabric is soft, and the fit is perfect. Would definitely buy again!</p>
+      <div class="text-sm text-gray-500 mt-2">By John Doe, 3 days ago</div>
+    </div>
+    <!-- Example Review -->
+    <div class="border-t border-gray-300 pt-4 mt-4">
+      <div class="flex items-center space-x-2 text-yellow-400">
+        <div class="flex space-x-1">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star-half-alt"></i>
+          <i class="far fa-star"></i>
+        </div>
+        <span class="text-sm text-gray-600">(4.0)</span>
+      </div>
+      <p class="text-sm text-gray-600 mt-2">Good quality, but the size runs a bit small. Still a solid choice!</p>
+      <div class="text-sm text-gray-500 mt-2">By Jane Smith, 1 week ago</div>
+    </div>
+  </div>
+</div>
+
+<!-- Similar Products Section -->
+<div>
+  <h2 class="text-3xl font-extrabold text-gray-900 mb-6">Similar Products</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-6">
+    <!-- Product 1 -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out">
+      <img src="https://via.placeholder.com/200" alt="Product 1" class="w-full object-cover rounded-t-lg">
+      <div class="p-4">
+        <h3 class="text-sm font-semibold text-gray-800">Product Name 1</h3>
+        <p class="text-blue-600 font-semibold">$39.99</p>
+      </div>
+    </div>
+    <!-- Product 2 -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out">
+      <img src="https://via.placeholder.com/200" alt="Product 2" class="w-full object-cover rounded-t-lg">
+      <div class="p-4">
+        <h3 class="text-sm font-semibold text-gray-800">Product Name 2</h3>
+        <p class="text-blue-600 font-semibold">$49.99</p>
+      </div>
+    </div>
+    <!-- Product 3 -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out">
+      <img src="https://via.placeholder.com/200" alt="Product 3" class="w-full object-cover rounded-t-lg">
+      <div class="p-4">
+        <h3 class="text-sm font-semibold text-gray-800">Product Name 3</h3>
+        <p class="text-blue-600 font-semibold">$29.99</p>
+      </div>
+    </div>
+    <!-- Product 4 -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out">
+      <img src="https://via.placeholder.com/200" alt="Product 4" class="w-full object-cover rounded-t-lg">
+      <div class="p-4">
+        <h3 class="text-sm font-semibold text-gray-800">Product Name 4</h3>
+        <p class="text-blue-600 font-semibold">$59.99</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function  updatePrice(size) {
+    const productId = window.location.pathname.split('/').pop();
+
+    try {
+        const response = await fetch('/getPrice', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId, size }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            document.getElementById('product-price').textContent = `₹${data.price}`;
+        } else {
+            alert(data.error || 'Failed to fetch price');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred');
+    }
+}
+
+</script> 
+
+
+<%- include('../partials/user/userfooter') %> 

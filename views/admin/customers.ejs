@@ -2,6 +2,24 @@
 <!-- Include header from partials -->
 
 <!-- Main Content Area -->
+ <style>
+    .cursor-not-allowed {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.opacity-50 {
+    opacity: 0.5;
+}
+
+ </style>
+<div class="flex-1 p-1">
+    <div class=" mx-7 flex items-center justify-between">
+      <nav class="text-sm text-gray-500">
+        <a href="#" class="hover:text-yellow-500">Dashboard</a> >
+        <a href="#" class="text-gray-800">Customers</a>
+      </nav>      
+    </div>
 <main class="flex-1 p-2 lg:ml-0 transition-all duration-300">
     <div class="bg-white p-2 rounded-lg shadow-md">
         <div class="flex justify-between items-center">
@@ -31,7 +49,7 @@
         <!-- Customer Table -->
         <div class="overflow-x-auto bg-white rounded-lg shadow-md mt-6">
             <table class="min-w-full table-auto">
-                <thead class="bg-yellow-500 text-white">
+                <thead class="bg-yellow-100 border-b-2 border-yellow-500 text-black">
                     <tr>
                         <th class="py-3 px-4 text-left text-sm font-semibold">No.</th>
                         <th class="py-3 px-4 text-left text-sm font-semibold">Name</th>
@@ -50,12 +68,12 @@
                         <td class="py-3 px-4 text-sm text-gray-700"><%= data[i].phone %></td>
                         <td class="py-3 px-4 text-sm text-gray-700">
                             <% if (data[i].isBlocked === false) { %>
-                            <button class="block-btn bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition duration-200" 
+                            <button class="block-btn bg-red-500 text-white w-24 h-10  rounded-lg font-semibold hover:bg-red-600 transition duration-200" 
                                 data-action="block" data-customer-id="<%= data[i].id %>">
                                 Block
                             </button>
                             <% } else { %>
-                            <button class="unblock-btn bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 transition duration-200 ml-2" 
+                            <button class="unblock-btn bg-green-500 text-white w-24 h-10  rounded-lg font-semibold hover:bg-green-600 transition duration-200 ml-2" 
                                 data-action="unblock" data-customer-id="<%= data[i].id %>">
                                 Unblock
                             </button>
@@ -83,33 +101,39 @@
    </div>
    
                                                                                                                                                                                                                                                                                                 
-        <!-- Pagination -->
-        <div class="flex justify-between items-center mt-6">
-            <div class="flex space-x-2">
-                <!-- Previous Button -->
-                <a href="/admin/customers?page=<%= currentPage - 1 %>" 
-                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-200 
-                    <% if (currentPage === 1) { %> cursor-not-allowed opacity-50 <% } %>" 
-                    <% if (currentPage === 1) { %> aria-disabled="true" <% } %>>
-                    Previous
-                 </a>        
 
-                <!-- Page Numbers -->
-                <% for (let page = 1; page <= totalPages; page++) { %>
-                <a href="/admin/customers?page=<%= page %>" 
-                   class="px-4 py-2 text-sm font-semibold text-gray-700 rounded-lg hover:bg-gray-200 transition duration-200 
-                   <%= currentPage === page ? 'bg-yellow-500 text-white' : 'bg-white' %>">
-                    <%= page %>
-                </a>
-                <% } %>
+<!-- Pagination -->
+<div class="flex items-center justify-center mt-4 space-x-2">
+    <!-- Previous Button -->
+    <a 
+        href="?page=<%= currentPage > 1 ? currentPage - 1 : 1 %>" 
+        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 
+        <%= currentPage === 1 ? 'cursor-not-allowed opacity-50' : '' %>">
+        &laquo;
+    </a>
 
-                <!-- Next Button -->
-                <a href="/admin/customers?page=<%= currentPage + 1 %>" 
-                   class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-200" 
-                   <% if (currentPage === totalPages) { %> class="cursor-not-allowed opacity-50" <% } %> 
-                   aria-disabled="true">Next</a>
-            </div>
-        </div>
+    <!-- Page Numbers -->
+    <% for (let i = 1; i <= totalPages; i++) { %>
+        <a 
+            href="?page=<%= i %>" 
+            class="px-4 py-2 rounded 
+            <%= currentPage === i ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+            <%= i %>
+        </a>
+    <% } %>
+
+    <!-- Next Button -->
+    <a 
+        href="?page=<%= currentPage < totalPages ? currentPage + 1 : totalPages %>" 
+        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 
+        <%= currentPage === totalPages ? 'cursor-not-allowed opacity-50' : '' %>">
+        &raquo;
+    </a>
+</div>
+
+
+        
+
     </div>
 </main>
 <script>

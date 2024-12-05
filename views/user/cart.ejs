@@ -1,0 +1,276 @@
+<%- include('../partials/user/userheader') %> 
+
+<div class="max-w-7xl mx-auto p-6">
+    <!-- Main Container -->
+    <div class="flex flex-col lg:flex-row gap-6">
+      <!-- Left: Products Section -->
+      <div class="bg-white w-full lg:w-2/3 p-6 rounded-lg shadow-md">
+        <!-- Actions on Top -->
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-semibold text-pink-500">
+            Your Cart (2 Items)
+          </h2>
+          <div class="flex items-center space-x-4">
+            <button class="text-sm text-blue-500 font-semibold hover:underline" onclick="showModal('removeAllModal')">
+              Remove All
+            </button>
+            <button class="text-sm text-blue-500 font-semibold hover:underline" onclick="showModal('moveAllToWishlistModal')">
+              Move All to Wishlist
+            </button>
+          </div>
+        </div>
+    
+        <!-- Cart Items -->
+        <div class="space-y-6">
+          <!-- Item 1 -->
+          <div class="flex items-start">
+            <img src="https://via.placeholder.com/100" alt="Athena Dress" class="w-24 h-24 rounded-lg">
+            <div class="ml-4 flex-1">
+              <h3 class="text-sm font-medium">Athena Women Solid Off-Shoulder Bodycon Midi Dress</h3>
+              <p class="text-sm text-gray-600">Sold by: Apex Apparels</p>
+              <div class="flex items-center space-x-4 mt-2">
+                <button class="border border-gray-300 rounded-lg px-2 py-1 text-sm" onclick="openSizeModal()">
+                  Size: XXL
+                </button>
+                <button class="border border-gray-300 rounded-lg px-2 py-1 text-sm" onclick="openQuantityModal()">
+                  Qty: 10
+                </button>
+              </div>
+              <p class="text-sm text-green-500 font-medium mt-2">7 days return available</p>
+            </div>
+            <div class="text-right">
+              <p class="text-lg font-semibold text-gray-900">₹12,240</p>
+              <p class="text-sm text-gray-400 line-through">₹24,990</p>
+              <p class="text-sm text-green-500 font-medium">51% OFF</p>
+              <button class="mt-4 text-red-500 hover:text-red-700" onclick="showModal('removeItemModal')">
+                Remove
+              </button>
+            </div>
+          </div>
+    
+          <!-- Modals for Product Actions -->
+          <!-- Add the modal code from the previous message here -->
+    
+        </div>
+      </div>
+    
+      <!-- Right: Price Details Section -->
+      <div class="bg-white w-full lg:w-1/3 p-6 rounded-lg shadow-md">
+        <!-- Apply Coupon Section -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold mb-4">Apply Coupon</h3>
+          <div class="flex items-center space-x-4">
+            <!-- Coupon Dropdown -->
+            <select id="couponDropdown" class="w-2/3 border border-gray-300 rounded-lg px-4 py-2 text-sm">
+              <option value="">Select a Coupon</option>
+              <option value="NEW10">NEW10 - 10% Off</option>
+              <option value="FREESHIP">FREESHIP - Free Shipping</option>
+              <option value="SAVE20">SAVE20 - ₹20 Off</option>
+            </select>
+            <!-- Apply Button -->
+            <button id="applyCouponBtn" class="w-1/3 bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-600">
+              Apply
+            </button>
+          </div>
+          <!-- Dialog/Feedback Message -->
+          <div id="couponFeedback" class="mt-4 hidden text-sm rounded-lg p-3 text-white">
+            <!-- Dynamic messages will appear here -->
+          </div>
+        </div>
+    
+        <!-- Price Details Section -->
+        <h3 class="text-lg font-semibold mb-4">Price Details (2 Items)</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between text-sm text-gray-600">
+            <p>Total MRP:</p>
+            <p>₹26,389</p>
+          </div>
+          <div class="flex justify-between text-sm text-gray-600">
+            <p>Discount on MRP:</p>
+            <p>-₹13,674</p>
+          </div>
+          <div class="flex justify-between text-sm text-gray-600">
+            <p>Coupon Discount:</p>
+            <p id="couponDiscount">-₹0</p>
+          </div>
+          <div class="flex justify-between text-sm text-gray-600">
+            <p>Platform Fee:</p>
+            <p>Free</p>
+          </div>
+          <div class="flex justify-between text-sm text-gray-600">
+            <p>Shipping Fee:</p>
+            <p>Free</p>
+          </div>
+        </div>
+        <div class="flex justify-between mt-6 text-lg font-semibold">
+          <p>Total Amount:</p>
+          <p id="totalAmount">₹11,515</p>
+        </div>
+        <button class="mt-6 w-full bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600">
+          PLACE ORDER
+        </button>
+      </div>
+    </div>
+    
+    <!-- Insert Modals Below Here -->
+    <!-- Example of Remove All Modal -->
+    <div id="removeAllModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+      <div class="bg-white p-4 rounded-lg shadow-lg w-96">
+        <p class="text-sm text-gray-800 mb-4">Are you sure you want to remove these products?</p>
+        <div class="flex justify-end space-x-4">
+          <button class="text-red-500 hover:text-red-700" onclick="removeAllItems()">Remove</button>
+          <button class="text-blue-500 hover:text-blue-700" onclick="moveAllToWishlist()">Move to Wishlist</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Other modals go here (like 'moveAllToWishlistModal' and 'removeItemModal') -->
+    
+<!-- Move All to Wishlist Modal -->
+<div id="moveAllToWishlistModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+  <div class="bg-white p-4 rounded-lg shadow-lg w-96">
+    <p class="text-sm text-gray-800 mb-4">Are you sure you want to move these items to the wishlist?</p>
+    <div class="flex justify-end space-x-4">
+      <button class="text-gray-500 hover:text-gray-700" onclick="closeModal('moveAllToWishlistModal')">Cancel</button>
+      <button class="text-blue-500 hover:text-blue-700" onclick="moveAllToWishlist()">Move to Wishlist</button>
+    </div>
+  </div>
+</div>
+
+<!-- Remove Single Item Modal -->
+<div id="removeItemModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+  <div class="bg-white p-4 rounded-lg shadow-lg w-96">
+    <p class="text-sm text-gray-800 mb-4">Are you sure you want to remove this item from the cart?</p>
+    <div class="flex justify-end space-x-4">
+      <button class="text-red-500 hover:text-red-700" onclick="removeItem()">Remove</button>
+      <button class="text-blue-500 hover:text-blue-700" onclick="moveToWishlist()">Move to Wishlist</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="sizeModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+  <div class="bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-lg font-semibold mb-4">Select Size</h2>
+    <div class="grid grid-cols-4 gap-4">
+      <button class="py-2 px-4 border rounded-lg">S</button>
+      <button class="py-2 px-4 border rounded-lg">M</button>
+      <button class="py-2 px-4 border rounded-lg">L</button>
+      <button class="py-2 px-4 border rounded-lg">XL</button>
+    </div>
+    <button class="mt-4 bg-pink-500 text-white py-2 px-4 rounded-lg" onclick="closeModal('sizeModal')">Done</button>
+  </div>
+</div>
+
+<div id="quantityModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+  <div class="bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-lg font-semibold mb-4">Select Quantity</h2>
+    <div class="grid grid-cols-5 gap-4">
+      <button class="py-2 px-4 border rounded-lg">1</button>
+      <button class="py-2 px-4 border rounded-lg">2</button>
+      <button class="py-2 px-4 border rounded-lg">3</button>
+      <button class="py-2 px-4 border rounded-lg">4</button>
+      <button class="py-2 px-4 border rounded-lg">5</button>
+    </div>
+    <button class="mt-4 bg-pink-500 text-white py-2 px-4 rounded-lg" onclick="closeModal('quantityModal')">Done</button>
+  </div>
+</div>
+
+     
+
+  <script>
+    const applyCouponBtn = document.getElementById('applyCouponBtn');
+    const couponDropdown = document.getElementById('couponDropdown');
+    const couponFeedback = document.getElementById('couponFeedback');
+    const couponDiscount = document.getElementById('couponDiscount');
+    const totalAmount = document.getElementById('totalAmount');
+
+    const originalTotal = 11515; 
+    const coupons = {
+      NEW10: 0.1,
+      FREESHIP: 0,
+      SAVE20: 20,
+    };
+
+    applyCouponBtn.addEventListener('click', () => {
+      const selectedCoupon = couponDropdown.value;
+      if (!selectedCoupon) {
+        showFeedback('Please select a coupon!', 'bg-red-500');
+        return;
+      }
+
+      const discount = coupons[selectedCoupon];
+      let discountAmount = 0;
+      if (typeof discount === 'number' && discount < 1) {
+        discountAmount = originalTotal * discount;
+      } else if (typeof discount === 'number') {
+        discountAmount = discount;
+      }
+
+      couponDiscount.textContent = `-₹${discountAmount.toFixed(2)}`;
+      totalAmount.textContent = `₹${(originalTotal - discountAmount).toFixed(2)}`;
+      showFeedback(`Coupon "${selectedCoupon}" applied successfully!`, 'bg-green-500');
+    });
+
+    function showFeedback(message, colorClass) {
+      couponFeedback.textContent = message;
+      couponFeedback.className = `mt-4 text-sm rounded-lg p-3 text-white ${colorClass}`;
+      couponFeedback.classList.remove('hidden');
+      setTimeout(() => {
+        couponFeedback.classList.add('hidden');
+      }, 3000);
+    }
+
+    function openSizeModal() {
+      document.getElementById('sizeModal').classList.remove('hidden');
+    }
+
+    function openQuantityModal() {
+      document.getElementById('quantityModal').classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+      // Function to show a modal
+  function showModal(modalId) {
+    document.getElementById(modalId).classList.remove('hidden');
+  }
+
+  // Function to close a modal
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+  }
+
+  // Actions for the modals
+  function removeAllItems() {
+    console.log('All items removed');
+    closeModal('removeAllModal');
+  }
+
+  function moveAllToWishlist() {
+    console.log('All items moved to wishlist');
+    closeModal('removeAllModal');
+    closeModal('moveAllToWishlistModal');
+  }
+
+  function removeItem() {
+    console.log('Item removed');
+    closeModal('removeItemModal');
+  }
+
+  function moveToWishlist() {
+    console.log('Item moved to wishlist');
+    closeModal('removeItemModal');
+  }
+  </script>
+
+
+
+</div>
+
+
+
+<%- include('../partials/user/userfooter') %> 

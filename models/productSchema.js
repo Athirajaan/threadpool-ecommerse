@@ -24,51 +24,73 @@ const productSchema = new Schema(
       type: Number,
       required: true,
     },
-    sellingPrice: {
+    salePrice: {
       type: Number,
       required: true,
     },
-    productOffer: {
+    createdOn: {
+      type: Date,
+      default: Date.now,
+    },
+    // Size Quantities
+    stock: {
+      S: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      M: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+       L: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+       XL: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+    },
+    totalQuantity: {
       type: Number,
       default: 0,
     },
-    stock: {
-      small: {
-        type: Number,
-        default: 0,
-        min: 0,
-      },
-      medium: {
-        type: Number,
-        default: 0,
-        min: 0,
-      },
-      large: {
-        type: Number,
-        default: 0,
-        min: 0,
-      },
-      extraLarge: {
-        type: Number,
-        default: 0,
-        min: 0,
-      },
-    },
+    
     productImage: {
-      type: [String],
+      type: [String], // Array of image URLs
       required: true,
+    },
+    status: {
+      type: String,
+      enum: ["Available", "out of stock","limited stock"],
+      default: "Available",
     },
     isBlocked: {
       type: Boolean,
       default: false,
     },
-    status: {
-      type: String,
-      enum: ["Available", "out of stock"],
-      default: "Available",
+    addToCartCount: {
+      type: Number,
+      default: 0,
+    },
+    salesCount: {
+      type: Number,
+      default: 0,
+    },
+    wishlistCount: {
+      type: Number,
+      default: 0,
+    },
+    averageRating: {
+      type: Number,
+      default: 0,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const Product = mongoose.model("Product", productSchema);

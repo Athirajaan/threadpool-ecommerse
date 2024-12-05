@@ -5,13 +5,21 @@
     display: none;
   }
 </style>
+<div class="flex-1 p-1">
+  <div class=" mx-7 flex items-center justify-between">
+    <nav class="text-sm text-gray-500">
+      <a href="#" class="hover:text-yellow-500">Dashboard</a> >
+      <a href="#" class="text-gray-800">Category</a>
+    </nav>      
+  </div>
+
 <div class="flex-1">
   <!-- Sidebar -->
 
   <!-- Main content area -->
-  <div class="flex-1 p-6">
+  <div class="flex-1 p-3">
     <!-- Title and button row -->
-    <div class="mb-4 flex items-center justify-between">
+    <div class=" flex items-center justify-between">
       <h1 class="text-xl font-bold text-gray-800">Category Management</h1>
       <button onclick="openModal()" class="px-4 py-2 text-white bg-yellow-500 rounded hover:bg-yellow-600">
         Add Category
@@ -62,15 +70,19 @@
                 <td class="p-4"><%= category.description %></td>
                 <td class="p-4"><%= category.gender %></td>
                 <td class="p-4">
-                  <button 
-                    onclick="toggleStatus(this)" 
-                    class="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600">
-                    Active
-                  </button>
+                  <% if (category.isListed) { %>
+                    <button  class="w-24 h-10  text-white bg-green-500 rounded ">
+                      <a href="/admin/listCategory?id=<%= category._id %>">Block</a>
+                    </button>
+                  <% } else { %>
+                    <button  class="w-24 h-10  text-white bg-red-500 rounded ">
+                      <a href="/admin/unlistCategory?id=<%= category._id %>">Unblock</a>
+                    </button>
+                  <% } %>
                 </td>
                 <td class="p-4">
                   <button class="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600">
-                    Edit
+                    <a href="/admin/editCategory?id=<%= category._id %>">Edit</a>
                   </button>
                 </td>
               </tr>
@@ -81,6 +93,7 @@
             </tr>
           <% } %>
         </tbody>
+        
         
       </table>
     </div>
@@ -214,14 +227,7 @@ function resetForm() {
     });
   }
 
-    // Toggle Status Button
-    function toggleStatus(button) {
-      button.innerText = button.innerText === 'Active' ? 'Block' : 'Active';
-      button.classList.toggle('bg-green-500');
-      button.classList.toggle('bg-red-500');
-    }
 
-    
     function handleFormSubmit(event) {
   event.preventDefault();
 

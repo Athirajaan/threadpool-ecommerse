@@ -1,0 +1,202 @@
+<%- include('../partials/admin/header') %> 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+  <div class="flex-1">
+    <div class="mb-6 flex flex-col md:flex-row items-start justify-between">
+      <!-- Breadcrumbs -->
+      <nav class="text-sm text-gray-500 mb-4 md:mb-0">
+          <a href="#" class="hover:text-yellow-500">Dashboard</a> &gt;
+          <a href="#" class="hover:text-yellow-500">All Products</a> &gt;
+          <a href="#" class="text-gray-800">edit Product</a>
+      </nav>
+  
+  </div>
+    <div class="w-full max-w-5xl bg-white rounded-lg shadow-lg p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Left Side -->
+      <div>
+        <form method="post" action="/admin/addProducts" enctype="multipart/form-data" onsubmit="return validateForm(event)">
+        <!-- Product Name -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-600">Product Name</label>
+          <input
+            type="text"
+            id="productName"
+            placeholder="Enter product name"
+            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
+          />
+          <div id="productName-error" class="text-red-500 text-sm mt-1 error-message"></div>
+        </div>
+
+        <!-- Gender Selection -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-600">Select Gender</label>
+          <select id="gender" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400">
+            <option value="">Choose...</option>
+            <option value="Men">Men</option>
+            <option value="Women">Women</option>
+          </select>
+          <div id="gender-error" class="text-red-500 text-sm mt-1 error-message"></div>
+        </div>
+  
+        <!-- category -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-600">Category</label>
+          <select id="category" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400" disabled>
+            <option value="" disabled selected>Choose category...</option>
+          </select>
+          <div id="category-error" class="text-red-500 text-sm mt-1 error-message"></div>
+        </div>
+      
+  
+        <!-- Description -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-600">Description</label>
+          <textarea
+            id="description"
+            rows="3"
+            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
+            placeholder="Write a compelling description..."
+          ></textarea>
+          <div id="description-error" class="text-red-500 text-sm mt-1 error-message"></div>
+        </div>
+  
+        <!-- Pricing Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600">Regular Price</label>
+            <input
+              type="number"
+              id="regularPrice"
+              placeholder="0.00"
+              class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
+            />
+            <div id="regularPrice-error" class="text-red-500 text-sm mt-1 error-message"></div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600">Sale Price</label>
+            <input
+              type="number"
+              id="salePrice"
+              placeholder="0.00"
+              class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
+            />
+            <div id="salePrice-error" class="text-red-500 text-sm mt-1 error-message"></div>
+          </div>
+        </div>
+  
+        <!-- Size Variants -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-600">Size Variants</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <!-- Size Fields  S-->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">S</label>
+              <input
+                type="number"
+                id="sizeSQty"
+                placeholder="Qty"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+              />
+              <div id="sizeSQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+            </div>
+            <!-- M -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">M</label>
+              <input
+                type="number"
+                id="sizeMQty"
+                placeholder="Qty"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+              />
+              <div id="sizeSQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+            </div>
+
+            <!-- L -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">L</label>
+              <input
+                type="number"
+                id="sizeLQty"
+                placeholder="Qty"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+              />
+              <div id="sizeLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+            </div>
+            <!-- XL -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">XL</label>
+              <input
+                type="number"
+                id="sizeXLQty"
+                placeholder="Qty"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+              />
+              <div id="sizeXLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+            </div>
+         
+          </div>
+        </div>
+      </div>
+ 
+  
+      <!-- Uploaded Images Section -->
+      <div class="max-w-md p-4 bg-white border rounded shadow-md">
+        <!-- File Input -->
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-gray-500">
+          <input type="file" id="imageInput" class="hidden" accept="image/*" multiple />
+          <label for="imageInput" class="cursor-pointer flex flex-col items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-10 w-10 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 15a4 4 0 11.88-7.9m6.12 0A4 4 0 1115 15m6-2v6m0 0H9m12 0l-3-3m0 0l-3 3"
+              />
+            </svg>
+            <p class="mt-2 text-sm font-medium">Drop your images here, or <span class="text-blue-500">browse</span></p>
+            <p class="text-xs">JPEG, PNG files are allowed</p>
+          </label>
+        </div>
+        <div id="imageInput-error" class="text-red-500 text-sm mt-1 error-message"></div>
+     
+         <!-- Cropping Modal -->
+        <div id="cropModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-4 rounded shadow-lg w-full max-w-lg">
+          <div class="w-[500px] h-[400px] overflow-hidden">
+              <img id="cropImage" class="object-contain w-full h-full" />
+          </div>
+          <div class="mt-4 flex justify-between">
+              <button id="cropConfirm" class="bg-blue-500 text-white px-4 py-2 rounded">Crop</button>
+              <button id="cropCancel" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Cancel</button>
+          </div>
+        </div>
+        </div>
+        <!-- Uploaded Images Section -->
+        <div id="imagePreview" class="mt-4 space-y-2"></div>
+        <div class="mt-20">
+          <button
+            type="submit"
+            id="submitButton"
+            class="w-full bg-yellow-500 text-white font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+          >
+            Submit Product
+          </button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+      
+      <!-- JavaScript -->
+      <script>
+        
+      </script>
+
+<%- include('../partials/admin/footer') %> 

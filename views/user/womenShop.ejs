@@ -1,0 +1,225 @@
+<%- include('../partials/user/userheader') %> 
+
+<section class="relative w-full h-[300px] bg-cover bg-center" style="background-image: url(/img/dc\ comics.jpg);">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div> 
+  </section>
+  <div class="w-full p-0 m-0">
+    <div class="grid grid-cols-[auto_1fr] gap-0">
+      <!-- Filter Sidebar -->
+      
+      <aside class="bg-white p-6 shadow rounded-lg sticky top-6 hidden md:block h-screen overflow-y-auto w-60">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="font-semibold text-xl text-gray-800">Filter Products</h2>
+          <button id="resetFilters" class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition">Reset</button>
+        </div>
+      
+        <!-- Categories Section -->
+        <div class="mb-6">
+          <h3 class="text-lg font-medium text-gray-700 mb-4">Category</h3>
+          <div class="flex flex-col gap-2">
+            <label class="flex items-center">
+              <input type="checkbox" class="category-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="Clothing">
+              <span class="text-gray-700">Clothing</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" class="category-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="Electronics">
+              <span class="text-gray-700">Electronics</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" class="category-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="Home">
+              <span class="text-gray-700">Home</span>
+            </label>
+          </div>
+        </div>
+      
+        <!-- Sizes Section -->
+        <div class="mb-6">
+          <h3 class="text-lg font-medium text-gray-700 mb-4">Size</h3>
+          <div id="sizeOptions" class="flex flex-wrap gap-2">
+            <div class="size-option border rounded-full px-3 py-1 text-gray-700 cursor-pointer hover:bg-gray-200 transition">
+              S
+            </div>
+            <div class="size-option border rounded-full px-3 py-1 text-gray-700 cursor-pointer hover:bg-gray-200 transition">
+              M
+            </div>
+            <div class="size-option border rounded-full px-3 py-1 text-gray-700 cursor-pointer hover:bg-gray-200 transition">
+              L
+            </div>
+            <div class="size-option border rounded-full px-3 py-1 text-gray-700 cursor-pointer hover:bg-gray-200 transition">
+              XL
+            </div>
+          </div>
+        </div>
+      
+        <!-- Price Range Section -->
+        <div class="mb-6">
+          <h3 class="text-lg font-medium text-gray-700 mb-4">Price Range</h3>
+          <div class="flex flex-col gap-2">
+            <label class="flex items-center">
+              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="under500">
+              <span class="text-gray-700">Under ₹500</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="500to799">
+              <span class="text-gray-700">₹500 - ₹799</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="800to999">
+              <span class="text-gray-700">₹800 - ₹999</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="1000to1999">
+              <span class="text-gray-700">₹1000 - ₹1999</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="2000to4000">
+              <span class="text-gray-700">₹2000 - ₹4000</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="4000above">
+              <span class="text-gray-700">₹4000 and Above</span>
+            </label>
+          </div>
+        </div>
+      </aside>
+      
+
+      <!-- Main Product Section -->
+      <main class="w-full">
+        <!-- Sort Button Section -->
+        <div class="flex justify-end mb-6 relative">
+          <!-- Sort Button Section -->
+          <div class="relative w-48">
+            <button id="sortButton" class="flex items-center justify-between w-full px-4 py-2 my-2 bg-gray-300 text-black rounded shadow-md hover:bg-gray-400 transition">
+              <span id="selectedSort">Popular</span>
+              <i class="fas fa-chevron-down transform transition-transform duration-200"></i>
+            </button>
+            <!-- Dropdown Menu -->
+            <ul id="sortMenu" class="absolute mt-1 w-full bg-white shadow-lg rounded-lg hidden z-20">
+              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="Popular">Popular</li>
+              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="Low to High">Price: Low to High</li>
+              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="High to Low">Price: High to Low</li>
+              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="Ratings">Average Ratings</li>
+              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="New">New Arrivals</li>
+              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="aA-zZ">aA-zZ</li>
+              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="zZ-aA">zZ-aA</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+
+        <!-- Products Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <!-- Product Card -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow relative">
+            <div class="h-72 bg-gray-100 flex items-center justify-center overflow-hidden relative group">
+              <img src="https://via.placeholder.com/150" alt="Product" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
+            </div>
+            <!-- Wishlist Icon -->
+            <div class="absolute bottom-12 right-4 cursor-pointer z-10">
+              <i class="fas fa-heart text-gray-500 hover:text-red-500"></i>
+            </div>
+            <!-- Product Details -->
+            <div class="p-4">
+              <h3 class="font-semibold text-lg text-gray-800 mb-2 truncate">Black Sweatshirt</h3>
+              <div class="flex items-center">
+                <span class="text-xl font-bold text-gray-900">$99.00</span>
+                <span class="text-sm text-gray-500 line-through ml-2">$123.00</span>
+                <span class="text-sm text-green-600 font-semibold ml-auto">20% Off</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Repeat Product Card -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow relative">
+            <div class="h-72 bg-gray-100 flex items-center justify-center overflow-hidden relative group">
+              <img src="https://via.placeholder.com/150" alt="Product" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
+            </div>
+            <div class="absolute bottom-12 right-4 cursor-pointer z-10">
+              <i class="fas fa-heart text-gray-500 hover:text-red-500"></i>
+            </div>
+            <div class="p-4">
+              <h3 class="font-semibold text-lg text-gray-800 mb-2 truncate">White T-Shirt</h3>
+              <div class="flex items-center">
+                <span class="text-xl font-bold text-gray-900">$49.00</span>
+                <span class="text-sm text-gray-500 line-through ml-2">$59.00</span>
+                <span class="text-sm text-green-600 font-semibold ml-auto">15% Off</span>
+              </div>
+            </div>
+          </div>
+          <!-- Add more product cards as needed -->
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+   
+   const sortButton = document.getElementById('sortButton');
+const sortMenu = document.getElementById('sortMenu');
+const selectedSort = document.getElementById('selectedSort');
+const arrowIcon = sortButton.querySelector('i');
+
+// Toggle dropdown visibility and animate arrow
+sortButton.addEventListener('click', () => {
+  sortMenu.classList.toggle('hidden');
+  arrowIcon.classList.toggle('rotate-180'); // Add rotation animation
+});
+
+// Update selected value and close dropdown
+sortMenu.addEventListener('click', (e) => {
+  if (e.target.tagName === 'LI') {
+    selectedSort.textContent = e.target.dataset.sort;
+    sortMenu.classList.add('hidden');
+    arrowIcon.classList.remove('rotate-180');
+  }
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  if (!sortButton.contains(e.target) && !sortMenu.contains(e.target)) {
+    sortMenu.classList.add('hidden');
+    arrowIcon.classList.remove('rotate-180');
+  }
+});
+
+
+// Toggle size selection for multiple selections
+document.querySelectorAll('.size-option').forEach((size) => {
+  size.addEventListener('click', () => {
+    size.classList.toggle('bg-blue-500');
+    size.classList.toggle('text-white');
+  });
+});
+
+// Reset filters
+document.getElementById('resetFilters').addEventListener('click', () => {
+  // Reset categories
+  document.querySelectorAll('.category-checkbox').forEach((checkbox) => {
+    checkbox.checked = false;
+  });
+
+  // Reset size options
+  document.querySelectorAll('.size-option').forEach((size) => {
+    size.classList.remove('bg-blue-500', 'text-white');
+  });
+
+  // Reset price range
+  document.querySelectorAll('.price-checkbox').forEach((checkbox) => {
+    checkbox.checked = false;
+  });
+});
+
+
+  </script>
+
+
+
+<%- include('../partials/user/userfooter') %> 
+
+
+
+
+
+

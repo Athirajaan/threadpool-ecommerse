@@ -43,8 +43,16 @@ app.set("views", [
 
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use((req, res, next) => { 
+  res.locals.isLoggedIn = req.session && req.session.userId ? true : false;
+  next();
+});
+
+
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
+
+
 
 connectDb()
   .then(() => {

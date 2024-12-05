@@ -1,0 +1,74 @@
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Main Container -->
+  <div class="w-full min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="bg-white w-60 p-6 border-r fixed lg:relative z-10 transform lg:translate-x-0 transition-transform duration-300 ease-in-out">
+      <!-- Welcome Message -->
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Hello Jhanvi</h2>
+      <p class="text-gray-600 mb-8">Welcome to your Account</p>
+
+      <!-- Navigation Links -->
+      <nav class="space-y-4">
+        <a href="#" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          <i class="fas fa-box mr-3 "></i>
+          <span>My Orders</span>
+        </a>
+        <a href="#" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          <i class="fas fa-heart mr-3 "></i>
+          <span>Wishlist</span>
+        </a>
+        <a href="#" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          <i class="fas fa-user mr-3 "></i>
+          <span>My Info</span>
+        </a>
+        <a href="#" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          <i class="fas fa-wallet mr-3"></i>
+          <span>My Wallet</span>
+        </a>
+        <a href="#" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          <i class="fas fa-ticket-alt mr-3"></i>
+          <span>Coupons</span>
+        </a>
+        <a href="/logout"   onclick="confirmLogoutWithSadModal()" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          <i class="fas fa-sign-out-alt mr-3 "></i>
+          <span>Sign Out</span>
+        </a>
+      </nav>
+    </aside>
+
+    <Script>
+             function confirmLogoutWithSadModal() {
+                event.preventDefault(); 
+                
+        Swal.fire({
+            title: 'We’re sad to see you go!',
+            text: "Are you sure you want to log out? We’ll miss you! Please come back soon.",
+            icon: 'info', // Using 'info' for a gentle tone
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, log me out',
+            cancelButtonText: 'Stay logged in',
+            customClass: {
+                popup: 'sad-modal-popup',
+                confirmButton: 'sad-modal-confirm',
+                cancelButton: 'sad-modal-cancel'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/logout'; // Proceed with logout
+            }
+        });
+    }
+    </Script>

@@ -4,7 +4,7 @@ const userAuth = (req, res, next) => {
   if (req.session.user) {
     User.findById(req.session.user)
       .then((data) => {
-        if (data && !data.isBlocked) {
+        if (data && !data.isBlocked && !data.isAdmin) {
           next();
         } else {
           res.redirect("/login");
@@ -18,6 +18,7 @@ const userAuth = (req, res, next) => {
     res.redirect("/login");
   }
 };
+
 
 const adminAuth = (req, res, next) => {
   User.findOne({ isAdmin: true })
@@ -34,7 +35,17 @@ const adminAuth = (req, res, next) => {
     });
 };
 
+
+const preventCache = (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+};
+
+
 module.exports = {
   userAuth,
   adminAuth,
+  preventCache,
 };

@@ -61,7 +61,46 @@ const addCategory = async (req, res) => {
   }
 };
 
+
+
+
+const getListCategory =async (req,res)=>{
+  try {
+    let id=req.query.id;
+    await Category.updateOne({_id:id},{$set:{isListed:false}});
+    res.redirect('/admin/category');
+  } catch (error) {
+    res.redirect('/pageerror')
+  }
+}
+
+
+const getUnListCategory  = async (req,res)=>{
+  try {
+    let id= req.query.id;
+    await Category.updateOne({_id:id},{$set:{isListed:true}})
+    res.redirect('/admin/category');
+  } catch (error) {
+    res.redirect('/pageerror')
+  }
+}
+
+
+const getEditCategory =async (req,res)=>{
+try {
+  const id=req.Query.id;
+  const category = await Category.findOne({_id:id})
+  res.render('/admin/category',{category:category})
+} catch (error) {
+  res.redirect('/pageerror')
+}
+}
+
+
 module.exports = {
   categoryInfo,
   addCategory,
+  getListCategory,
+  getUnListCategory,
+  getEditCategory
 };

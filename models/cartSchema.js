@@ -18,21 +18,14 @@ const cartSchema = new Schema({
         type: Number,
         default: 1,
       },
-      price: {
+
+      salePrice: {
         type: Number,
         required: true,
       },
       totalPrice: {
         type: Number,
         required: true,
-      },
-      status: {
-        type: String,
-        default: "placed",
-      },
-      cancellationReason: {
-        type: String,
-        default: "none",
       },
     },
   ],
@@ -44,20 +37,14 @@ const cartSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
 });
 
-// Middleware to update totalCartPrice when the cart is modified
 cartSchema.pre("save", function (next) {
   if (this.isModified("items")) {
     this.totalCartPrice = this.items.reduce(
       (total, item) => total + item.totalPrice,
-      0,
+      0
     );
-    this.updatedAt = Date.now();
   }
   next();
 });

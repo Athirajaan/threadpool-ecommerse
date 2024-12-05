@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <div class="flex-1">
     <div class="mb-6 flex flex-col md:flex-row items-start justify-between">
@@ -105,13 +105,6 @@
                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
               />
               <div id="sizeSQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
-              <!-- <input
-                type="number"
-                id="sizeSIncrement"
-                placeholder="Increment"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
-              />
-              <div id="sizeSIncrement-error" class="text-red-500 text-sm mt-1 error-message"></div> -->
             </div>
             <!-- M -->
             <div>
@@ -123,13 +116,6 @@
                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
               />
               <div id="sizeSQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
-              <!-- <input
-                type="number"
-                id="sizeMIncrement"
-                placeholder="Increment"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
-              />
-              <div id="sizeSIncrement-error" class="text-red-500 text-sm mt-1 error-message"></div> -->
             </div>
 
             <!-- L -->
@@ -142,13 +128,6 @@
                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
               />
               <div id="sizeLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
-              <!-- <input
-                type="number"
-                id="sizeLIncrement"
-                placeholder="Increment"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
-              />
-              <div id="sizeLIncrement-error" class="text-red-500 text-sm mt-1 error-message"></div> -->
             </div>
             <!-- XL -->
             <div>
@@ -160,13 +139,6 @@
                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
               />
               <div id="sizeXLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
-              <!-- <input
-                type="number"
-                id="sizeXLIncrement"
-                placeholder="Increment"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 mt-1"
-              />
-              <div id="sizeXLIncrement-error" class="text-red-500 text-sm mt-1 error-message"></div> -->
             </div>
          
           </div>
@@ -198,6 +170,7 @@
             <p class="text-xs">JPEG, PNG files are allowed</p>
           </label>
         </div>
+        <div id="imageInput-error" class="text-red-500 text-sm mt-1 error-message"></div>
      
          <!-- Cropping Modal -->
         <div id="cropModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -229,12 +202,76 @@
       
       <!-- JavaScript -->
       <script>
-        
-       // form validation
-     function validateForm() {
-    clearErrorMessages();
-    console.log("validateForm is triggered.");
 
+document.querySelector('form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    // Validate the form
+    if (validateForm(event)) {
+        // Create a FormData object to properly handle file uploads
+        const formData = new FormData(this);
+
+       // Append additional form fields manually
+       formData.append('productName', document.getElementById('productName').value);
+       formData.append('description', document.getElementById('description').value);
+       formData.append('gender', document.getElementById('gender').value);
+       formData.append('category', document.getElementById('category').value);
+       formData.append('regularPrice', document.getElementById('regularPrice').value);
+       formData.append('salePrice', document.getElementById('salePrice').value);
+       formData.append('sizeSQty', document.getElementById('sizeSQty').value || '0');
+       formData.append('sizeMQty', document.getElementById('sizeMQty').value || '0');
+       formData.append('sizeLQty', document.getElementById('sizeLQty').value || '0');
+       formData.append('sizeXLQty', document.getElementById('sizeXLQty').value || '0');
+
+        // Clear any existing file inputs
+        const fileInput = document.getElementById('imageInput');
+        fileInput.value = ''; // Clear the file input
+
+        // Append cropped images to the form data
+        imageFiles.forEach((file, index) => {
+            formData.append('images', file, `image-${index}.png`);
+        });
+
+        // Use AJAX to submit the form
+        fetch('/admin/addProducts', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    text: 'Product added sucessfully',
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = data.redirectUrl;
+                });
+            } else {
+                // Handle validation errors
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    html: data.errors ? data.errors.join('<br>') : data.message
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Submission Error',
+                text: 'There was a problem submitting the form'
+            });
+        });
+    }
+});
+
+function validateForm(event) {
+    // Clear any previous error messages
+    console.log('form validation started')
+    clearErrorMessages();
+    
+    // Flag to track overall form validity
     let isValid = true;
 
     // Get form values
@@ -246,14 +283,12 @@
     const salePrice = document.getElementById('salePrice').value.trim();
     const imageInput = document.getElementById('imageInput');
 
-    // Size quantities and increments
+    // Size quantities
     const sizeFields = ['S', 'M', 'L', 'XL'];
-    const sizeErrors = [];
 
     // Product Name Validation
     if (!productName) {
         displayErrorMessage('productName-error', 'Please enter a product name.');
-         event.preventDefault();
         isValid = false;
     } else if (!/^[a-zA-Z\s]+$/.test(productName)) {
         displayErrorMessage('productName-error', 'Product name should contain only alphabetic characters.');
@@ -282,91 +317,112 @@
     }
 
     // Price Validation
-    if (!/^\d+(\.\d{1,2})?$/.test(regularPrice) || parseFloat(regularPrice) < 0) {
+    if (!regularPrice) {
+        displayErrorMessage('regularPrice-error', 'Please enter a regular price.');
+        isValid = false;
+    } else if (!/^\d+(\.\d{1,2})?$/.test(regularPrice) || parseFloat(regularPrice) < 0) {
         displayErrorMessage('regularPrice-error', 'Please enter a valid non-negative price.');
         isValid = false;
     }
-    if (!/^\d+(\.\d{1,2})?$/.test(salePrice) || parseFloat(salePrice) < 0) {
+
+    if (!salePrice) {
+        displayErrorMessage('salePrice-error', 'Please enter a sale price.');
+        isValid = false;
+    } else if (!/^\d+(\.\d{1,2})?$/.test(salePrice) || parseFloat(salePrice) < 0) {
         displayErrorMessage('salePrice-error', 'Please enter a valid non-negative sale price.');
         isValid = false;
     }
+
     if (parseFloat(regularPrice) <= parseFloat(salePrice)) {
         displayErrorMessage('regularPrice-error', 'Regular price must be greater than sale price.');
         isValid = false;
     }
 
     // Size Validation
+    let totalQuantity = 0;
     sizeFields.forEach(size => {
-        const qty = document.getElementById(`size${size}Qty`).value.trim();
-        const increment = document.getElementById(`size${size}Increment`).value.trim();
+        const qtyInput = document.getElementById(`size${size}Qty`);
+        if (qtyInput) {
+            const qty = qtyInput.value.trim();
 
-        if (qty && (!/^\d+$/.test(qty) || parseInt(qty) < 0)) {
-            displayErrorMessage(`size${size}Qty-error`, `Size ${size} quantity must be a non-negative number.`);
-            sizeErrors.push(false);
-        }
-        if (increment && (!/^\d+$/.test(increment) || parseInt(increment) < 0)) {
-            displayErrorMessage(`size${size}Increment-error`, `Size ${size} increment must be a non-negative number.`);
-            sizeErrors.push(false);
+            if (qty && (!/^\d+$/.test(qty) || parseInt(qty) < 0)) {
+                displayErrorMessage(`size${size}Qty-error`, `Size ${size} quantity must be a non-negative number.`);
+                isValid = false;
+            }
+
+            // Sum up total quantity
+            if (qty) {
+                totalQuantity += parseInt(qty);
+            }
         }
     });
 
-    if (sizeErrors.includes(false)) isValid = false;
-
-    // Image Validation
-      if (imageInput.files.length === 0) {
-        displayErrorMessage('imageInput-error', 'Please upload at least one image.');
+  
+    if (totalQuantity === 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Quantity Error',
+            text: 'At least one size must have a quantity.'
+        });
         isValid = false;
-      }
-
-      return isValid;
     }
 
-     function displayErrorMessage(elementId, message) {
-       const errorElement = document.getElementById(elementId);
-       errorElement.innerText = message;
-        errorElement.style.display = "block";
-      }
+    // Image Validation - 3 to 5 images
+    if (imageFiles.length < 3 || imageFiles.length > 5) {
+        displayErrorMessage('imageInput-error', 'Please upload between 3 to 5 images.');
+        isValid = false;
+    }
 
-    function clearErrorMessages() {
-        const errorElements = document.getElementsByClassName('error-message');
-        Array.from(errorElements).forEach(element => {
+    return isValid;
+}
+
+
+
+
+
+function displayErrorMessage(elementId, message) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.innerText = message;
+    errorElement.style.display = "block";
+}
+
+function clearErrorMessages() {
+    const errorElements = document.getElementsByClassName('error-message');
+    Array.from(errorElements).forEach(element => {
         element.innerText = '';
         element.style.display = "none";
-     });
+    });
+}
+
+
+
+const genderDropdown = document.getElementById("gender");
+const categoryDropdown = document.getElementById("category");
+const categories = <%- JSON.stringify(cat) %>;
+
+genderDropdown.addEventListener("change", () => {
+  const selectedGender = genderDropdown.value;
+
+  categoryDropdown.innerHTML = '<option value="" disabled selected>Choose category...</option>';
+
+  if (selectedGender) {
+    // Filter categories based on the selected gender and isListed status
+    const filteredCategories = categories.filter(cat => 
+      cat.gender === selectedGender && cat.isListed === true
+    );
+
+    filteredCategories.forEach(category => {
+      const option = document.createElement("option");
+      option.value = category._id;  // Use _id instead of category.name
+      option.textContent = category.name;
+      categoryDropdown.appendChild(option);
+    });
+
+    categoryDropdown.disabled = filteredCategories.length === 0;
+  } else {
+    categoryDropdown.disabled = true;
   }
-
-
-
-
-
-    //Get references to the dropdowns for category menu
-        const genderDropdown = document.getElementById("gender");
-        const categoryDropdown = document.getElementById("category");
-        const categories = <%- JSON.stringify(cat) %>;
-
-         genderDropdown.addEventListener("change", () => {
-         const selectedGender = genderDropdown.value;
-
-         categoryDropdown.innerHTML = '<option value="" disabled selected>Choose category...</option>';
-
-          if (selectedGender) {
-         const filteredCategories = categories.filter(cat => cat.gender === selectedGender);
-
-         filteredCategories.forEach(category => {
-          const option = document.createElement("option");
-          option.value = category.name;
-          option.textContent = category.name;
-          categoryDropdown.appendChild(option);
-          });
-
-         categoryDropdown.disabled = filteredCategories.length === 0;
-        } else {
-         categoryDropdown.disabled = true;
-       }
-     })
-
-
-    
+});
 
 
         // cropper
@@ -462,13 +518,18 @@ function cancelCrop() {
 
 // Confirm crop
 function confirmCrop(event) {
-    event.preventDefault(); // Prevent form submission or page redirection
-    
-    const canvas = cropper.getCroppedCanvas();
-    canvas.toBlob((blob) => {
-        const fileName = `cropped-${Date.now()}.png`;
-        const file = new File([blob], fileName, { type: "image/png" });
+    event.preventDefault();
 
+    const canvas = cropper.getCroppedCanvas({
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: 'high',
+    });
+    if (!canvas) return;
+
+    canvas.toBlob((blob) => {
+        if (!blob) return;
+        const fileName = `cropped-${Date.now()}.webp`; // Use webp format
+        const file = new File([blob], fileName, { type: "image/webp" });
         imageFiles.push(file);
         addImageToPreview(file);
         cropModal.classList.add('hidden');
