@@ -35,6 +35,15 @@ const orderSchema = new Schema({
       },
     },
   ],
+  phoneNumber: {
+    type: String,
+    required: true, 
+    validate: {
+      validator: function (v) {
+        return /^[0-9]{10}$/.test(v); 
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
   totalPrice: {
     type: Number,
     required: true,
@@ -51,10 +60,6 @@ const orderSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Address",
     required: true,
-  },
-  invoiceDate: {
-    type: Date,
-    default: Date.now,
   },
   status: {
     type: String,

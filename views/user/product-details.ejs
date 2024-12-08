@@ -11,6 +11,7 @@
   transform: scale(1);
 }
 
+
 .zoom-container:hover .zoom-image {
   transform: scale(1.5); /* Reduced zoom level */
 }
@@ -18,6 +19,9 @@
 .zoom-container:hover {
   cursor: zoom-in;
 }
+
+
+
 </style>
 
 <div class="container mx-auto p-8 space-y-12">
@@ -60,7 +64,7 @@
 
       <!-- Price -->
       <div class="mb-2">
-        <p class="text-lg text-gray-500 line-through">₹<%= product.regularPrice %></p>
+        <p class="text-lg font-semibold text-gray-500 line-through">₹<%= product.regularPrice %></p>
         <div class="flex items-center space-x-2">
           <p class="text-2xl font-semibold text-blue-600">₹<%= product.salePrice %></p>
           <span class="text-lg text-red-600 font-semibold">70% OFF</span>
@@ -69,29 +73,43 @@
       
       <!-- Size Selection -->
    <!-- Size Selection Section -->
-<div class="mb-2">
-  <h3 class="text-sm font-semibold text-gray-800 mb-2">Size</h3>
-  <div class="flex items-center gap-3">
-    <% const sizes = ['S', 'M', 'L', 'XL']; %>
-    <% sizes.forEach(size => { %>
-      <% const isDisabled = !product.stock[size]; %>
-      <button 
-        class="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-100 focus:outline-none 
-          <% if (isDisabled) { %> bg-gray-200 cursor-not-allowed <% } %>"
-        <% if (!isDisabled) { %> onclick="updatePrice('<%= size %>')" <% } %>
-        <% if (isDisabled) { %> disabled <% } %>
-      >
-        <%= size %>
-      </button>
-    <% }) %>
+   <!-- Size Selection Section -->
+   <div class="mb-4">
+    <h3 class="text-sm font-semibold text-gray-700 mb-2">Size</h3>
+    <div class="flex flex-wrap gap-4">
+      <% const sizes = ['S', 'M', 'L', 'XL']; %>
+      <% sizes.forEach(size => { %>
+        <% const quantity = product.stock[size] || 0; %>
+        <% const isDisabled = quantity === 0; %>
+        <div class="text-center">
+          <button 
+            class="size-btn px-4 py-2 w-12 h-12 text-lg font-medium rounded-full border transition-all duration-300 ease-in-out 
+              <% if (isDisabled) { %> bg-gray-200 text-gray-500 border-gray-300 cursor-not-allowed 
+              <% } else { %> bg-white text-gray-800 border-gray-300 hover:border-gray-400 hover:bg-gray-100 <% } %>"
+            <% if (!isDisabled) { %> data-size="<%= size %>" data-saleprice="<%= product.salePrice %>" data-regularprice="<%= product.regularPrice %>" <% } %>
+            <% if (isDisabled) { %> disabled <% } %>
+          >
+            <%= size %>
+          </button>
+          <% if (quantity > 0 && quantity < 5) { %>
+            <p class="text-xs text-red-500 mt-1 font-medium">Only <%= quantity %> left!</p>
+          <% } else if (quantity >= 5 && quantity < 10) { %>
+            <p class="text-xs text-yellow-500 mt-1 font-medium">Few left!</p>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+    <a href="#" class="text-sm text-blue-600 mt-2 inline-block hover:underline">Size Guide</a>
   </div>
-  <a href="#" class="text-sm text-blue-500 mt-2 inline-block hover:underline">Size Guide</a>
-</div>
+  
 
 
       <!-- Add to Cart and Wishlist -->
       <div class="flex items-center gap-4 mb-2">
-        <button class="w-full bg-blue-600 text-white text-sm font-medium px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none">Add to Cart</button>
+        <button id="addToCartButton" data-product-id="<%= product._id %>" class="w-full bg-blue-600 text-white text-sm font-medium px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none">
+          Add to Cart
+        </button>
+        
         <button class="w-full bg-gray-100 text-gray-600 text-sm font-medium px-6 py-3 rounded-lg hover:bg-gray-200 focus:outline-none">Wishlist</button>
       </div>
 
@@ -205,6 +223,58 @@
         alert('An error occurred');
     }
 }
+
+document.getElementById('addToCartButton').addEventListener('click', function() {
+    const productId = this.dataset.productId; // Dynamic product ID
+    const quantity = 1; // Example quantity
+
+    fetch('/addToCart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ productId, quantity }),
+    })
+    .then(response => response.text())
+    .then(message => {
+      alert(message);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+});
+
+
+// Select all size buttons and the price element
+const sizeButtons = document.querySelectorAll('.size-btn');
+const priceElement = document.querySelector('.text-2xl.font-semibold.text-blue-600');
+
+sizeButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    // Get size, sale price, and regular price from the data attributes
+    const selectedSize = button.getAttribute('data-size');
+    const salePrice = parseFloat(button.getAttribute('data-saleprice'));
+    const regularPrice = parseFloat(button.getAttribute('data-regularprice'));
+
+    // Calculate the price based on the selected size
+    let finalPrice;
+    if (selectedSize === 'L' || selectedSize === 'XL') {
+      finalPrice = salePrice + 0.1 * regularPrice; // Add 10% of regular price
+    } else {
+      finalPrice = salePrice; // Use sale price for S and M
+    }
+
+    // Update the price element
+    priceElement.textContent = `₹${finalPrice.toFixed(2)}`;
+
+    // Update the yellow border for the selected size
+    sizeButtons.forEach(btn => btn.classList.remove('border-yellow-500')); // Remove yellow border from all
+    button.classList.add('border-yellow-500'); // Add yellow border to the selected button
+  });
+});
+
+
+
 
 </script> 
 

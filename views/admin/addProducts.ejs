@@ -425,75 +425,48 @@ genderDropdown.addEventListener("change", () => {
 });
 
 
-        // cropper
+// Cropper functionality
 
-         const imageInput = document.getElementById('imageInput');
-         const imagePreview = document.getElementById('imagePreview');
-         const cropModal = document.getElementById('cropModal');
-         const cropImage = document.getElementById('cropImage');
-         const cropConfirm = document.getElementById('cropConfirm');
-         const cropCancel = document.getElementById('cropCancel');
-         let cropper = null;
-         let imageFiles = [];
-        let selectedThumbnail = null;
-        const MAX_IMAGES = 5;
+const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+const cropModal = document.getElementById('cropModal');
+const cropImage = document.getElementById('cropImage');
+const cropConfirm = document.getElementById('cropConfirm');
+const cropCancel = document.getElementById('cropCancel');
 
-// Event Listener for image input change
+let cropper = null;
+let imageFiles = [];
+const MAX_IMAGES = 5;
+
+// Event Listeners
 imageInput.addEventListener('change', handleImageInput);
-
-// Event Listener for cancel crop
 cropCancel.addEventListener('click', cancelCrop);
-
-// Event Listener for crop confirm
 cropConfirm.addEventListener('click', confirmCrop);
-
-
 
 // Handle image input
 function handleImageInput(e) {
     const files = e.target.files;
-    
+
+    // Check image limit
     if (files.length + imageFiles.length > MAX_IMAGES) {
-      Swal.fire({
-            icon: 'error',
-            title: 'Limit Exceeded',
-            text: `You can only upload up to ${MAX_IMAGES} images.`,
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-        });
+        showAlert('Limit Exceeded', `You can only upload up to ${MAX_IMAGES} images.`, 'error');
         return;
     }
 
     Array.from(files).forEach(file => {
         if (!file.type.startsWith("image/")) {
-          Swal.fire({
-                icon: 'error',
-                title: 'Invalid File Type',
-                text: "Please upload only image files.",
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-            });
+            showAlert('Invalid File Type', 'Please upload only image files.', 'error');
             return;
         }
 
         const reader = new FileReader();
-        reader.onload = (e) => {
-            const imageSrc = e.target.result;
-            showCropModal(imageSrc);
-        };
+        reader.onload = (e) => showCropModal(e.target.result);
+        reader.onerror = () => showAlert('Error', 'Failed to read the image file.', 'error');
         reader.readAsDataURL(file);
     });
-    console.log(imageFiles); 
 }
 
-
-// Show crop modal
+// Show the crop modal
 function showCropModal(imageSrc) {
     cropImage.src = imageSrc;
     cropModal.classList.remove('hidden');
@@ -512,7 +485,7 @@ function showCropModal(imageSrc) {
 
 // Cancel crop
 function cancelCrop() {
-    cropper.destroy();
+    if (cropper) cropper.destroy();
     cropModal.classList.add('hidden');
 }
 
@@ -521,58 +494,61 @@ function confirmCrop(event) {
     event.preventDefault();
 
     const canvas = cropper.getCroppedCanvas({
-      imageSmoothingEnabled: true,
-      imageSmoothingQuality: 'high',
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
     });
-    if (!canvas) return;
 
-    canvas.toBlob((blob) => {
+    if (!canvas) {
+        showAlert('Error', 'Failed to crop the image.', 'error');
+        return;
+    }
+
+    canvas.toBlob(blob => {
         if (!blob) return;
-        const fileName = `cropped-${Date.now()}.webp`; // Use webp format
+
+        const fileName = `cropped-${Date.now()}.webp`;
         const file = new File([blob], fileName, { type: "image/webp" });
         imageFiles.push(file);
         addImageToPreview(file);
+
         cropModal.classList.add('hidden');
         cropper.destroy();
-    });
+    }, "image/webp", 1.0);
 }
-
 
 // Add image to preview section
 function addImageToPreview(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
-        const imageSrc = e.target.result;
-        const imageRow = createImageRow(imageSrc, file);
+        const imageRow = createImageRow(e.target.result, file);
         imagePreview.appendChild(imageRow);
     };
     reader.readAsDataURL(file);
 }
 
-// Create image row element
-// Create image row element
+// Create image row
 function createImageRow(imageSrc, file) {
     const imageRow = document.createElement('div');
     imageRow.classList.add('flex', 'items-center', 'justify-between', 'border', 'rounded-lg', 'p-6', 'bg-gray-50', 'my-3', 'w-full', 'shadow-lg', 'hover:shadow-xl', 'transition-shadow');
 
-    // Left side: Image and file name
+    // Image and file info
     const imageInfo = document.createElement('div');
-    imageInfo.classList.add('flex', 'items-center', 'space-x-4');  // Increased space between image and name
+    imageInfo.classList.add('flex', 'items-center', 'space-x-4');
 
     const imgElement = document.createElement('img');
     imgElement.src = imageSrc;
     imgElement.alt = file.name;
-    imgElement.classList.add('w-12', 'h-12', 'rounded-lg', 'object-cover');  // Larger image size with rounded corners
+    imgElement.classList.add('w-12', 'h-12', 'rounded-lg', 'object-cover');
 
     const fileName = document.createElement('p');
     fileName.textContent = file.name;
-    fileName.classList.add('text-base', 'font-medium', 'truncate', 'max-w-[200px]', 'text-gray-800');  // Slightly larger text, better color contrast
+    fileName.classList.add('text-base', 'font-medium', 'truncate', 'max-w-[200px]', 'text-gray-800');
 
     imageInfo.appendChild(imgElement);
     imageInfo.appendChild(fileName);
 
-    // Right side: Buttons for Set Thumbnail and Delete
-    const buttonContainer = createButtonContainer(imageRow,file);
+    // Button container
+    const buttonContainer = createButtonContainer(imageRow, file);
 
     imageRow.appendChild(imageInfo);
     imageRow.appendChild(buttonContainer);
@@ -580,65 +556,48 @@ function createImageRow(imageSrc, file) {
     return imageRow;
 }
 
-
-// Create Set Thumbnail button
-function createButtonContainer(imageRow,file) {
+// Create button container
+function createButtonContainer(imageRow, file) {
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('flex', 'items-center', 'space-x-4');
 
     // Set Thumbnail button
-    const setThumbnailButton = document.createElement('button');
-    setThumbnailButton.classList.add('text-green-500', 'hover:text-green-700', 'set-thumbnail', 'transition-colors', 'duration-200');
-    setThumbnailButton.innerHTML = `
+    const thumbnailButton = document.createElement('button');
+    thumbnailButton.classList.add('text-blue-500', 'hover:text-blue-700', 'transition-colors', 'duration-200', 'set-thumbnail');
+    thumbnailButton.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
     `;
-    setThumbnailButton.addEventListener('click', () => setThumbnail(setThumbnailButton));
+    thumbnailButton.addEventListener('click', () => setThumbnail(imageRow));
 
     // Delete button
     const deleteButton = document.createElement('button');
-    deleteButton.classList.add('text-red-500', 'hover:text-red-700', 'delete-image', 'transition-colors', 'duration-200');
+    deleteButton.classList.add('text-red-500', 'hover:text-red-700', 'transition-colors', 'duration-200', 'delete-image');
     deleteButton.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
     `;
-    deleteButton.addEventListener('click', () => confirmDelete(imageRow,file));
+    deleteButton.addEventListener('click', () => confirmDelete(imageRow, file));
 
-    buttonContainer.appendChild(setThumbnailButton);
+    buttonContainer.appendChild(thumbnailButton);
     buttonContainer.appendChild(deleteButton);
 
     return buttonContainer;
 }
 
-// Create Delete button
-function createDeleteButton(imageRow,file) {
-    const deleteButton = document.createElement('button');
-    deleteButton.classList.add('text-red-500', 'hover:text-red-700');
-    deleteButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    `;
-    deleteButton.addEventListener('click', () => confirmDelete(imageRow,file));
-    return deleteButton;
-}
-
-// Set thumbnail for selected image
+// Set thumbnail
 function setThumbnail(imageRow) {
-    const buttons = document.querySelectorAll('.set-thumbnail');
-    buttons.forEach((btn) => {
-        btn.classList.remove('text-green-500', 'hover:text-green-700');
-        btn.classList.add('text-blue-500', 'hover:text-blue-700');
+    document.querySelectorAll('.set-thumbnail').forEach(button => {
+        button.classList.replace('text-green-500', 'text-blue-500');
     });
-    const setThumbnailButton = imageRow.querySelector('.set-thumbnail');
-    setThumbnailButton.classList.remove('text-blue-500', 'hover:text-blue-700');
-    setThumbnailButton.classList.add('text-green-500', 'hover:text-green-700');
+    const button = imageRow.querySelector('.set-thumbnail');
+    button.classList.replace('text-blue-500', 'text-green-500');
 }
 
-// Confirm delete with SweetAlert
-function confirmDelete(imageRow,file) {
+// Confirm delete
+function confirmDelete(imageRow, file) {
     Swal.fire({
         title: 'Are you sure?',
         text: "You won't be able to undo this!",
@@ -647,17 +606,27 @@ function confirmDelete(imageRow,file) {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
+    }).then(result => {
         if (result.isConfirmed) {
-            const indexToDelete = imageFiles.indexOf(file);           
-            if (indexToDelete !== -1) {
-                imageFiles.splice(indexToDelete, 1);
-                console.log(`Image deleted. Remaining files: ${imageFiles.length}`);
-            }
-
+            const indexToDelete = imageFiles.indexOf(file);
+            if (indexToDelete !== -1) imageFiles.splice(indexToDelete, 1);
             imageRow.remove();
-            Swal.fire('Deleted!', 'Your image has been deleted.', 'success');
+            showAlert('Deleted!', 'Your image has been deleted.', 'success');
         }
+    });
+}
+
+// Utility: Show SweetAlert messages
+function showAlert(title, text, icon) {
+    Swal.fire({
+        icon,
+        title,
+        text,
+        toast: true,
+        position: 'top',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
     });
 }
 

@@ -53,7 +53,7 @@
                   </td>
                   <td class="p-4 flex space-x-2">
                     <button  title="Edit product details" class="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600">
-                     <a href="/admin/editProduct?id=<%=data[i]._id%>"> Edit </a>
+                      <a href="/admin/editProduct/<%= data[i]._id %>"> Edit </a>
                     </button>
                     <% if (data[i].isBlocked === false) { %>
                       <button class="block-btn bg-red-500 text-white w-24 h-10  rounded-lg font-semibold hover:bg-red-600 transition duration-200" 

@@ -1,3 +1,4 @@
+
 const env = require('dotenv').config(); // Load environment variables
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
@@ -10,23 +11,27 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Use CloudinaryStorage with Multer
+// Configure Cloudinary Storage
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'products', // Specify the folder in Cloudinary
-    format: async (req, file) => {
-      const mimeType = file.mimetype.split('/')[1];
-
-      if (mimeType === 'jpeg') return 'jpeg';
-      if (mimeType === 'png') return 'png';
-      if (mimeType === 'webp') return 'webp';
-
-      // Default to jpeg if the format isn't recognized
-      return 'jpeg';
-    },
-    quality: '100', // This will automatically optimize the quality (you can use 'auto', 'good', 'best' etc.)
-    public_id: (req, file) => `${Date.now()}-${file.originalname}`,
+  params: async (req, file) => {
+    const publicId = `${Date.now()}-${file.originalname
+      .replace(/\s+/g, '-')
+      .replace(/[^a-zA-Z0-9-_\.]/g, '')}`;
+    return {
+      folder: 'product-images', // Corrected folder name
+      public_id: publicId, // Unique public ID for each image
+      resource_type: 'image', // Ensure only images are uploaded
+      format: 'webp', // Force conversion to WebP format
+      transformation: [
+        {
+          width: 800,
+          height: 800,
+          crop: 'fill', // Ensure images fit within the dimensions
+          quality: 'auto:best', // Automatically set best quality
+        },
+      ],
+    };
   },
 });
 

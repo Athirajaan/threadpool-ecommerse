@@ -12,26 +12,35 @@
 
   <!-- Main Container -->
   <div class="w-full min-h-screen flex">
+ 
+
+
     <!-- Sidebar -->
-    <aside class="bg-white w-60 p-6 border-r fixed lg:relative z-10 transform lg:translate-x-0 transition-transform duration-300 ease-in-out">
+    <aside class=" bg-white p-6 border-r fixed fixed top-0 left-0 lg:relative z-10 transform lg:translate-x-0 transition-transform duration-300 ease-in-out ">
+      <nav class="text-sm text-gray-500 mb-4 flex items-center">
+        <a href="/" class="hover:underline">Home</a>
+        <span class="mx-2">/</span>
+        <a href="/profile" class="hover:underline">Profile</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-800 font-semibold">My Info</span>
+      </nav>
       <!-- Welcome Message -->
-      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Hello Jhanvi</h2>
+      <h2 class=" font-semibold text-gray-800 mb-1 mt-6">
+        Hello, <%= user.name %>!
+      </h2>
       <p class="text-gray-600 mb-8">Welcome to your Account</p>
 
       <!-- Navigation Links -->
       <nav class="space-y-4">
         <a href="#" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
-          <i class="fas fa-box mr-3 "></i>
-          <span>My Orders</span>
-        </a>
-        <a href="#" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
-          <i class="fas fa-heart mr-3 "></i>
-          <span>Wishlist</span>
-        </a>
-        <a href="#" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
           <i class="fas fa-user mr-3 "></i>
           <span>My Info</span>
         </a>
+        <a href="#" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          <i class="fas fa-box mr-3 "></i>
+          <span>My Orders</span>
+        </a>
+        
         <a href="#" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
           <i class="fas fa-wallet mr-3"></i>
           <span>My Wallet</span>
@@ -71,4 +80,31 @@
             }
         });
     }
+
+
+    // Define the breadcrumb paths based on the current page
+    const breadcrumbs = {
+      home: "/",
+      profile: "/profile",
+      myInfo: "/profile/my-info",
+    };
+
+    // Function to render the breadcrumb
+    function renderBreadcrumbs() {
+      const path = window.location.pathname;  // Get the current URL path
+      let breadcrumbHTML = `<a href="${breadcrumbs.home}" class="hover:underline">Home</a>`;
+
+      if (path.includes(breadcrumbs.profile)) {
+        breadcrumbHTML += ` <span class="mx-2">/</span><a href="${breadcrumbs.profile}" class="hover:underline">Profile</a>`;
+      }
+      if (path.includes(breadcrumbs.myInfo)) {
+        breadcrumbHTML += ` <span class="mx-2">/</span><span class="text-gray-800 font-semibold">My Info</span>`;
+      }
+
+      document.getElementById("breadcrumb").innerHTML = breadcrumbHTML;  // Insert the breadcrumb HTML
+    }
+
+    // Call the function to render breadcrumbs when the page loads
+    window.onload = renderBreadcrumbs;
+
     </Script>

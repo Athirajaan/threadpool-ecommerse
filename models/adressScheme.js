@@ -42,14 +42,11 @@ const addressSchema = new Schema(
           min: 100000,
           max: 999999,
         },
-        phone: {
-          type: String,
-          required: true,
-          match: [
-            /^[6-9]\d{9}$/,
-            "Please enter a valid 10-digit mobile number",
-          ],
+        isDefault: {
+          type: Boolean,
+          default: false,
         },
+       
       },
     ],
   },

@@ -29,7 +29,7 @@ router.get("/Products", adminAuth, productController.getAllProducts);
 router.get("/products/:productId/variants",adminAuth,productController.getVarients);
 router.get("/addProducts", adminAuth, productController.getProductAddPage);
 router.post("/addProducts",adminAuth,upload.array("images",5),productController.addProducts);
-router.get("/editProduct",adminAuth,productController.getEditProduct);
+router.get("/editProduct/:id",adminAuth,productController.getProductForEdit);
 router.patch("/blockProduct",adminAuth,productController.blockProduct);
 router.patch("/unblockProduct",adminAuth,productController.unblockProduct);
 

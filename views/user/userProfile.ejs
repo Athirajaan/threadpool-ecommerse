@@ -2,26 +2,355 @@
 <%- include('../partials/user/userProfile') %>
 
     <!-- Main Content -->
-    <main class="absolute inset-0 lg:ml-60 flex items-center justify-center p-8" style="top: -20%;">
-        <div class="flex flex-col items-center justify-center">
-          <!-- Icon -->
-          <div class="w-24 h-24 bg-green-100 flex items-center justify-center rounded-full mb-6">
-            <i class="fas fa-heart text-4xl text-green-500"></i>
+    <main class="flex-grow p-1">
+     
+  <div class="w-full max-w-4xl mx-auto px-1 sm:px-1 lg:px-1 py-3">
+    <!-- Page Title -->
+  
+    <!-- Contact Details -->
+    <div class="mb-12">
+      <h2 class="text-lg font-medium text-gray-800 mb-6">Personal Information</h2>
+      <div class="divide-y divide-gray-300">
+        <!-- Field -->
+        <div id="notification" class="hidden fixed top-12 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg text-white shadow-lg transition-opacity duration-500 z-50"></div>
+        <div class="flex items-start justify-between py-4">
+          <div>
+            <span class="block text-gray-600 text-sm">Your Name</span>
+            <span class="block text-gray-900 font-medium text-base mt-1"><%= user.name %></span>
           </div>
-          <!-- Message -->
-          <h2 class="text-2xl font-semibold text-gray-800 mb-2">Your wishlist is empty.</h2>
-          <p class="text-gray-600 text-center mb-6">
-            You don’t have any products in the wishlist yet. Explore our shop page to find interesting products.
-          </p>
-          <!-- Button -->
-          <a href="#" class="px-8 py-3 bg-yellow-500 text-white font-medium text-lg rounded-lg shadow-md hover:bg-yellow-600 transition">
-            Continue Shopping
+          <a href="#" class="text-black hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md  transition duration-200 ease-in-out self-center inline-block flex items-center">
+            <i class="fas fa-pencil-alt mr-2"></i> Change
           </a>
+          
+          
         </div>
-      </main>
-      
+        <!-- Field -->
+        <div class="flex items-start justify-between py-4">
+          <div>
+            <span class="block text-gray-600 text-sm">Email Address</span>
+            <span class="block text-gray-900 font-medium text-base mt-1"><%= user.email%></span>
+          </div>
+          <a href="#" class="text-black hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md  transition duration-200 ease-in-out self-center inline-block flex items-center">
+            <i class="fas fa-pencil-alt mr-2"></i> Change
+          </a>
+          
+        </div>
+        <!-- Field -->
+        <div class="flex items-start justify-between py-4">
+          <div>
+            <span class="block text-gray-600 text-sm">Phone Number</span>
+            <span class="block text-gray-900 font-medium text-base mt-1"><%= user.phone || "Not provided" %></span>
+          </div>
+          <a href="#" class="text-black hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md  transition duration-200 ease-in-out self-center inline-block flex items-center">
+            <i class="fas fa-pencil-alt mr-2"></i> Change
+          </a>
+          
+        </div>
+        <!-- Field -->
+        <div class="flex items-start justify-between py-4">
+          <div>
+            <span class="block text-gray-600 text-sm">Password</span>
+            <span class="block text-gray-900 font-medium text-base mt-1">********</span>
+          </div>
+          <a href="#" class="text-black hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md  transition duration-200 ease-in-out self-center inline-block flex items-center">
+            <i class="fas fa-pencil-alt mr-2"></i> Change
+          </a>
+          
+        </div>
+        <div class="flex items-start justify-between py-4">
+      </div>
+    </div>
+  
+    <!-- Address Section -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-lg font-medium text-gray-700">Address</h2>
+        <button  id="openModalBtn" class="text-yellow-600 hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md border border-yellow-600  hover:border-yellow-800 transition duration-200 ease-in-out self-center inline-block flex items-center">
+          <i class="fas fa-plus mr-2"></i>  add new
+        </button>
+        
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Address Card -->
+        <% if (addresses && addresses.length > 0) { %>
+          <% addresses.forEach(addressItem => { %>
+            <% const address = addressItem.address[0]; %> <!-- Access the first object in the address array -->
+            <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+              <h3 class="text-gray-900 font-semibold mb-2"><%= address.name || 'N/A' %></h3>
+              <p class="text-gray-700 text-sm mb-1"><%= address.city || 'N/A' %></p>
+              <p class="text-gray-600 text-sm mb-4">
+                <%= address.landMark || 'N/A' %>, <%= address.state || 'N/A' %> - <%= address.pincode || 'N/A' %>
+              </p>
+              <div class="flex items-center justify-between text-sm">
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg"><%= address.addressType || 'N/A' %></span>
+                <div class="space-x-2">
+                  <% if (address.isDefault) { %>
+                    <button class="text-blue-600 hover:underline">Default Address</button>
+                  <% } %>
+                </div>
+              </div>
+              <div class="flex justify-between mt-4 text-sm text-gray-600">
+                <button class="hover:text-red-600">Remove</button>
+                <button class="hover:text-blue-600">Edit</button>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p>No addresses available.</p>
+        <% } %>
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+
+<!-- Modal -->
+<div
+  id="addAddressModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden"
+>
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
+    <div class="flex justify-between items-center">
+      <h2 class="text-xl font-bold">Add Address</h2>
+      <button id="closeModalBtn" class="text-gray-500 hover:text-black text-xl">&times;</button>
+    </div>
+    <form id="addressForm" class="mt-4">
+      <!-- Address Type -->
+      <div class="mb-4">
+        <label for="addressType" class="block text-sm font-medium">Address Type*</label>
+        <select
+          id="addressType"
+          name="addressType"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+          required
+        >
+          <option value="" disabled selected>Select type</option>
+          <option value="Home">Home</option>
+          <option value="Work">Work</option>
+          <option value="Office">Office</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <!-- Name -->
+      <div class="mb-4">
+        <label for="name" class="block text-sm font-medium">Name*</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+          placeholder="Full Name"
+          minlength="3"
+          maxlength="50"
+          required
+        />
+      </div>
+
+      <!-- City -->
+      <div class="mb-4">
+        <label for="city" class="block text-sm font-medium">City*</label>
+        <input
+          type="text"
+          id="city"
+          name="city"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+          placeholder="City"
+          minlength="2"
+          maxlength="100"
+          required
+        />
+      </div>
+
+      <!-- Landmark -->
+      <div class="mb-4">
+        <label for="landMark" class="block text-sm font-medium">Landmark*</label>
+        <input
+          type="text"
+          id="landMark"
+          name="landMark"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+          placeholder="Landmark"
+          maxlength="100"
+          required
+        />
+      </div>
+
+      <!-- State -->
+      <div class="mb-4">
+        <label for="state" class="block text-sm font-medium">State*</label>
+        <input
+          type="text"
+          id="state"
+          name="state"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+          placeholder="State"
+          required
+        />
+      </div>
+
+      <!-- Pincode -->
+      <div class="mb-4">
+        <label for="pincode" class="block text-sm font-medium">Pincode*</label>
+        <input
+          type="number"
+          id="pincode"
+          name="pincode"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+          placeholder="6-digit Pincode"
+          min="100000"
+          max="999999"
+          required
+        />
+      </div>
+      <div>
+        <label class="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="isDefault"
+            class="form-checkbox h-4 w-4 text-blue-600"
+            onchange="handleDefaultAddressCheckbox()"
+          />
+          <span>Set as Default Address</span>
+        </label>
+      </div>
+      <div id="error-message" class="text-red-500"></div>
+
+
+      <!-- Buttons -->
+      <div class="flex justify-end">
+        <button
+          type="submit"
+          class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mr-2"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          id="cancelModalBtn"
+          class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
       
   </div>
 
+
+  <script>
+
+// Get modal elements
+const modal = document.getElementById("addAddressModal");
+const openModalBtn = document.getElementById("openModalBtn");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const cancelModalBtn = document.getElementById("cancelModalBtn");
+const addressForm = document.getElementById("addressForm");
+
+// Open modal
+openModalBtn.addEventListener("click", () => {
+  modal.classList.remove("hidden");
+  addressForm.reset(); // Reset the form fields when opening the modal
+});
+
+// Close modal
+[closeModalBtn, cancelModalBtn].forEach((btn) =>
+  btn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+  })
+);
+
+// Close modal if clicked outside
+window.addEventListener("click", (event) => {
+  if (event.target === modal) {
+    modal.classList.add("hidden");
+  }
+});
+
+// Submit form
+document.getElementById("addressForm").addEventListener("submit", async function(event) {
+  event.preventDefault();  // Prevent the default form submission
+
+  // Collect form data
+  const formData = {
+    addressType: document.getElementById("addressType").value,
+    name: document.getElementById("name").value,
+    city: document.getElementById("city").value,
+    landMark: document.getElementById("landMark").value,
+    state: document.getElementById("state").value,
+    pincode: document.getElementById("pincode").value,
+    isDefault: document.getElementById("isDefault").checked,
+  };
+
+  try {
+    const response = await fetch("http://localhost:3000/add-address", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      // If successful, show a success message or update the UI
+      localStorage.setItem("addressAdded", "true");
+      // Optionally, close the modal here
+      modal.classList.add("hidden");
+      addressForm.reset(); // Reset the form fields after successful submission
+    
+    } else {
+      // If there's an error, show an error message
+      localStorage.setItem("addressAdded", "error");
+    }
+    location.reload()
+  } catch (error) {
+    console.error("Error:", error);
+    localStorage.setItem("addressAdded", "error");
+    location.reload();
+  }
+});
+
+// Cancel button closes the modal without submitting
+document.getElementById("cancelModalBtn").addEventListener("click", function() {
+  modal.classList.add("hidden");
+  addressForm.reset(); // Reset the form when canceling
+});
+
+window.addEventListener("load", () => {
+  const addressAdded = localStorage.getItem("addressAdded");
+
+  if (addressAdded === "true") {
+    showNotification("Address added successfully!", "bg-green-500");
+  } else if (addressAdded === "error") {
+    showNotification("Something went wrong. Please try again.", "bg-red-500");
+  }
+
+  // Clear the flag after showing the notification
+  localStorage.removeItem("addressAdded");
+});
+
+// Function to show the notification
+function showNotification(message, bgColor) {
+  const notification = document.getElementById("notification");
+  notification.textContent = message;
+
+  // Apply the background color using Tailwind
+  notification.classList.remove("hidden");
+  notification.classList.add("show", bgColor); // Dynamically add the color class
+
+  // Show notification for 5 seconds (5000ms)
+  setTimeout(() => {
+    notification.classList.remove("show");
+    notification.classList.add("hidden");
+  }, 5000); // Change this to 5000ms for 5 seconds
+}
+
+  </script>
 
 <%- include('../partials/user/userfooter') %> 

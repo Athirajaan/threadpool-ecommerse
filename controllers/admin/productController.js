@@ -104,8 +104,6 @@ const getProductAddPage = async (req, res) => {
   }
 };
 
-
-// addProduct
 const addProducts = async (req, res) => {
   try {
     const { 
@@ -138,7 +136,6 @@ const addProducts = async (req, res) => {
       validationErrors.push('Regular price must be greater than sale price');
     }
 
-    
     const stock = {
       S: parseInt(sizeSQty, 10) || 0,
       M: parseInt(sizeMQty, 10) || 0,
@@ -150,11 +147,11 @@ const addProducts = async (req, res) => {
       validationErrors.push('At least one size must have a quantity');
     }
 
-    
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
       validationErrors.push('Invalid category ID');
     }
+
     const productExists = await Product.findOne({ 
       productName: { $regex: new RegExp(`^${productName}$`, 'i') } 
     });
@@ -166,19 +163,28 @@ const addProducts = async (req, res) => {
       });
     }
 
-    
     if (!req.files || req.files.length < 3 || req.files.length > 5) {
       return res.status(400).json({
         success: false, 
         message: "Please upload between 3 and 5 images."
       });
     }
+
+    // Image upload section
     const images = [];
     try {
       for (let file of req.files) {
         const result = await cloudinary.uploader.upload(file.path, {
-          folder: "product-images",
-          transformation: [{ width: 440, height: 440, crop: "fill", quality: "100" }]
+          folder: "product-images", // Ensure images are uploaded to the correct folder
+          transformation: [
+            { 
+              width: 800, 
+              height: 800, 
+              crop: "fill", 
+              quality: "auto:best", 
+              format: "webp" // Ensure images are saved in WebP format
+            }
+          ],
         });
         images.push(result.secure_url);
       }
@@ -189,9 +195,9 @@ const addProducts = async (req, res) => {
         message: 'Failed to upload images'
       });
     }
+
     const totalQuantity = Object.values(stock).reduce((a, b) => a + b, 0);
 
-  
     const newProduct = new Product({
       productName,
       description,
@@ -223,24 +229,42 @@ const addProducts = async (req, res) => {
 };
 
 
-// edit product 
+const getProductForEdit = async (req, res) => {
+  try {
+    const productId = req.params.id;
 
-const getEditProduct = async (req,res)=>{
- try { 
+    // Find the product by ID and populate its category
+    const product = await Product.findById(productId).populate('category');
 
-  const id = req.query.id;
-  const product = await Product.findOne({_id:id});
-  const category = await Category.find({});
-  res.render("edit-product", {
-    product:product,
-    cat:category,
+    // Check if the product exists
+    if (!product) {
+      return res.status(404).render('error', {
+        message: 'Product not found',
+      });
+    }
 
-  })
-  
- } catch (error) {
-     res.redirect("/pageerror");
- }
-}
+    // Render the edit page and pass the product details
+    const categories = await Category.find();
+    res.render('edit-Product', {
+      title: 'Edit Product',
+      product,
+      categories,
+      existingImages: product.productImage
+    });
+  } catch (error) {
+    console.error('Error fetching product for edit:', error);
+
+    // Render an error page in case of a server error
+    res.status(500).render('error', {
+      message: 'Error retrieving product details',
+    });
+  }
+};
+
+
+
+
+
 const blockProduct = async (req, res) => {
   try {
     const { productId } = req.body; // Retrieve productId from request body
@@ -269,7 +293,7 @@ module.exports = {
   getProductAddPage,
   addProducts,
   getVarients,
-  getEditProduct,
+  getProductForEdit,
   blockProduct,
   unblockProduct,
 };

@@ -33,19 +33,13 @@ const getPrice = async (req, res) => {
 }
 
 
-const getCart = async (req,res)=>{
-   try {
-    res.render('cart')
-   } catch (error) {
-    res.status(500).send('Server Error');
-   }
-}
 
 
 
 
-module.exports ={
+
+module.exports = {
     productDetails,
     getPrice,
-    getCart,
+
 }

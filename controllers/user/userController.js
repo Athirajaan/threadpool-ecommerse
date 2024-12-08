@@ -2,6 +2,7 @@ const User = require("../../models/userSchema");
 const Category =require("../../models/categorySchema");
 const Product =require('../../models/productSchema');
 const Calculate=require('../../models/categorySchema');
+const Address = require('../../models/adressScheme');
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -216,7 +217,6 @@ const login = async (req, res) => {
     console.log(req.body);
     const { email, password } = req.body;
     const findUser = await User.findOne({ isAdmin: false, email: email });
-    console.log("User found:", findUser);
 
     if (!findUser) {
       console.log("User not found");
@@ -243,7 +243,7 @@ const login = async (req, res) => {
 
 
 
-const logoutUser= (req, res) => {
+const logOutUser= (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       return res.status(500).send('Unable to log out');
@@ -253,111 +253,87 @@ const logoutUser= (req, res) => {
 };
 
 
-const loadWomenShopping = async (req,res)=>{
+const loadProfile = async (req, res) => {
   try {
-    const user = req.session.user;
-    const userData = await User.findOne({ _id:user})
-    const category = await Category.find({isListed:true,gender:women})
-    const categoryIds = category.map((categories)=>categories._id.toString())
-    const page = parseInt(req.query.page) || 1;
-    const limit = 9;
-    const skip = (page-1)*limit;
-    const products =await Product.find({ 
-      isBlocked:false,
-      category:{$in:categoryIds},
-      totalQuantity:{$gt:0}
-    }).sort({createdOn:-1}).skip(skip).limit(limit);
-    const totalProducts = await Product.countDocuments({
-      isBlocked:false,
-      category:{$in:categoryIds},
-      totalQuantity:{$gt:0}
-    });
-    const totalPages = Math.ceil(totalProducts/limit);
-    const categoryWithIds = category.map((categories)=>({_id:categories,name:categories.name}))
+    const userId = req.session.userId; // Get user ID from the session
+    const user = await User.findById(userId); // Fetch user from the database
+    
+    if (user) {
+      // Fetch addresses for the user
+      const addresses = await Address.find({ UserId: userId }); // Multiple addresses for the user
+      console.log(addresses); // Log the addresses array before rendering the page
 
-     res.render('womenShop',{
-      user : userData,
-      products:products,
-      category:categoryWithIds,
-      totalProducts:totalProducts,
-      currentPage:page,
-      totalPages:totalPages
-     })
-     
-  } catch (error) {
-    res.redirect('/pageNotFound')
-  }
-}
-
-
-const loadMenShopping = async (req, res) => {
-  try {
-    const user = req.session.user;
-    if (!user) {
-      return res.redirect('/login'); // Redirect to login if user is not found
-    }
-
-    const userData = await User.findOne({ _id: user });
-    const categories = await Category.find({ isListed: true, gender: 'men'});
-    if (!categories.length) {
-      return res.render('menShope', {
-        user: userData,
-        products: [],
-        category: [],
-        totalProducts: 0,
-        currentPage: 1,
-        totalPages: 1,
+      // Render the profile page and pass user details and address data
+      res.render('userProfile', {
+        user,
+        addresses: addresses.length > 0 ? addresses : [], // Pass addresses to the template
       });
+    } else {
+      res.redirect('/login'); // Redirect if the user doesn't exist
     }
-
-    const categoryIds = categories.map(category => category._id.toString());
-    const page = parseInt(req.query.page) || 1;
-    const limit = 9;
-    const skip = (page - 1) * limit;
-
-    const products = await Product.find({
-      isBlocked: false,
-      category: { $in: categoryIds },
-      totalQuantity: { $gt: 0 },
-    })
-      .sort({ createdOn: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    const totalProducts = await Product.countDocuments({
-      isBlocked: false,
-      category: { $in: categoryIds },
-      totalQuantity: { $gt: 0 },
-    });
-
-    const totalPages = Math.ceil(totalProducts / limit);
-    const categoriesList = categories.map(category => ({
-      _id: category._id,
-      name: category.name,
-    }));
-
-    res.render('menshope', {
-      user: userData,
-      products: products,
-      category: categoriesList,
-      totalProducts: totalProducts,
-      currentPage: page,
-      totalPages: totalPages,
-    });
   } catch (error) {
-    console.error(error);
+    console.error('Error loading profile:', error);
     res.redirect('/pageNotFound');
   }
 };
 
 
-const loadProfile = async (req,res)=>{
+
+const addAddress = async (req, res) => {
   try {
-    res.render('userProfile')
-  } catch (error) {
-    res.redirect('/pageNotFound')
+    const userId = req.session.userId; 
+  
+
+    const { addressType, name, city, landMark, state, pincode, isDefault } = req.body;
+
+    if (isDefault) {
+      
+      const existingDefaultAddress = await Address.findOne({
+        UserId: userId,
+        "address.isDefault": true,
+      });
+
+      if (existingDefaultAddress) {
+        
+        await Address.updateOne(
+          { UserId: userId, "address.isDefault": true },
+          { $set: { "address.$.isDefault": false } }
+        );
+      }
+    }
+
+    const address = {
+      addressType,
+      name,
+      city,
+      landMark,
+      state,
+      pincode,
+      isDefault,
+    };
+    
+
+    if (!userId || !address) {
+      return res.status(400).json({ message: "User ID and address are required" });
+    }
+  
+  
+
+    const newAddress = new Address({
+      UserId: userId,
+      address: address,
+    });
+
+    await newAddress.save();
+    res.status(200).json({ message: "Address added successfully" });
+
+  } catch (err) {
+    res.status(500).json({ message: "Something went wrong", error: err.message });
   }
-}
+};
+
+
+
 
 
 module.exports = {
@@ -370,8 +346,7 @@ module.exports = {
   resendOtp,
   pageNotFound,
   login,
-  logoutUser,
-  loadWomenShopping ,
-  loadMenShopping,
+  logOutUser,
   loadProfile,
+  addAddress ,
 };

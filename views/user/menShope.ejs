@@ -109,45 +109,35 @@
         </div>
         
 
-        <!-- Products Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          <!-- Product Card -->
-          <div class="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow relative">
-            <div class="h-72 bg-gray-100 flex items-center justify-center overflow-hidden relative group">
-              <img src="https://via.placeholder.com/150" alt="Product" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
-            </div>
-            <!-- Wishlist Icon -->
-            <div class="absolute bottom-12 right-4 cursor-pointer z-10">
-              <i class="fas fa-heart text-gray-500 hover:text-red-500"></i>
-            </div>
-            <!-- Product Details -->
-            <div class="p-4">
-              <h3 class="font-semibold text-lg text-gray-800 mb-2 truncate">Black Sweatshirt</h3>
-              <div class="flex items-center">
-                <span class="text-xl font-bold text-gray-900">$99.00</span>
-                <span class="text-sm text-gray-500 line-through ml-2">$123.00</span>
-                <span class="text-sm text-green-600 font-semibold ml-auto">20% Off</span>
-              </div>
-            </div>
-          </div>
+    <!-- Products Grid -->
+<!-- Products Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+  <% products.forEach(product => { %>
+    <!-- Product Card -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow relative">
+      <div class="h-72 bg-gray-100 flex items-center justify-center overflow-hidden relative group">
+        <!-- Display product image -->
+        <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
+      </div>
+      <!-- Wishlist Icon -->
+      <div class="absolute bottom-12 right-4 cursor-pointer z-10">
+        <i class="fas fa-heart text-gray-500 hover:text-red-500"></i>
+      </div>
+      <!-- Product Details -->
+      <div class="p-4">
+        <h3 class="font-semibold text-lg text-gray-800 mb-2 truncate"><%= product.productName %></h3>
+        <div class="flex items-center">
+          <span class="text-xl font-bold text-gray-900">$<%= product.salePrice %></span>
+          <span class="text-sm text-gray-500 line-through ml-2">$<%= product.regularPrice %></span>
+          <span class="text-sm text-green-600 font-semibold ml-auto"><%= ((product.regularPrice - product.salePrice) / product.regularPrice * 100).toFixed(0) %>% Off</span>
+        </div>
+      </div>
+    </div>
+  <% }); %>
+</div>
 
           <!-- Repeat Product Card -->
-          <div class="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow relative">
-            <div class="h-72 bg-gray-100 flex items-center justify-center overflow-hidden relative group">
-              <img src="https://via.placeholder.com/150" alt="Product" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
-            </div>
-            <div class="absolute bottom-12 right-4 cursor-pointer z-10">
-              <i class="fas fa-heart text-gray-500 hover:text-red-500"></i>
-            </div>
-            <div class="p-4">
-              <h3 class="font-semibold text-lg text-gray-800 mb-2 truncate">White T-Shirt</h3>
-              <div class="flex items-center">
-                <span class="text-xl font-bold text-gray-900">$49.00</span>
-                <span class="text-sm text-gray-500 line-through ml-2">$59.00</span>
-                <span class="text-sm text-green-600 font-semibold ml-auto">15% Off</span>
-              </div>
-            </div>
-          </div>
+        
           <!-- Add more product cards as needed -->
         </div>
       </main>

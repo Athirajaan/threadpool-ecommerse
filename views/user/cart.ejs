@@ -1,117 +1,103 @@
 <%- include('../partials/user/userheader') %> 
-
 <div class="max-w-7xl mx-auto p-6">
-    <!-- Main Container -->
-    <div class="flex flex-col lg:flex-row gap-6">
-      <!-- Left: Products Section -->
-      <div class="bg-white w-full lg:w-2/3 p-6 rounded-lg shadow-md">
-        <!-- Actions on Top -->
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-lg font-semibold text-pink-500">
-            Your Cart (2 Items)
-          </h2>
-          <div class="flex items-center space-x-4">
-            <button class="text-sm text-blue-500 font-semibold hover:underline" onclick="showModal('removeAllModal')">
-              Remove All
-            </button>
-            <button class="text-sm text-blue-500 font-semibold hover:underline" onclick="showModal('moveAllToWishlistModal')">
-              Move All to Wishlist
-            </button>
-          </div>
-        </div>
-    
-        <!-- Cart Items -->
-        <div class="space-y-6">
-          <!-- Item 1 -->
-          <div class="flex items-start">
-            <img src="https://via.placeholder.com/100" alt="Athena Dress" class="w-24 h-24 rounded-lg">
-            <div class="ml-4 flex-1">
-              <h3 class="text-sm font-medium">Athena Women Solid Off-Shoulder Bodycon Midi Dress</h3>
-              <p class="text-sm text-gray-600">Sold by: Apex Apparels</p>
-              <div class="flex items-center space-x-4 mt-2">
-                <button class="border border-gray-300 rounded-lg px-2 py-1 text-sm" onclick="openSizeModal()">
-                  Size: XXL
-                </button>
-                <button class="border border-gray-300 rounded-lg px-2 py-1 text-sm" onclick="openQuantityModal()">
-                  Qty: 10
-                </button>
-              </div>
-              <p class="text-sm text-green-500 font-medium mt-2">7 days return available</p>
-            </div>
-            <div class="text-right">
-              <p class="text-lg font-semibold text-gray-900">₹12,240</p>
-              <p class="text-sm text-gray-400 line-through">₹24,990</p>
-              <p class="text-sm text-green-500 font-medium">51% OFF</p>
-              <button class="mt-4 text-red-500 hover:text-red-700" onclick="showModal('removeItemModal')">
-                Remove
-              </button>
-            </div>
-          </div>
-    
-          <!-- Modals for Product Actions -->
-          <!-- Add the modal code from the previous message here -->
-    
+  <!-- Main Container -->
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Left: Products Section -->
+    <div class="bg-white w-full lg:w-2/3 p-6 rounded-lg shadow-md flex flex-col">
+      <!-- Actions on Top -->
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-semibold text-yellow-500">Your Cart (2 Items)</h2>
+        <div class="flex items-center space-x-4">
+          <button class="text-sm text-blue-500 font-semibold hover:underline" onclick="showModal('removeAllModal')">Remove All</button>
+          <button class="text-sm text-blue-500 font-semibold hover:underline" onclick="showModal('moveAllToWishlistModal')">Move All to Wishlist</button>
         </div>
       </div>
-    
-      <!-- Right: Price Details Section -->
-      <div class="bg-white w-full lg:w-1/3 p-6 rounded-lg shadow-md">
-        <!-- Apply Coupon Section -->
-        <div class="mb-6">
-          <h3 class="text-lg font-semibold mb-4">Apply Coupon</h3>
-          <div class="flex items-center space-x-4">
-            <!-- Coupon Dropdown -->
-            <select id="couponDropdown" class="w-2/3 border border-gray-300 rounded-lg px-4 py-2 text-sm">
-              <option value="">Select a Coupon</option>
-              <option value="NEW10">NEW10 - 10% Off</option>
-              <option value="FREESHIP">FREESHIP - Free Shipping</option>
-              <option value="SAVE20">SAVE20 - ₹20 Off</option>
-            </select>
-            <!-- Apply Button -->
-            <button id="applyCouponBtn" class="w-1/3 bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-600">
-              Apply
-            </button>
-          </div>
-          <!-- Dialog/Feedback Message -->
-          <div id="couponFeedback" class="mt-4 hidden text-sm rounded-lg p-3 text-white">
-            <!-- Dynamic messages will appear here -->
-          </div>
-        </div>
-    
-        <!-- Price Details Section -->
-        <h3 class="text-lg font-semibold mb-4">Price Details (2 Items)</h3>
-        <div class="space-y-3">
-          <div class="flex justify-between text-sm text-gray-600">
-            <p>Total MRP:</p>
-            <p>₹26,389</p>
-          </div>
-          <div class="flex justify-between text-sm text-gray-600">
-            <p>Discount on MRP:</p>
-            <p>-₹13,674</p>
-          </div>
-          <div class="flex justify-between text-sm text-gray-600">
-            <p>Coupon Discount:</p>
-            <p id="couponDiscount">-₹0</p>
-          </div>
-          <div class="flex justify-between text-sm text-gray-600">
-            <p>Platform Fee:</p>
-            <p>Free</p>
-          </div>
-          <div class="flex justify-between text-sm text-gray-600">
-            <p>Shipping Fee:</p>
-            <p>Free</p>
-          </div>
-        </div>
-        <div class="flex justify-between mt-6 text-lg font-semibold">
-          <p>Total Amount:</p>
-          <p id="totalAmount">₹11,515</p>
-        </div>
-        <button class="mt-6 w-full bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600">
-          PLACE ORDER
-        </button>
+      <!-- Cart Items -->
+      <div class="space-y-6">
+        <% if (items.length === 0) { %>
+          <p>Your cart is empty.</p>
+        <% } else { %>
+          <% items.forEach(item => { %>
+            <div class="flex items-start gap-4 border-b border-gray-300">
+              <img src="<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" class="w-24 h-24 rounded-lg">
+              <div class="ml-4 flex-1">
+                <h3 class="text-sm font-medium"><%= item.productId.productName %></h3>
+                <!-- <p class="text-sm text-gray-600">Description: <%= item.productId.description %></p> -->
+                <div class="flex items-center space-x-4 mt-2">
+                  <button class="border border-gray-300 rounded-lg px-2 py-1 text-sm" onclick="openSizeModal()">Size: <%= item.size || 'M' %></button>
+                  <button class="border border-gray-300 rounded-lg px-2 py-1 text-sm"  onclick="openQuantityModal()">Qty: <%= item.quantity %></button>
+                </div>
+                <p class="text-sm text-green-500 font-medium mt-2">7 days return available</p>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-between space-x-2">
+                  <p class="text-lg font-semibold text-gray-900">₹<%= item.totalPrice %></p>
+                  <p class="text-sm font-semibold text-gray-400 line-through">₹<%= item.productId.regularPrice %></p>
+                </div>
+                <p class="text-sm text-green-500 font-medium">
+                  <%= Math.round(((item.productId.regularPrice - item.productId.salePrice) / item.productId.regularPrice) * 100) %>% OFF
+                </p>
+                <!-- Remove Icon -->
+                <i class="fa fa-trash text-red-500 hover:text-red-700 cursor-pointer mt-4" onclick="removeItem('<%= item.productId._id %>')" title="Remove from cart"></i>
+              </div>
+            </div>
+          <% }); %>
+        <% } %>
       </div>
     </div>
-    
+
+    <!-- Right: Price Details Section -->
+    <div class="bg-white w-full lg:w-1/3 p-6 rounded-lg shadow-md flex flex-col">
+      <!-- Apply Coupon Section -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold mb-4">Apply Coupon</h3>
+        <div class="flex items-center space-x-4">
+          <select id="couponDropdown" class="w-2/3 border border-gray-300 rounded-lg px-4 py-2 text-sm">
+            <option value="">Select a Coupon</option>
+            <option value="NEW10">NEW10 - 10% Off</option>
+            <option value="FREESHIP">FREESHIP - Free Shipping</option>
+            <option value="SAVE20">SAVE20 - ₹20 Off</option>
+          </select>
+          <button id="applyCouponBtn" class="w-1/3 bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-600">Apply</button>
+        </div>
+        <div id="couponFeedback" class="mt-4 hidden text-sm rounded-lg p-3 text-white"></div>
+      </div>
+
+      <!-- Price Details Section -->
+      <h3 class="text-lg font-semibold mb-4">Price Details (2 Items)</h3>
+      <div class="space-y-3">
+        <div class="flex justify-between text-sm text-gray-600">
+          <p>Total MRP:</p>
+          <p>₹26,389</p>
+        </div>
+        <div class="flex justify-between text-sm text-gray-600">
+          <p>Discount on MRP:</p>
+          <p>-₹13,674</p>
+        </div>
+        <div class="flex justify-between text-sm text-gray-600">
+          <p>Coupon Discount:</p>
+          <p id="couponDiscount">-₹0</p>
+        </div>
+        <div class="flex justify-between text-sm text-gray-600">
+          <p>Platform Fee:</p>
+          <p>Free</p>
+        </div>
+        <div class="flex justify-between text-sm text-gray-600">
+          <p>Shipping Fee:</p>
+          <p>Free</p>
+        </div>
+      </div>
+      <div class="flex justify-between mt-6 text-lg font-semibold">
+        <p>Total Amount:</p>
+        <p id="totalAmount">₹11,515</p>
+      </div>
+      <button class="mt-6 w-full bg-yellow-500 text-black py-3 rounded-lg font-semibold hover:bg-yellow-600">PLACE ORDER</button>
+    </div>
+  </div>
+</div>
+
+     
+
     <!-- Insert Modals Below Here -->
     <!-- Example of Remove All Modal -->
     <div id="removeAllModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
@@ -176,8 +162,6 @@
     <button class="mt-4 bg-pink-500 text-white py-2 px-4 rounded-lg" onclick="closeModal('quantityModal')">Done</button>
   </div>
 </div>
-
-     
 
   <script>
     const applyCouponBtn = document.getElementById('applyCouponBtn');

@@ -12,191 +12,606 @@
       </nav>
   
   </div>
-    <div class="w-full max-w-5xl bg-white rounded-lg shadow-lg p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-      <!-- Left Side -->
-      <div>
-        <form method="post" action="/admin/addProducts" enctype="multipart/form-data" onsubmit="return validateForm(event)">
-        <!-- Product Name -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-600">Product Name</label>
-          <input
-            type="text"
-            id="productName"
-            placeholder="Enter product name"
-            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
-          />
-          <div id="productName-error" class="text-red-500 text-sm mt-1 error-message"></div>
-        </div>
-
-        <!-- Gender Selection -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-600">Select Gender</label>
-          <select id="gender" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400">
-            <option value="">Choose...</option>
-            <option value="Men">Men</option>
-            <option value="Women">Women</option>
-          </select>
-          <div id="gender-error" class="text-red-500 text-sm mt-1 error-message"></div>
-        </div>
-  
-        <!-- category -->
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-600">Category</label>
-          <select id="category" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400" disabled>
-            <option value="" disabled selected>Choose category...</option>
-          </select>
-          <div id="category-error" class="text-red-500 text-sm mt-1 error-message"></div>
-        </div>
+      <!-- Edit Product Form (Similar Structure to Add Product) -->
+      <div class="w-full max-w-5xl bg-white rounded-lg shadow-lg p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Left Side -->
+        <div>
+          <form method="post" action="/admin/editProduct/<%= product._id %>" enctype="multipart/form-data" onsubmit="return validateForm(event)">
+            <!-- Hidden Input for Product ID -->
+            <input type="hidden" id="productId" name="productId" value="<%= product._id %>">
       
-  
-        <!-- Description -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-600">Description</label>
-          <textarea
-            id="description"
-            rows="3"
-            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
-            placeholder="Write a compelling description..."
-          ></textarea>
-          <div id="description-error" class="text-red-500 text-sm mt-1 error-message"></div>
-        </div>
-  
-        <!-- Pricing Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-600">Regular Price</label>
-            <input
-              type="number"
-              id="regularPrice"
-              placeholder="0.00"
-              class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
-            />
-            <div id="regularPrice-error" class="text-red-500 text-sm mt-1 error-message"></div>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-600">Sale Price</label>
-            <input
-              type="number"
-              id="salePrice"
-              placeholder="0.00"
-              class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
-            />
-            <div id="salePrice-error" class="text-red-500 text-sm mt-1 error-message"></div>
-          </div>
-        </div>
-  
-        <!-- Size Variants -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-600">Size Variants</label>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <!-- Size Fields  S-->
-            <div>
-              <label class="block text-xs font-medium text-gray-600">S</label>
-              <input
-                type="number"
-                id="sizeSQty"
-                placeholder="Qty"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
-              />
-              <div id="sizeSQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+            <!-- Product Name -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-600">Product Name</label>
+              <input type="text" id="productName" name="productName" placeholder="Enter product name"
+                class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400" value="<%= product.productName %>" />
+              <div id="productName-error" class="text-red-500 text-sm mt-1 error-message"></div>
             </div>
-            <!-- M -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600">M</label>
-              <input
-                type="number"
-                id="sizeMQty"
-                placeholder="Qty"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
-              />
-              <div id="sizeSQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+      
+            <!-- Gender Selection -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-600">Select Gender</label>
+              <select id="gender" name="gender" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400">
+                <option value="" <%= !product.gender ? 'selected' : '' %>>Choose...</option>
+                <option value="Men" <%= product.gender === 'Men' ? 'selected' : '' %>>Men</option>
+                <option value="Women" <%= product.gender === 'Women' ? 'selected' : '' %>>Women</option>
+              </select>
+              <div id="gender-error" class="text-red-500 text-sm mt-1 error-message"></div>
             </div>
+      
+            <!-- Category -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-600">Category</label>
+              <select id="category" name="category" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400">
+                <option value="" disabled <%= !product.category ? 'selected' : '' %>>Choose category...</option>
+                <% categories.forEach(category => { %>
+                  <option value="<%= category._id %>" <%= product.category._id.toString() === category._id.toString() ? 'selected' : '' %>><%= category.name %></option>
+                <% }) %>
+              </select>
+              <div id="category-error" class="text-red-500 text-sm mt-1 error-message"></div>
+            </div>
+      
+            <!-- Description -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-600">Description</label>
+              <textarea id="description" name="description" rows="3" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
+                placeholder="Write a compelling description..."><%= product.description %></textarea>
+              <div id="description-error" class="text-red-500 text-sm mt-1 error-message"></div>
+            </div>
+      
+            <!-- Pricing Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-600">Regular Price</label>
+                <input type="number" id="regularPrice" name="regularPrice" placeholder="0.00"
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400" value="<%= product.regularPrice %>" />
+                <div id="regularPrice-error" class="text-red-500 text-sm mt-1 error-message"></div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-600">Sale Price</label>
+                <input type="number" id="salePrice" name="salePrice" placeholder="0.00"
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400" value="<%= product.salePrice %>" />
+                <div id="salePrice-error" class="text-red-500 text-sm mt-1 error-message"></div>
+              </div>
+            </div>
+      
+            <!-- Size Variants -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-600">Size Variants</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <!-- Size S -->
+                <div>
+                  <label class="block text-xs font-medium text-gray-600">S</label>
+                  <input type="number" id="sizeSQty" name="sizeSQty" placeholder="Qty"
+                    class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400" value="<%= product.stock.S%>" />
+                  <div id="sizeSQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+                </div>
+                <!-- Size M -->
+                <div>
+                  <label class="block text-xs font-medium text-gray-600">M</label>
+                  <input type="number" id="sizeMQty" name="sizeMQty" placeholder="Qty"
+                    class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400" value="<%= product.stock.M%>" />
+                  <div id="sizeMQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+                </div>
+                <!-- Size L -->
+                <div>
+                  <label class="block text-xs font-medium text-gray-600">L</label>
+                  <input type="number" id="sizeLQty" name="sizeLQty" placeholder="Qty"
+                    class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400" value="<%= product.stock.L%>" />
+                  <div id="sizeLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+                </div>
+                <!-- Size XL -->
+                <div>
+                  <label class="block text-xs font-medium text-gray-600">XL</label>
+                  <input type="number" id="sizeXLQty" name="sizeXLQty" placeholder="Qty"
+                    class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400" value="<%= product.stock.XL%>" />
+                  <div id="sizeXLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+      
 
-            <!-- L -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600">L</label>
-              <input
-                type="number"
-                id="sizeLQty"
-                placeholder="Qty"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
-              />
-              <div id="sizeLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
-            </div>
-            <!-- XL -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600">XL</label>
-              <input
-                type="number"
-                id="sizeXLQty"
-                placeholder="Qty"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
-              />
-              <div id="sizeXLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
-            </div>
-         
-          </div>
-        </div>
+            
+          <!-- Edit Product Design -->
+<div class="max-w-md p-4 bg-white border rounded shadow-md">
+  <!-- File Input -->
+  <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-gray-500">
+    <input type="file" id="imageInput" class="hidden" accept="image/*" multiple />
+    <label for="imageInput" class="cursor-pointer flex flex-col items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 11.88-7.9m6.12 0A4 4 0 1115 15m6-2v6m0 0H9m12 0l-3-3m0 0l-3 3" />
+      </svg>
+      <p class="mt-2 text-sm font-medium">Drop your images here, or <span class="text-blue-500">browse</span></p>
+      <p class="text-xs">JPEG, PNG files are allowed</p>
+    </label>
+  </div>
+  <div id="imageInput-error" class="text-red-500 text-sm mt-1 error-message"></div>
+
+  <!-- Cropping Modal -->
+  <div id="cropModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-4 rounded shadow-lg w-full max-w-lg">
+      <div class="w-[500px] h-[400px] overflow-hidden">
+        <img id="cropImage" class="object-contain w-full h-full" />
       </div>
- 
-  
-      <!-- Uploaded Images Section -->
-      <div class="max-w-md p-4 bg-white border rounded shadow-md">
-        <!-- File Input -->
-        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-gray-500">
-          <input type="file" id="imageInput" class="hidden" accept="image/*" multiple />
-          <label for="imageInput" class="cursor-pointer flex flex-col items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-10 w-10 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 15a4 4 0 11.88-7.9m6.12 0A4 4 0 1115 15m6-2v6m0 0H9m12 0l-3-3m0 0l-3 3"
-              />
-            </svg>
-            <p class="mt-2 text-sm font-medium">Drop your images here, or <span class="text-blue-500">browse</span></p>
-            <p class="text-xs">JPEG, PNG files are allowed</p>
-          </label>
-        </div>
-        <div id="imageInput-error" class="text-red-500 text-sm mt-1 error-message"></div>
-     
-         <!-- Cropping Modal -->
-        <div id="cropModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-4 rounded shadow-lg w-full max-w-lg">
-          <div class="w-[500px] h-[400px] overflow-hidden">
-              <img id="cropImage" class="object-contain w-full h-full" />
-          </div>
-          <div class="mt-4 flex justify-between">
-              <button id="cropConfirm" class="bg-blue-500 text-white px-4 py-2 rounded">Crop</button>
-              <button id="cropCancel" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Cancel</button>
-          </div>
-        </div>
-        </div>
-        <!-- Uploaded Images Section -->
-        <div id="imagePreview" class="mt-4 space-y-2"></div>
-        <div class="mt-20">
-          <button
-            type="submit"
-            id="submitButton"
-            class="w-full bg-yellow-500 text-white font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-          >
-            Submit Product
-          </button>
-        </div>
-      </form>
+      <div class="mt-4 flex justify-between">
+        <button id="cropConfirm" class="bg-blue-500 text-white px-4 py-2 rounded">Crop</button>
+        <button id="cropCancel" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Cancel</button>
       </div>
     </div>
   </div>
-      
-      <!-- JavaScript -->
-      <script>
-        
-      </script>
 
+  <!-- <div>
+    <h3 class="text-xl font-semibold text-gray-800 mb-4">Current Images</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <% if (existingImages && existingImages.length > 0) { %>
+        <% existingImages.forEach(image => { %>
+          <div class="relative">
+            <img src="<%= image %>" alt="Product Image" class="w-full h-32 object-cover rounded-lg" />
+            <button class="absolute top-1 right-1 text-red-600 bg-white p-2 rounded-full delete-image-button" data-image="<%= image %>" type="button">
+              X
+            </button>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p>No images available.</p>
+      <% } %>
+    </div>
+  </div> -->
+
+  <!-- Submit Button -->
+  <div id="imagePreview" class="mt-4 space-y-2"></div>
+  <div class="mt-20">
+    <button
+      type="submit"
+      id="submitButton"
+      class="w-full bg-yellow-500 text-white font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+    >
+      Submit Product
+    </button>
+  </div>
+</form>
+</div>
+</div>
+</div>
+
+  
+      <script>
+      function populateProductDetails(product) {
+    // Set hidden product ID
+    document.getElementById('productId').value = product._id;
+
+    // Fill basic details
+    document.getElementById('productName').value = product.name;
+    document.getElementById('description').value = product.description;
+    document.getElementById('gender').value = product.gender;
+    document.getElementById('regularPrice').value = product.regularPrice;
+    document.getElementById('salePrice').value = product.salePrice;
+
+    // Populate category dropdown (you might need backend logic to filter categories)
+    const categoryDropdown = document.getElementById('category');
+    const option = document.createElement('option');
+    option.value = product.category._id;
+    option.textContent = product.category.name;
+    option.selected = true;
+    categoryDropdown.appendChild(option);
+
+    // Populate size quantities
+    const sizeQuantities = {
+        'S': document.getElementById('sizeSQty'),
+        'M': document.getElementById('sizeMQty'),
+        'L': document.getElementById('sizeLQty'),
+        'XL': document.getElementById('sizeXLQty')
+    };
+
+    Object.keys(sizeQuantities).forEach(size => {
+        const quantity = product.varients.find(v => v.size === size)?.quantity || 0;
+        sizeQuantities[size].value = quantity;
+    });
+
+    // Populate existing images
+    const imagePreview = document.getElementById('imagePreview');
+    product.productImage.forEach((image, index) => {
+        const imageRow = createImageRow(image, image); // Pass the same `image` as both URL and filename
+        if (index === 0) {
+            const thumbnailButton = imageRow.querySelector('.set-thumbnail');
+            thumbnailButton.classList.replace('text-blue-500', 'text-green-500');
+        }
+        imagePreview.appendChild(imageRow);
+    });
+}
+
+
+
+const genderDropdown = document.getElementById("gender");
+  const categoryDropdown = document.getElementById("category");
+  const categories = <%- JSON.stringify(categories) %>;  <!-- Pass the categories here -->
+
+  genderDropdown.addEventListener("change", () => {
+    const selectedGender = genderDropdown.value;
+
+    categoryDropdown.innerHTML = '<option value="" disabled selected>Choose category...</option>';
+
+    if (selectedGender) {
+      // Filter categories based on the selected gender and isListed status
+      const filteredCategories = categories.filter(cat => 
+        cat.gender === selectedGender && cat.isListed === true
+      );
+
+      filteredCategories.forEach(category => {
+        const option = document.createElement("option");
+        option.value = category._id;  // Use _id instead of category.name
+        option.textContent = category.name;
+        categoryDropdown.appendChild(option);
+      });
+
+      categoryDropdown.disabled = filteredCategories.length === 0;
+    } else {
+      categoryDropdown.disabled = true;
+    }
+  });
+
+
+
+  
+function validateForm(event) {
+    // Clear any previous error messages
+    console.log('form validation started')
+    clearErrorMessages();
+    
+    // Flag to track overall form validity
+    let isValid = true;
+
+    // Get form values
+    const productName = document.getElementById('productName').value.trim();
+    const gender = document.getElementById('gender').value;
+    const category = document.getElementById('category').value;
+    const description = document.getElementById('description').value.trim();
+    const regularPrice = document.getElementById('regularPrice').value.trim();
+    const salePrice = document.getElementById('salePrice').value.trim();
+    const imageInput = document.getElementById('imageInput');
+
+    // Size quantities
+    const sizeFields = ['S', 'M', 'L', 'XL'];
+
+    // Product Name Validation
+    if (!productName) {
+        displayErrorMessage('productName-error', 'Please enter a product name.');
+        isValid = false;
+    } else if (!/^[a-zA-Z\s]+$/.test(productName)) {
+        displayErrorMessage('productName-error', 'Product name should contain only alphabetic characters.');
+        isValid = false;
+    }
+
+    // Gender Validation
+    if (!gender) {
+        displayErrorMessage('gender-error', 'Please select a gender.');
+        isValid = false;
+    }
+
+    // Category Validation
+    if (!category) {
+        displayErrorMessage('category-error', 'Please select a category.');
+        isValid = false;
+    }
+
+    // Description Validation
+    if (!description) {
+        displayErrorMessage('description-error', 'Please enter a product description.');
+        isValid = false;
+    } else if (description.length < 10) {
+        displayErrorMessage('description-error', 'Description must be at least 10 characters long.');
+        isValid = false;
+    }
+
+    // Price Validation
+    if (!regularPrice) {
+        displayErrorMessage('regularPrice-error', 'Please enter a regular price.');
+        isValid = false;
+    } else if (!/^\d+(\.\d{1,2})?$/.test(regularPrice) || parseFloat(regularPrice) < 0) {
+        displayErrorMessage('regularPrice-error', 'Please enter a valid non-negative price.');
+        isValid = false;
+    }
+
+    if (!salePrice) {
+        displayErrorMessage('salePrice-error', 'Please enter a sale price.');
+        isValid = false;
+    } else if (!/^\d+(\.\d{1,2})?$/.test(salePrice) || parseFloat(salePrice) < 0) {
+        displayErrorMessage('salePrice-error', 'Please enter a valid non-negative sale price.');
+        isValid = false;
+    }
+
+    if (parseFloat(regularPrice) <= parseFloat(salePrice)) {
+        displayErrorMessage('regularPrice-error', 'Regular price must be greater than sale price.');
+        isValid = false;
+    }
+
+    // Size Validation
+    let totalQuantity = 0;
+    sizeFields.forEach(size => {
+        const qtyInput = document.getElementById(`size${size}Qty`);
+        if (qtyInput) {
+            const qty = qtyInput.value.trim();
+
+            if (qty && (!/^\d+$/.test(qty) || parseInt(qty) < 0)) {
+                displayErrorMessage(`size${size}Qty-error`, `Size ${size} quantity must be a non-negative number.`);
+                isValid = false;
+            }
+
+            // Sum up total quantity
+            if (qty) {
+                totalQuantity += parseInt(qty);
+            }
+        }
+    });
+
+  
+    if (totalQuantity === 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Quantity Error',
+            text: 'At least one size must have a quantity.'
+        });
+        isValid = false;
+    }
+
+    // Image Validation - 3 to 5 images
+    if (imageFiles.length < 3 || imageFiles.length > 5) {
+        displayErrorMessage('imageInput-error', 'Please upload between 3 to 5 images.');
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+
+// Cropper functionality
+
+const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+const cropModal = document.getElementById('cropModal');
+const cropImage = document.getElementById('cropImage');
+const cropConfirm = document.getElementById('cropConfirm');
+const cropCancel = document.getElementById('cropCancel');
+
+let cropper = null;
+let imageFiles = [];
+const MAX_IMAGES = 5;
+
+// Event Listeners
+imageInput.addEventListener('change', handleImageInput);
+cropCancel.addEventListener('click', cancelCrop);
+cropConfirm.addEventListener('click', confirmCrop);
+
+// Handle image input
+function handleImageInput(e) {
+    const files = e.target.files;
+
+    // Check image limit
+    if (files.length + imageFiles.length > MAX_IMAGES) {
+        showAlert('Limit Exceeded', `You can only upload up to ${MAX_IMAGES} images.`, 'error');
+        return;
+    }
+
+    Array.from(files).forEach(file => {
+        if (!file.type.startsWith("image/")) {
+            showAlert('Invalid File Type', 'Please upload only image files.', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => showCropModal(e.target.result);
+        reader.onerror = () => showAlert('Error', 'Failed to read the image file.', 'error');
+        reader.readAsDataURL(file);
+    });
+}
+
+// Show the crop modal
+function showCropModal(imageSrc) {
+    cropImage.src = imageSrc;
+    cropModal.classList.remove('hidden');
+
+    cropper = new Cropper(cropImage, {
+        aspectRatio: 1,
+        viewMode: 2,
+        autoCropArea: 0.8,
+        scalable: true,
+        zoomable: true,
+        responsive: true,
+        minCropBoxWidth: 100,
+        minCropBoxHeight: 100,
+    });
+}
+
+// Cancel crop
+function cancelCrop() {
+    if (cropper) cropper.destroy();
+    cropModal.classList.add('hidden');
+}
+
+// Confirm crop
+function confirmCrop(event) {
+    event.preventDefault();
+
+    const canvas = cropper.getCroppedCanvas({
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+    });
+
+    if (!canvas) {
+        showAlert('Error', 'Failed to crop the image.', 'error');
+        return;
+    }
+
+    canvas.toBlob(blob => {
+        if (!blob) return;
+
+        const fileName = `cropped-${Date.now()}.webp`;
+        const file = new File([blob], fileName, { type: "image/webp" });
+        imageFiles.push(file);
+        addImageToPreview(file);
+
+        cropModal.classList.add('hidden');
+        cropper.destroy();
+    }, "image/webp", 1.0);
+}
+
+// Add image to preview section
+function addImageToPreview(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const imageRow = createImageRow(e.target.result, file);
+        imagePreview.appendChild(imageRow);
+    };
+    reader.readAsDataURL(file);
+}
+
+// Create image row
+// Create image row for existing or newly uploaded images
+
+
+// Remove image from preview
+function removeImageFromPreview(imageRow, file) {
+    imagePreview.removeChild(imageRow);
+    // Optionally remove the image from the imageFiles array
+    const index = imageFiles.indexOf(file);
+    if (index !== -1) {
+        imageFiles.splice(index, 1);
+    }
+}     
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const existingImages = <%- JSON.stringify(existingImages) %>;  // Fetching existing images from backend (passed to EJS or other template engine)
+
+    // Function to create the image row for existing images
+    function createImageRow(imageSrc, file = null) {
+      const imageRow = document.createElement('div');
+      imageRow.classList.add('flex', 'items-center', 'justify-between', 'border', 'rounded-lg', 'p-6', 'bg-gray-50', 'my-3', 'w-full', 'shadow-lg', 'hover:shadow-xl', 'transition-shadow');
+      
+      const imageInfo = document.createElement('div');
+      imageInfo.classList.add('flex', 'items-center', 'space-x-4');
+
+      const imgElement = document.createElement('img');
+      imgElement.src = imageSrc;  // The image source (existing image URL)
+      imgElement.alt = file ? file.name : 'Product Image';
+      imgElement.classList.add('w-12', 'h-12', 'rounded-lg', 'object-cover');
+
+      const fileName = document.createElement('p');
+      fileName.textContent = file ? file.name : '';  // Display file name if available
+      fileName.classList.add('text-base', 'font-medium', 'truncate', 'max-w-[200px]', 'text-gray-800');
+
+      imageInfo.appendChild(imgElement);
+      imageInfo.appendChild(fileName);
+
+      const buttonContainer = createButtonContainer(imageRow, file);
+      imageRow.appendChild(imageInfo);
+      imageRow.appendChild(buttonContainer);
+
+      return imageRow;
+    }
+
+    // Function to create the button container (Remove button for existing images)
+    function createButtonContainer(imageRow, file) {
+      const buttonContainer = document.createElement('div');
+      buttonContainer.classList.add('flex', 'space-x-4');
+
+      if (file) {
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove';
+        removeButton.classList.add('bg-red-500', 'text-white', 'py-2', 'px-4', 'rounded-lg', 'hover:bg-red-700', 'transition-colors');
+        removeButton.addEventListener('click', () => {
+          imageRow.remove(); // Remove image row on click
+        });
+        buttonContainer.appendChild(removeButton);
+      }
+         
+      const thumbnailButton = document.createElement('button');
+    thumbnailButton.classList.add('text-blue-500', 'hover:text-blue-700', 'transition-colors', 'duration-200', 'set-thumbnail');
+    thumbnailButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+    `;
+    thumbnailButton.addEventListener('click', () => setThumbnail(imageRow));
+
+    // Delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('text-red-500', 'hover:text-red-700', 'transition-colors', 'duration-200', 'delete-image');
+    deleteButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    `;
+    deleteButton.addEventListener('click', () => confirmDelete(imageRow, file));
+
+    buttonContainer.appendChild(thumbnailButton);
+    buttonContainer.appendChild(deleteButton);
+
+    return buttonContainer;
+
+      return buttonContainer;
+    }
+
+    // Check if there are existing images to display
+    if (Array.isArray(existingImages)) {
+      existingImages.forEach(imageSrc => {
+        const imageRow = createImageRow(imageSrc);  // Create image row for each existing image
+        document.getElementById('imagePreview').appendChild(imageRow);  // Append to image preview container
+      });
+    }
+  });
+
+
+// Confirm delete
+function confirmDelete(imageRow, file) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to undo this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then(result => {
+        if (result.isConfirmed) {
+            const indexToDelete = imageFiles.indexOf(file);
+            if (indexToDelete !== -1) imageFiles.splice(indexToDelete, 1);
+            imageRow.remove();
+            showAlert('Deleted!', 'Your image has been deleted.', 'success');
+        }
+    });
+}
+
+// Utility: Show SweetAlert messages
+function showAlert(title, text, icon) {
+    Swal.fire({
+        icon,
+        title,
+        text,
+        toast: true,
+        position: 'top',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+    });
+}
+      // Event listener to fetch and populate product details
+      document.addEventListener('DOMContentLoaded', () => {
+          fetch(`/admin/getProductDetails/${productId}`)
+              .then(response => response.json())
+              .then(product => {
+                  populateProductDetails(product);
+              })
+              .catch(error => {
+                  console.error('Error fetching product details:', error);
+                  Swal.fire({
+                      icon: 'error',
+                      title: 'Error',
+                      text: 'Failed to load product details'
+                  });
+              });
+      });
+      </script>
+  </div>
 <%- include('../partials/admin/footer') %> 
