@@ -44,9 +44,6 @@ const orderSchema = new Schema({
       },
       message: (props) => `${props.value} is not a valid phone number!`,
     },
-  totalPrice: {
-    type: Number,
-    required: true,
   },
   discount: {
     type: Number,
@@ -66,15 +63,26 @@ const orderSchema = new Schema({
     required: true,
     enum: [
       "Pending",
-      "Processing",
       "Shipped",
+      "out for delivery",
       "Delivered",
       "Cancelled",
-      "Return Request",
       "Returned",
-      "Paid",
-      "Payment Pending",
     ],
+  },
+  invoice: {
+    invoiceId: { 
+      type: String, 
+      required: true 
+    }, // Unique Invoice ID
+    dateGenerated: { 
+      type: Date, 
+      default: Date.now 
+    }, // Date Invoice was created
+    invoiceURL: { 
+      type: String, 
+      required: false 
+    }, // Link to the invoice (PDF or digital copy)
   },
   createdOn: {
     type: Date,

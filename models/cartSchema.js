@@ -18,7 +18,10 @@ const cartSchema = new Schema({
         type: Number,
         default: 1,
       },
-
+      size :{
+        type: String,
+        required: true,
+      },
       salePrice: {
         type: Number,
         required: true,
@@ -30,6 +33,10 @@ const cartSchema = new Schema({
     },
   ],
   totalCartPrice: {
+    type: Number,
+    default: 0,
+  },
+  finalAmount : {
     type: Number,
     default: 0,
   },

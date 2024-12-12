@@ -1,4 +1,11 @@
 <%- include('../partials/user/userheader') %> 
+<% if (items.length === 0) { %>
+  <div class="text-center py-10">
+    <img src="/images/emptyCart.jpg" alt="Empty Cart" class="mx-auto w-100 h-80">
+    <h2 class="text-2xl font-bold mt-4">Your Cart is Empty</h2>
+    <p class="text-gray-600 mt-2 mb-6">Add some items to your cart to see them here!</p>
+  </div>
+<% } else { %>
 <div class="max-w-7xl mx-auto p-6">
   <!-- Main Container -->
   <div class="flex flex-col lg:flex-row gap-6">
@@ -6,7 +13,8 @@
     <div class="bg-white w-full lg:w-2/3 p-6 rounded-lg shadow-md flex flex-col">
       <!-- Actions on Top -->
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-lg font-semibold text-yellow-500">Your Cart (2 Items)</h2>
+       
+        <h2 class="text-lg font-semibold text-yellow-500">Your Cart   (<%= items.length %> Items)         </h2>
         <div class="flex items-center space-x-4">
           <button class="text-sm text-blue-500 font-semibold hover:underline" onclick="showModal('removeAllModal')">Remove All</button>
           <button class="text-sm text-blue-500 font-semibold hover:underline" onclick="showModal('moveAllToWishlistModal')">Move All to Wishlist</button>
@@ -14,9 +22,7 @@
       </div>
       <!-- Cart Items -->
       <div class="space-y-6">
-        <% if (items.length === 0) { %>
-          <p>Your cart is empty.</p>
-        <% } else { %>
+       
           <% items.forEach(item => { %>
             <div class="flex items-start gap-4 border-b border-gray-300">
               <img src="<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" class="w-24 h-24 rounded-lg">
@@ -24,15 +30,32 @@
                 <h3 class="text-sm font-medium"><%= item.productId.productName %></h3>
                 <!-- <p class="text-sm text-gray-600">Description: <%= item.productId.description %></p> -->
                 <div class="flex items-center space-x-4 mt-2">
-                  <button class="border border-gray-300 rounded-lg px-2 py-1 text-sm" onclick="openSizeModal()">Size: <%= item.size || 'M' %></button>
-                  <button class="border border-gray-300 rounded-lg px-2 py-1 text-sm"  onclick="openQuantityModal()">Qty: <%= item.quantity %></button>
+                  <button 
+        class=" px-2 py-1 text-sm size-btn" 
+        data-item-id="<%= item.productId._id %>" >
+        Size: <span id="size-display-<%= item.productId._id %>"><%= item.size%></span>
+      </button>
+      <button 
+      class="border border-gray-300 rounded-lg px-2 py-1 text-sm quantity-btn" 
+      data-item-id="<%= item.productId._id %>" 
+      data-item-size="<%= item.size %>"
+      onclick="openQuantityModal('<%= item.productId._id %>', '<%= item.size %>')">
+      Qty: <span id="quantity-display-<%= item.productId._id %>-<%= item.size %>">
+        <%= item.quantity %>
+      </span>
+    </button>
+    
                 </div>
                 <p class="text-sm text-green-500 font-medium mt-2">7 days return available</p>
               </div>
               <div class="text-right">
                 <div class="flex items-center justify-between space-x-2">
-                  <p class="text-lg font-semibold text-gray-900">₹<%= item.totalPrice %></p>
-                  <p class="text-sm font-semibold text-gray-400 line-through">₹<%= item.productId.regularPrice %></p>
+                  <p class="text-lg font-semibold text-gray-900" id="total-price-display-<%= item.productId._id %>-<%= item.size %>">₹<%= item.totalPrice %></p>
+
+                  <p id="regular-price-display-<%= item.productId._id %>-<%= item.size %>" class="text-sm font-semibold text-gray-400 line-through">
+                    ₹<%= item.productId.regularPrice * item.quantity %>
+                  </p>
+                  
                 </div>
                 <p class="text-sm text-green-500 font-medium">
                   <%= Math.round(((item.productId.regularPrice - item.productId.salePrice) / item.productId.regularPrice) * 100) %>% OFF
@@ -42,7 +65,7 @@
               </div>
             </div>
           <% }); %>
-        <% } %>
+       
       </div>
     </div>
 
@@ -64,15 +87,15 @@
       </div>
 
       <!-- Price Details Section -->
-      <h3 class="text-lg font-semibold mb-4">Price Details (2 Items)</h3>
+      <h3 class="text-lg font-semibold mb-4">Price Details (<%= items.length %> Items)</h3>
       <div class="space-y-3">
         <div class="flex justify-between text-sm text-gray-600">
           <p>Total MRP:</p>
-          <p>₹26,389</p>
+          <p id="totalMRP">₹<%= totalMRP %></p>
         </div>
         <div class="flex justify-between text-sm text-gray-600">
           <p>Discount on MRP:</p>
-          <p>-₹13,674</p>
+          <p id="discountOnMRP">-₹<%= discountOnMRP %></p>
         </div>
         <div class="flex justify-between text-sm text-gray-600">
           <p>Coupon Discount:</p>
@@ -80,7 +103,7 @@
         </div>
         <div class="flex justify-between text-sm text-gray-600">
           <p>Platform Fee:</p>
-          <p>Free</p>
+          <p>₹<%= platformFee %></p>
         </div>
         <div class="flex justify-between text-sm text-gray-600">
           <p>Shipping Fee:</p>
@@ -89,16 +112,21 @@
       </div>
       <div class="flex justify-between mt-6 text-lg font-semibold">
         <p>Total Amount:</p>
-        <p id="totalAmount">₹11,515</p>
+        <p id="totalAmount">₹<%= finalAmount %></p>
       </div>
-      <button class="mt-6 w-full bg-yellow-500 text-black py-3 rounded-lg font-semibold hover:bg-yellow-600">PLACE ORDER</button>
+      <a href="/checkout">
+        <button class="mt-6 w-full bg-yellow-500 text-black py-3 rounded-lg font-semibold hover:bg-yellow-600">
+          PLACE ORDER
+        </button>
+      </a>
+      
     </div>
+    
+ <% } %>
   </div>
-</div>
 
+ </div>
      
-
-    <!-- Insert Modals Below Here -->
     <!-- Example of Remove All Modal -->
     <div id="removeAllModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
       <div class="bg-white p-4 rounded-lg shadow-lg w-96">
@@ -110,7 +138,6 @@
       </div>
     </div>
     
-    <!-- Other modals go here (like 'moveAllToWishlistModal' and 'removeItemModal') -->
     
 <!-- Move All to Wishlist Modal -->
 <div id="moveAllToWishlistModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
@@ -134,30 +161,15 @@
   </div>
 </div>
 
-
-
-<div id="sizeModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-  <div class="bg-white p-6 rounded-lg shadow-lg">
-    <h2 class="text-lg font-semibold mb-4">Select Size</h2>
-    <div class="grid grid-cols-4 gap-4">
-      <button class="py-2 px-4 border rounded-lg">S</button>
-      <button class="py-2 px-4 border rounded-lg">M</button>
-      <button class="py-2 px-4 border rounded-lg">L</button>
-      <button class="py-2 px-4 border rounded-lg">XL</button>
-    </div>
-    <button class="mt-4 bg-pink-500 text-white py-2 px-4 rounded-lg" onclick="closeModal('sizeModal')">Done</button>
-  </div>
-</div>
-
 <div id="quantityModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
   <div class="bg-white p-6 rounded-lg shadow-lg">
     <h2 class="text-lg font-semibold mb-4">Select Quantity</h2>
     <div class="grid grid-cols-5 gap-4">
-      <button class="py-2 px-4 border rounded-lg">1</button>
-      <button class="py-2 px-4 border rounded-lg">2</button>
-      <button class="py-2 px-4 border rounded-lg">3</button>
-      <button class="py-2 px-4 border rounded-lg">4</button>
-      <button class="py-2 px-4 border rounded-lg">5</button>
+      <button class="py-2 px-4 border rounded-lg" onclick="updateQuantity(1)">1</button>
+      <button class="py-2 px-4 border rounded-lg" onclick="updateQuantity(2)">2</button>
+      <button class="py-2 px-4 border rounded-lg" onclick="updateQuantity(3)">3</button>
+      <button class="py-2 px-4 border rounded-lg" onclick="updateQuantity(4)">4</button>
+      <button class="py-2 px-4 border rounded-lg" onclick="updateQuantity(5)">5</button>
     </div>
     <button class="mt-4 bg-pink-500 text-white py-2 px-4 rounded-lg" onclick="closeModal('quantityModal')">Done</button>
   </div>
@@ -206,55 +218,95 @@
       }, 3000);
     }
 
-    function openSizeModal() {
-      document.getElementById('sizeModal').classList.remove('hidden');
-    }
 
-    function openQuantityModal() {
-      document.getElementById('quantityModal').classList.remove('hidden');
-    }
 
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
-    }
 
-      // Function to show a modal
-  function showModal(modalId) {
-    document.getElementById(modalId).classList.remove('hidden');
+  let currentItemId = null;
+
+
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.add('hidden');
+}
+
+
+let currentItemForQuantity = null;
+
+function openQuantityModal(itemId, itemSize) {
+  currentItemForQuantity = { itemId, itemSize };
+
+  // Fetch stock data for the selected item
+  fetch(`/get-stock/${itemId}/${itemSize}`)
+    .then((response) => response.json())
+    .then((data) => {
+      const buttons = document.querySelectorAll('#quantityModal button');
+      buttons.forEach((button) => {
+        const quantity = parseInt(button.textContent, 10);
+        button.disabled = quantity > data.stock; // Disable buttons exceeding stock
+      });
+    })
+    .catch((error) => console.error('Error fetching stock:', error));
+
+  document.getElementById('quantityModal').classList.remove('hidden');
+}
+
+
+
+function updateQuantity(selectedQuantity) {
+  if (currentItemForQuantity) {
+    const { itemId, itemSize } = currentItemForQuantity;
+    fetch('/update-cart-quantity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ itemId, itemSize, quantity: selectedQuantity }), // Include size in request
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          // Update the quantity in the UI
+          const quantityDisplayElement = document.querySelector(
+            `#quantity-display-${itemId}-${itemSize}`
+          );
+          if (quantityDisplayElement) {
+            quantityDisplayElement.textContent = selectedQuantity; // Update quantity in UI
+          }
+
+          // Update the total price in the UI
+          const totalPriceElement = document.querySelector(
+            `#total-price-display-${itemId}-${itemSize}` // Added itemId and itemSize to ensure correct selection
+          );
+          if (totalPriceElement) {
+            totalPriceElement.textContent = `₹${data.totalPrice}`; // Update total price
+          }
+          const regularPriceElement = document.querySelector(
+            `#regular-price-display-${itemId}-${itemSize}` // Unique selector for regular price
+          );
+          if (regularPriceElement) {
+            const regularPrice = data.regularPrice; // Regular price should be sent from the backend
+            regularPriceElement.textContent = `₹${regularPrice * selectedQuantity}`; // Update the regular price with new quantity
+          }
+ 
+          document.querySelector("#totalMRP").textContent = `₹${data.totalMRP}`;
+          document.querySelector("#discountOnMRP").textContent = `₹${data.discountOnMRP}`;
+          document.querySelector("#totalAmount").textContent = `₹${data.finalAmount}`;
+          // window.location.reload();
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch((error) => console.error('Error updating quantity:', error));
   }
-
-  // Function to close a modal
-  function closeModal(modalId) {
-    document.getElementById(modalId).classList.add('hidden');
-  }
-
-  // Actions for the modals
-  function removeAllItems() {
-    console.log('All items removed');
-    closeModal('removeAllModal');
-  }
-
-  function moveAllToWishlist() {
-    console.log('All items moved to wishlist');
-    closeModal('removeAllModal');
-    closeModal('moveAllToWishlistModal');
-  }
-
-  function removeItem() {
-    console.log('Item removed');
-    closeModal('removeItemModal');
-  }
-
-  function moveToWishlist() {
-    console.log('Item moved to wishlist');
-    closeModal('removeItemModal');
-  }
-  </script>
+  closeModal('quantityModal');
+}
 
 
 
+
+
+
+</script>
 </div>
-
+</div>
 
 
 <%- include('../partials/user/userfooter') %> 

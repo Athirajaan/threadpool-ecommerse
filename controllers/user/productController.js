@@ -35,9 +35,6 @@ const getPrice = async (req, res) => {
 
 
 
-
-
-
 module.exports = {
     productDetails,
     getPrice,

@@ -39,6 +39,11 @@ router.post("/add-address",userAuth,userController.addAddress);
 //cart management
 router.get('/cart',userAuth,cartController.getCart);
 router.post('/addToCart',userAuth,cartController.addToCart);
+router.post('/update-cart-quantity',userAuth,cartController.updateCartquantity);
+router.get('/get-stock/:itemId/:size',userAuth, cartController.getStock)
+
+router.get('/checkout',userAuth,cartController.getCheckOut);
+router.post('/create-order',userAuth,cartController.createOrder);
 
 
 
