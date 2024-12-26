@@ -61,13 +61,36 @@
   top: 70px !important; /* Adjust this value to move the toast lower */
 }
 
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 </style>
 
-<div class="container mx-auto p-8 space-y-12">
+
+<div class="container mx-auto px-4 pt-8">
+  <nav class="mb-2" aria-label="Breadcrumb">
+    <ul class="flex items-center space-x-2 text-sm text-gray-600">
+      <li><a href="/" class="hover:text-blue-600 transition">Home</a></li>
+      <li><span class="mx-2">→</span></li>
+      <li><a href="/shop" class="hover:text-blue-600 transition">Shop</a></li>
+      <li><span class="mx-2">→</span></li>
+      <li><span class="text-gray-900 font-medium"><%= product.productName %></span></li>
+    </ul>
+   </nav>
   <!-- Product Layout -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white shadow-lg rounded-lg overflow-hidden">
-    
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white shadow-lg rounded-lg overflow-hidden">  
     <!-- Left Section: Images -->
     <div class="p-6 flex">
       <!-- Thumbnails -->
@@ -107,7 +130,9 @@
         <p class="text-lg font-semibold text-gray-500 line-through">₹<%= product.regularPrice %></p>
         <div class="flex items-center space-x-2">
           <p class="text-2xl font-semibold text-blue-600">₹<%= product.salePrice %></p>
-          <span class="text-lg text-red-600 font-semibold">70% OFF</span>
+          <span class="text-sm font-medium text-green-600">
+            <%= Math.round((product.regularPrice - product.salePrice) / product.regularPrice * 100) %>% OFF
+          </span>
         </div>
       </div>
       
@@ -142,7 +167,12 @@
     <a href="#" class="text-sm text-blue-600 mt-2 inline-block hover:underline">Size Guide</a>
   </div>
   
-
+      <!-- out of stock -->
+      <% if (product.status === "out of stock") { %>
+        <div class="status text-red-600 font-semibold">
+          <p>Out of Stock</p>
+        </div>
+      <% } %>
 
       <!-- Add to Cart and Wishlist -->
       <div class="flex items-center gap-4 mb-2">
@@ -150,52 +180,142 @@
           Add to Cart
         </button>
         
-        <button class="w-full bg-gray-100 text-gray-600 text-sm font-medium px-6 py-3 rounded-lg hover:bg-gray-200 focus:outline-none">Wishlist</button>
+        <button id="wishlistButton" 
+          data-product-id="<%= product._id %>" 
+          class="w-full bg-gray-100 text-gray-600 text-sm font-medium px-6 py-3 rounded-lg hover:bg-gray-200 focus:outline-none flex items-center justify-center gap-2">
+          <i class="fas fa-heart" id="heartIcon"></i>
+          <span id="wishlistButtonText">Add to Wishlist</span>
+        </button>
       </div>
 
-      <!-- Description -->
-      <div>
-        <h3 class="text-sm font-semibold text-gray-800 mb-2">Description</h3>
-        <p class="text-sm text-gray-600">
-          <%= product. description %>
-        </p>
+      <!-- Enhanced Product Description -->
+      <div class="border-t border-gray-100 pt-2 mt-2">
+        <div class="bg-white rounded-xl p-4">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-info-circle mr-2 text-blue-600"></i>
+            Product Details
+          </h3>
+          
+          <div class="prose max-w-none">
+            <p class="text-gray-600 leading-relaxed">
+              <%= product.description %>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Reviews Section -->
-  <div class="mt-8 bg-gray-50 p-6 rounded-lg shadow-lg">
-    <h2 class="text-2xl font-semibold text-gray-900 mb-4">User Reviews</h2>
-    
-    <!-- Example Review -->
-    <div class="border-t border-gray-300 pt-4 mt-4">
-      <div class="flex items-center space-x-2 text-yellow-400">
-        <div class="flex space-x-1">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="far fa-star"></i>
+  <!-- Enhanced Reviews Section -->
+  <div class="mt-16 bg-white rounded-2xl shadow-sm p-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-8">Customer Reviews</h2>
+
+    <!-- Review Statistics with Product Image -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
+      <!-- Product Image -->
+      <div class="md:col-span-3">
+        <div class="aspect-square rounded-lg overflow-hidden border border-gray-300">
+          <img 
+            src="<%= product.productImage[2] %>" 
+            alt="<%= product.productName %>" 
+            class="w-full h-full object-cover"
+          />
         </div>
-        <span class="text-sm text-gray-600">(4.5)</span>
       </div>
-      <p class="text-sm text-gray-600 mt-2">Great product! The fabric is soft, and the fit is perfect. Would definitely buy again!</p>
-      <div class="text-sm text-gray-500 mt-2">By John Doe, 3 days ago</div>
+
+      <!-- Rating Statistics -->
+      <div class="md:col-span-9 flex items-center bg-gray-50 rounded-xl p-6">
+        <!-- Overall Rating -->
+        <div class="flex flex-col items-center pr-6 border-r border-gray-200">
+          <h3 class="text-5xl font-bold text-gray-900">4.5</h3>
+          <div class="flex justify-center text-yellow-400 my-2">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star-half-alt"></i>
+          </div>
+          <p class="text-gray-500 text-sm">128 reviews</p>
+        </div>
+
+        <!-- Rating Distribution -->
+        <div class="flex-1 pl-4">
+          <div class="space-y-2">
+            <% [5,4,3,2,1].forEach(stars => { %>
+              <div class="flex items-center gap-3">
+                <div class="w-8 text-right">
+                  <div class="flex items-center justify-end">
+                    <span class="text-sm font-medium text-gray-600"><%= stars %></span>
+                    <i class="fas fa-star text-yellow-400 text-xs ml-1"></i>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <div class="h-2 rounded-full bg-gray-200 overflow-hidden">
+                    <div class="h-full rounded-full bg-yellow-400 transition-all" 
+                         style="width: <%= Math.random() * 100 %>%"></div>
+                  </div>
+                </div>
+                <div class="w-8 text-right">
+                  <span class="text-xs text-gray-600"><%= Math.floor(Math.random() * 50) %></span>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- Example Review -->
-    <div class="border-t border-gray-300 pt-4 mt-4">
-      <div class="flex items-center space-x-2 text-yellow-400">
-        <div class="flex space-x-1">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star-half-alt"></i>
-          <i class="far fa-star"></i>
+
+    <!-- Individual Reviews -->
+    <div class="space-y-6">
+      <% [[4.5, 'John Doe'], [4.0, 'Jane Smith']].forEach(([rating, name]) => { %>
+        <div class="border border-gray-100 rounded-xl p-5 hover:shadow-sm transition-shadow">
+          <div class="flex items-start space-x-4">
+            <!-- User Avatar -->
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium">
+              <%= name[0] %>
+            </div>
+
+            <!-- Review Content -->
+            <div class="flex-1">
+              <!-- User Info and Rating -->
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h4 class="font-medium text-gray-900"><%= name %></h4>
+                  <div class="flex items-center mt-1 space-x-3">
+                    <div class="flex text-yellow-400">
+                      <% Array(Math.floor(rating)).fill().forEach(() => { %>
+                        <i class="fas fa-star text-xs"></i>
+                      <% }) %>
+                      <% if(rating % 1 !== 0) { %>
+                        <i class="fas fa-star-half-alt text-xs"></i>
+                      <% } %>
+                    </div>
+                    <span class="text-xs text-gray-400">3 days ago</span>
+                  </div>
+                </div>
+                
+                <!-- Size Info -->
+                <div class="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
+                  Size: M
+                </div>
+              </div>
+
+              <!-- Review Text -->
+              <p class="text-gray-600 text-sm leading-relaxed">
+                Great product! The fabric is soft, and the fit is perfect. Would definitely buy again!
+                The quality is exceptional and worth every penny.
+              </p>
+            </div>
+          </div>
         </div>
-        <span class="text-sm text-gray-600">(4.0)</span>
+      <% }) %>
+
+      <!-- Load More Button -->
+      <div class="text-center mt-8">
+        <button class="px-8 py-3 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition text-sm font-medium">
+          Show More Reviews
+        </button>
       </div>
-      <p class="text-sm text-gray-600 mt-2">Good quality, but the size runs a bit small. Still a solid choice!</p>
-      <div class="text-sm text-gray-500 mt-2">By Jane Smith, 1 week ago</div>
     </div>
   </div>
 </div>
@@ -411,6 +531,91 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+document.addEventListener('DOMContentLoaded', async function() {
+  const wishlistButton = document.getElementById('wishlistButton');
+  const heartIcon = document.getElementById('heartIcon');
+  const wishlistButtonText = document.getElementById('wishlistButtonText');
+  const wishlistMessage = document.getElementById('wishlistMessage');
+  const productId = wishlistButton.dataset.productId;
+
+  // Check if product is in wishlist
+  try {
+    const response = await fetch(`/check-wishlist/${productId}`);
+    const data = await response.json();
+    
+    if (data.inWishlist) {
+      heartIcon.classList.add('text-red-500');
+      wishlistButtonText.textContent = 'Remove from Wishlist';
+    }
+  } catch (error) {
+    console.error('Error checking wishlist status:', error);
+  }
+
+  wishlistButton.addEventListener('click', async function() {
+    try {
+      const response = await fetch('/wishlist/toggle', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (data.message.includes('Added')) {
+          // Product was added to wishlist
+          heartIcon.classList.add('text-red-500');
+          wishlistButtonText.textContent = 'Remove from Wishlist';
+          showWishlistMessage('Product added to wishlist!', 'success');
+        } else {
+          // Product was removed from wishlist
+          heartIcon.classList.remove('text-red-500');
+          wishlistButtonText.textContent = 'Add to Wishlist';
+          showWishlistMessage('Product removed from wishlist!', 'info');
+        }
+      } else {
+        if (data.message.includes('already in wishlist')) {
+          showWishlistMessage('This product is already in your wishlist!', 'warning');
+        } else {
+          throw new Error(data.message);
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showWishlistMessage('Something went wrong. Please try again.', 'error');
+    }
+  });
+
+  function showWishlistMessage(message, type) {
+    wishlistMessage.textContent = message;
+    wishlistMessage.className = 'mt-2 text-sm text-center animate-fade-in';
+    
+    // Add appropriate color classes based on message type
+    switch(type) {
+      case 'success':
+        wishlistMessage.classList.add('text-green-600');
+        break;
+      case 'warning':
+        wishlistMessage.classList.add('text-yellow-600');
+        break;
+      case 'error':
+        wishlistMessage.classList.add('text-red-600');
+        break;
+      case 'info':
+        wishlistMessage.classList.add('text-blue-600');
+        break;
+    }
+    
+    wishlistMessage.classList.remove('hidden');
+    
+    // Hide message after 3 seconds
+    setTimeout(() => {
+      wishlistMessage.classList.add('hidden');
+    }, 3000);
+  }
+});
 
 </script> 
 

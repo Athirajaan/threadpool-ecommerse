@@ -2,100 +2,189 @@
 
 
 <!-- Hero Section -->
-<section class="flex flex-col md:flex-row items-center justify-between p-6 bg-gray-100 mt-8 rounded-lg mx-auto max-w-full shadow-md h-[200px] md:h-[300px] bg-cover bg-center" style="background-image: url('/images/Screenshot 2024-11-13 094925.png');">
-  <!-- <div class="flex-1 space-y-4 bg-black bg-opacity-50 p-6 rounded-lg">
-    <h2 class="text-4xl md:text-5xl font-extrabold text-white leading-tight">
-      LET’S <br>EXPLORE <span class="text-yellow-500">GYM</span> CLOTHES.
-    </h2>
-    <p class="text-white text-lg md:text-xl">Live for Influential and Innovative fashion!</p>
-    <button class="mt-6 px-8 py-3 bg-yellow-500 text-black rounded-md hover:bg-yellow-400 text-lg md:text-xl">Shop Now</button>
-  </div> -->
+<section class="relative flex flex-col items-center justify-center bg-gray-100 rounded-lg mx-auto w-full shadow-md h-[500px]">
+  <video autoplay muted loop class="absolute top-0 left-0 w-full h-full object-cover rounded-lg">
+      <source src="/videos/homeBanner.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+  </video>
+  
+  <!-- Overlay Content -->
+  <div class="relative z-10 text-center text-white px-6">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
+      Unleash Your Power <br> with Premium Gym Wear
+    </h1>
+    <p class="text-lg md:text-xl mb-6 drop-shadow-lg">
+      Performance, Style, and Comfort for Every Workout.
+    </p>
+    <a href="/womenShop" class="px-6 py-3 bg-white hover:bg-white text-black text-lg font-medium rounded-lg shadow-md transition duration-300">
+      Shop Now
+    </a>
+  </div>
+  
+  <!-- Optional Overlay -->
+  <div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 rounded-lg"></div>
 </section>
 
-<h2 class="text-xl md:text-2xl lg:text-3xl font-bold mb-4 my-3 mx-14">Our Top Sellerse</h2>
-<!-- New Arrivals Section -->
-<section class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-5 mx-3">
-  <% for (let i = 0; i < products.length; i++) { %>
-    <!-- Dynamic Product Card -->
-    <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center space-y-4">
-      <!-- Link to Product View -->
-      <a href="/productDetails?id=<%= products[i]._id %>" class="block w-full">
-        <img 
-          src="<%= products[i].productImage[0] %>" 
-          alt="Product Image" 
-          class="w-[90%] h-[300px] object-cover rounded-lg">
-      </a>
-      <a href="/product/<%= products[i]._id %>" class="block text-lg font-semibold text-gray-800 hover:underline">
-        <%= products[i].productName %>
-      </a>
-      <p class="text-gray-600">Explore Now!</p>
+
+
+<!-- Section Header -->
+<div class="container mx-auto px-4 py-12">
+  <div class="flex items-center justify-between mb-8">
+    <div class="relative">
+      <h2 class="text-3xl font-bold text-gray-900">Our Top Sellers</h2>
+      <div class="absolute -bottom-2 left-0 w-24 h-1 bg-yellow-500"></div>
     </div>
-  <% } %>
-</section>
+    <a href="/womenShop" class="inline-flex items-center text-yellow-600 hover:text-yellow-700 font-medium">
+      View All
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <% for (let i = 0; i < products.length; i++) { %>
+      <div class="group">
+        <div class="relative bg-white rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+          <!-- Product Images with Hover Effect -->
+          <div class="aspect-w-3 aspect-h-4 relative overflow-hidden">
+            <img 
+              src="<%= products[i].productImage[0] %>" 
+              alt="<%= products[i].productName %>" 
+              class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0">
+            <img 
+              src="<%= products[i].productImage[1] || products[i].productImage[0] %>" 
+              alt="<%= products[i].productName %>" 
+              class="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          </div>
+
+          <!-- Quick Shop Button -->
+          <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-0 group-hover:bg-opacity-70 backdrop-blur-sm transition-all duration-300 h-0 group-hover:h-14 flex items-center justify-center">
+            <a href="/productDetails?id=<%= products[i]._id %>" 
+               class="text-white font-medium tracking-wider uppercase text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:text-yellow-400">
+              Quick View
+            </a>
+          </div>
+
+          <!-- Product Info -->
+          <div class="p-4">
+            <h3 class="font-medium text-gray-900 group-hover:text-yellow-600 transition-colors duration-200 mb-2">
+              <%= products[i].productName %>
+            </h3>
+            <div class="flex items-center justify-between">
+              <div class="flex flex-col">
+                <span class="text-lg font-bold text-gray-900">₹<%= products[i].salePrice %></span>
+                <% if (products[i].regularPrice > products[i].salePrice) { %>
+                  <span class="text-sm text-gray-500 line-through">₹<%= products[i].regularPrice %></span>
+                <% } %>
+              </div>
+              <% const discount = Math.round((products[i].regularPrice - products[i].salePrice) / products[i].regularPrice * 100) %>
+              <% if (discount > 0) { %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  -<%= discount %>%
+                </span>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
 
 
 <!-- Sale Banner -->
-<div class="px-4 md:px-8 lg:px-16 py-8 bg-white">
-  <div class="flex flex-col md:flex-row bg-gray-100 p-4 md:p-8 lg:p-12 rounded-lg shadow-md mb-8">
-    <div class="flex-1 mb-4 md:mb-0">
-      <img src="https://via.placeholder.com/600x400" alt="Sale Banner Image" class="rounded-lg w-full h-full object-cover" />
-    </div>
-    <div class="flex-1 md:pl-8 flex flex-col justify-center">
-      <h2 class="text-yellow-400 text-2xl md:text-3xl lg:text-4xl font-bold mb-2">PAYDAY SALE NOW</h2>
-      <p class="text-gray-700 text-md md:text-lg lg:text-xl mb-4">
-        Spend a minimum of $100 to get a 30% off voucher code for your next purchase. <br> 1 Nov - 30 Dec 2024
-      </p>
-      <p class="text-gray-500 text-sm mb-6">*Terms & Conditions apply</p>
-      <button class="bg-black text-white py-2 px-4 rounded hover:bg-gray-800 text-md md:text-lg lg:text-xl">
-        SHOP NOW
-      </button>
-    </div>
+<div class="relative overflow-hidden bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-200 mb-8">
+  <div class="absolute inset-0">
+    <img src="/images/sale-pattern.jpg" alt="Sale Pattern" class="w-full h-full object-cover opacity-10">
   </div>
-  
-  <!-- Collections Section -->
-  <h2 class="text-xl md:text-2xl lg:text-3xl font-bold mb-4 text-gray-800">COLLECTIONS</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-    <!-- Collection Item 1 -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <img src="https://via.placeholder.com/400x400" alt="Product Image 1" class="w-full h-auto object-cover" />
-      <div class="p-4">
-        <p class="text-gray-600 text-sm font-medium">Trending on Instagram</p>
-        <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div class="text-center md:text-left">
+        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+          Summer Sale <br/>
+          <span class="text-white">Up to 50% Off</span>
+        </h2>
+        <p class="text-lg md:text-xl text-gray-800 mb-6">
+          Discover amazing deals on our latest collection. Limited time offer!
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+          <a href="/shop" class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 transition duration-150">
+            Shop Now
+          </a>
+          <a href="/new-arrivals" class="inline-flex items-center px-8 py-3 border border-gray-900 text-base font-medium rounded-md text-gray-900 bg-transparent hover:bg-gray-900 hover:text-white transition duration-150">
+            New Arrivals
+          </a>
+        </div>
       </div>
-    </div>
-
-    <!-- Collection Item 2 -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <img src="https://via.placeholder.com/400x400" alt="Product Image 2" class="w-full h-auto object-cover" />
-      <div class="p-4">
-        <p class="text-gray-600 text-sm font-medium">All Under $40</p>
-        <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
-      </div>
-    </div>
-
-    <!-- Collection Item 3 -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <img src="https://via.placeholder.com/400x400" alt="Product Image 3" class="w-full h-auto object-cover" />
-      <div class="p-4">
-        <p class="text-gray-600 text-sm font-medium">Trending on Instagram</p>
-        <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
-      </div>
-    </div>
-
-    <!-- Collection Item 4 -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <img src="https://via.placeholder.com/400x400" alt="Product Image 4" class="w-full h-auto object-cover" />
-      <div class="p-4">
-        <p class="text-gray-600 text-sm font-medium">All Under $40</p>
-        <a href="#" class="text-gray-800 text-lg font-semibold hover:underline">Explore Now</a>
+      <div class="relative h-64 md:h-96">
+        <img src="/images/david.jpg" alt="Sale Hero Image" class="absolute inset-0 w-full h-full object-cover rounded-lg shadow-2xl">
+        <div class="absolute top-4 right-4 bg-white rounded-full p-4 shadow-lg">
+          <span class="text-2xl font-bold text-gray-900">50%</span>
+          <span class="block text-sm text-gray-600">OFF</span>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
+  <!-- Featured Products Section -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="relative mb-8">
+      <h2 class="text-3xl font-bold text-gray-900">Featured Products</h2>
+      <div class="absolute -bottom-2 left-0 w-24 h-1 bg-yellow-500"></div>
+    </div>
 
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <% for(let i = 4; i < Math.min(products.length, 8); i++) { %>
+        <div class="group">
+          <div class="relative bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            <!-- Product Images with Hover Effect -->
+            <div class="aspect-w-1 aspect-h-1 w-full relative overflow-hidden">
+              <img 
+                src="<%= products[i].productImage[0] %>" 
+                alt="<%= products[i].productName %>" 
+                class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0">
+              <img 
+                src="<%= products[i].productImage[1] || products[i].productImage[0] %>" 
+                alt="<%= products[i].productName %>" 
+                class="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            </div>
 
+            <!-- Quick Shop Button -->
+            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-0 group-hover:bg-opacity-70 backdrop-blur-sm transition-all duration-300 h-0 group-hover:h-14 flex items-center justify-center">
+              <a href="/productDetails?id=<%= products[i]._id %>" 
+                 class="text-white font-medium tracking-wider uppercase text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:text-yellow-400">
+                Quick View
+              </a>
+            </div>
 
+            <!-- Product Info -->
+            <div class="p-4">
+              <h3 class="font-medium text-gray-900 group-hover:text-yellow-600 transition-colors duration-200 mb-2">
+                <%= products[i].productName %>
+              </h3>
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col">
+                  <span class="text-lg font-bold text-gray-900">₹<%= products[i].salePrice %></span>
+                  <% if (products[i].regularPrice > products[i].salePrice) { %>
+                    <span class="text-sm text-gray-500 line-through">₹<%= products[i].regularPrice %></span>
+                  <% } %>
+                </div>
+                <% const discount = Math.round((products[i].regularPrice - products[i].salePrice) / products[i].regularPrice * 100) %>
+                <% if (discount > 0) { %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    -<%= discount %>%
+                  </span>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
 
 <%- include('../partials/user/userfooter') %> 
 

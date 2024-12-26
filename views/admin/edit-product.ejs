@@ -2,8 +2,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
-  <div class="flex-1">
-    <div class="mb-6 flex flex-col md:flex-row items-start justify-between">
+  <div class="flex-1 px-6 py-8">
+    <div class="mb-8 flex flex-col md:flex-row items-start justify-between">
       <!-- Breadcrumbs -->
       <nav class="text-sm text-gray-500 mb-4 md:mb-0">
           <a href="#" class="hover:text-yellow-500">Dashboard</a> &gt;
@@ -13,7 +13,7 @@
   
   </div>
       <!-- Edit Product Form (Similar Structure to Add Product) -->
-      <div class="w-full max-w-5xl bg-white rounded-lg shadow-lg p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="w-full max-w-6xl mx-auto bg-white rounded-xl shadow-xl p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
         <!-- Left Side -->
         <div>
           <form method="post" action="/admin/editProduct/<%= product._id %>" enctype="multipart/form-data" onsubmit="return validateForm(event)">
@@ -165,9 +165,9 @@
     <button
       type="submit"
       id="submitButton"
-      class="w-full bg-yellow-500 text-white font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+      class="w-full bg-yellow-500 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-yellow-600 transform hover:scale-[1.02] transition-all duration-200"
     >
-      Submit Product
+      Update Product
     </button>
   </div>
 </form>
@@ -255,11 +255,7 @@ const genderDropdown = document.getElementById("gender");
 
   
 function validateForm(event) {
-    // Clear any previous error messages
-    console.log('form validation started')
     clearErrorMessages();
-    
-    // Flag to track overall form validity
     let isValid = true;
 
     // Get form values
@@ -269,55 +265,36 @@ function validateForm(event) {
     const description = document.getElementById('description').value.trim();
     const regularPrice = document.getElementById('regularPrice').value.trim();
     const salePrice = document.getElementById('salePrice').value.trim();
-    const imageInput = document.getElementById('imageInput');
 
-    // Size quantities
-    const sizeFields = ['S', 'M', 'L', 'XL'];
-
-    // Product Name Validation
+    // Basic validations
     if (!productName) {
         displayErrorMessage('productName-error', 'Please enter a product name.');
         isValid = false;
-    } else if (!/^[a-zA-Z\s]+$/.test(productName)) {
-        displayErrorMessage('productName-error', 'Product name should contain only alphabetic characters.');
-        isValid = false;
     }
 
-    // Gender Validation
     if (!gender) {
         displayErrorMessage('gender-error', 'Please select a gender.');
         isValid = false;
     }
 
-    // Category Validation
     if (!category) {
         displayErrorMessage('category-error', 'Please select a category.');
         isValid = false;
     }
 
-    // Description Validation
     if (!description) {
         displayErrorMessage('description-error', 'Please enter a product description.');
         isValid = false;
-    } else if (description.length < 10) {
-        displayErrorMessage('description-error', 'Description must be at least 10 characters long.');
+    }
+
+    // Price validations
+    if (!regularPrice || parseFloat(regularPrice) <= 0) {
+        displayErrorMessage('regularPrice-error', 'Please enter a valid regular price.');
         isValid = false;
     }
 
-    // Price Validation
-    if (!regularPrice) {
-        displayErrorMessage('regularPrice-error', 'Please enter a regular price.');
-        isValid = false;
-    } else if (!/^\d+(\.\d{1,2})?$/.test(regularPrice) || parseFloat(regularPrice) < 0) {
-        displayErrorMessage('regularPrice-error', 'Please enter a valid non-negative price.');
-        isValid = false;
-    }
-
-    if (!salePrice) {
-        displayErrorMessage('salePrice-error', 'Please enter a sale price.');
-        isValid = false;
-    } else if (!/^\d+(\.\d{1,2})?$/.test(salePrice) || parseFloat(salePrice) < 0) {
-        displayErrorMessage('salePrice-error', 'Please enter a valid non-negative sale price.');
+    if (!salePrice || parseFloat(salePrice) <= 0) {
+        displayErrorMessage('salePrice-error', 'Please enter a valid sale price.');
         isValid = false;
     }
 
@@ -326,38 +303,36 @@ function validateForm(event) {
         isValid = false;
     }
 
-    // Size Validation
+    // Size quantity validation
     let totalQuantity = 0;
-    sizeFields.forEach(size => {
-        const qtyInput = document.getElementById(`size${size}Qty`);
-        if (qtyInput) {
-            const qty = qtyInput.value.trim();
-
-            if (qty && (!/^\d+$/.test(qty) || parseInt(qty) < 0)) {
-                displayErrorMessage(`size${size}Qty-error`, `Size ${size} quantity must be a non-negative number.`);
-                isValid = false;
-            }
-
-            // Sum up total quantity
-            if (qty) {
-                totalQuantity += parseInt(qty);
-            }
-        }
+    ['S', 'M', 'L', 'XL'].forEach(size => {
+        const qty = parseInt(document.getElementById(`size${size}Qty`).value) || 0;
+        totalQuantity += qty;
     });
 
-  
     if (totalQuantity === 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Quantity Error',
-            text: 'At least one size must have a quantity.'
-        });
+        displayErrorMessage('sizeSQty-error', 'At least one size must have quantity.');
         isValid = false;
     }
 
-    // Image Validation - 3 to 5 images
-    if (imageFiles.length < 3 || imageFiles.length > 5) {
-        displayErrorMessage('imageInput-error', 'Please upload between 3 to 5 images.');
+    // Image validation
+    const existingImages = document.querySelectorAll('#imagePreview img').length; // Count existing images
+    const newImages = imageFiles ? imageFiles.length : 0;
+    const deletedImages = document.querySelectorAll('.deleted-image').length;
+    
+    // Calculate total images after changes
+    const totalImages = existingImages + newImages - deletedImages;
+    
+    console.log('Image counts:', {
+        existing: existingImages,
+        new: newImages,
+        deleted: deletedImages,
+        total: totalImages
+    });
+
+    // Only validate image count if new images are being added or existing ones are deleted
+    if ((newImages > 0 || deletedImages > 0) && (totalImages < 3 || totalImages > 5)) {
+        displayErrorMessage('imageInput-error', 'Product must have between 3 and 5 images.');
         isValid = false;
     }
 
@@ -597,7 +572,7 @@ function showAlert(title, text, icon) {
     });
 }
       // Event listener to fetch and populate product details
-      document.addEventListener('DOMContentLoaded', () => {
+      /* document.addEventListener('DOMContentLoaded', () => {
           fetch(`/admin/getProductDetails/${productId}`)
               .then(response => response.json())
               .then(product => {
@@ -611,7 +586,103 @@ function showAlert(title, text, icon) {
                       text: 'Failed to load product details'
                   });
               });
-      });
+      }); */
+
+document.querySelector('form').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    console.log('Form submission started'); // Debug log
+
+    if (validateForm(event)) {
+        const formData = new FormData(this);
+        
+        // Log form data for debugging
+        console.log('Form data before sending:');
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+
+        // Add any cropped/new images from imageFiles array
+        if (imageFiles && imageFiles.length > 0) {
+            imageFiles.forEach((file, index) => {
+                formData.append('images', file);
+            });
+        }
+
+        // Add deleted images if any
+        const deletedImages = Array.from(document.querySelectorAll('.deleted-image'))
+            .map(el => el.getAttribute('data-url'))
+            .filter(url => url); // Filter out any null/undefined values
+
+        if (deletedImages.length > 0) {
+            formData.append('deletedImages', JSON.stringify(deletedImages));
+        }
+
+        try {
+            console.log('Sending request to:', this.action); // Debug log
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            console.log('Response received:', response.status); // Debug log
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Response data:', data); // Debug log
+
+            if (data.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Product updated successfully',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                window.location.href = data.redirectUrl || '/admin/products';
+            } else {
+                throw new Error(data.message || 'Update failed');
+            }
+        } catch (error) {
+            console.error('Error during submission:', error); // Debug log
+            Swal.fire({
+                icon: 'error',
+                title: 'Update Failed',
+                text: error.message || 'An unexpected error occurred while updating the product'
+            });
+        }
+    } else {
+        console.log('Form validation failed'); // Debug log
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please check all required fields'
+        });
+    }
+});
+
+// Add this helper function to check if an image is valid
+function isValidImage(file) {
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    return file && validTypes.includes(file.type);
+}
+
+// Helper function to clear error messages
+function clearErrorMessages() {
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.textContent = '';
+    });
+}
+
+// Helper function to display error messages
+function displayErrorMessage(elementId, message) {
+    const errorElement = document.getElementById(elementId);
+    if (errorElement) {
+        errorElement.textContent = message;
+    }
+}
       </script>
   </div>
 <%- include('../partials/admin/footer') %> 

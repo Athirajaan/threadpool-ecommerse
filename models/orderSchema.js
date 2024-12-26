@@ -1,23 +1,21 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const { v4: uuidv4 } = require("uuid");
 
 const orderSchema = new Schema({
   orderId: {
     type: String,
-    default: () => uuidv4(),
     unique: true,
   },
   user: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true,
   },
   orderedItems: [
     {
       product: {
         type: Schema.Types.ObjectId,
-        ref: "Product",
+        ref: 'Product',
         required: true,
       },
       quantity: {
@@ -30,17 +28,30 @@ const orderSchema = new Schema({
       },
       size: {
         type: String,
-        enum: ["S", "M", "L", "XL"],
-        default: "M",
+        enum: ['S', 'M', 'L', 'XL'],
+        default: 'M',
+      },
+      status: {
+        type: String,
+        required: true,
+        enum: [
+          'Pending',
+          'Shipped',
+          'out for delivery',
+          'Delivered',
+          'Cancelled',
+          'Returned',
+        ],
+        default: 'Pending',
       },
     },
   ],
   phoneNumber: {
     type: String,
-    required: true, 
+    required: true,
     validate: {
       validator: function (v) {
-        return /^[0-9]{10}$/.test(v); 
+        return /^[0-9]{10}$/.test(v);
       },
       message: (props) => `${props.value} is not a valid phone number!`,
     },
@@ -55,33 +66,21 @@ const orderSchema = new Schema({
   },
   address: {
     type: Schema.Types.ObjectId,
-    ref: "Address",
+    ref: 'Address',
     required: true,
-  },
-  status: {
-    type: String,
-    required: true,
-    enum: [
-      "Pending",
-      "Shipped",
-      "out for delivery",
-      "Delivered",
-      "Cancelled",
-      "Returned",
-    ],
   },
   invoice: {
-    invoiceId: { 
-      type: String, 
-      required: true 
+    invoiceId: {
+      type: String,
+      required: true,
     }, // Unique Invoice ID
-    dateGenerated: { 
-      type: Date, 
-      default: Date.now 
+    dateGenerated: {
+      type: Date,
+      default: Date.now,
     }, // Date Invoice was created
-    invoiceURL: { 
-      type: String, 
-      required: false 
+    invoiceURL: {
+      type: String,
+      required: false,
     }, // Link to the invoice (PDF or digital copy)
   },
   createdOn: {
@@ -95,16 +94,16 @@ const orderSchema = new Schema({
   },
   paymentStatus: {
     type: String,
-    enum: ["Pending", "Completed", "Failed"],
-    default: "Pending",
+    enum: ['Pending', 'Completed', 'Failed'],
+    default: 'Pending',
   },
   paymentMethod: {
     type: String,
-    enum: ["Credit Card", "Debit Card", "PayPal", "Cash on Delivery"],
-    default: "Credit Card",
+    required: true,
+    enum: ['Cash on Delivery', 'Wallet', 'Razorpay'],
   },
 });
 
-const Order = mongoose.model("Order", orderSchema);
+const Order = mongoose.model('Order', orderSchema);
 
 module.exports = Order;

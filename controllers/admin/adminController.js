@@ -20,7 +20,7 @@ const login = async (req, res) => {
       const passwordMatch = await bcrypt.compare(password, admin.password);
 
       if (passwordMatch) {
-        req.session.admin = true;
+        req.session.admin =admin;
         return res.redirect("/admin");
       } else {
         return res.redirect("/admin/login");
@@ -48,13 +48,8 @@ const loadDashboard = async (req, res) => {
 //logout
 const logout = async (req, res) => {
   try {
-    req.session.destroy((err) => {
-      if (err) {
-        console.log("Error destroying admin session", err);
-        return res.redirect("/pageerror");
-      }
-      res.redirect("/admin/login");
-    });
+    delete req.session.admin;
+    res.redirect("/admin/login");
   } catch (error) {
     console.log("unexpected error during logout", error);
     res.redirect("/pageerror");

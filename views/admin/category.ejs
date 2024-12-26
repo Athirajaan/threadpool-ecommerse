@@ -25,6 +25,15 @@
         Add Category
       </button>
     </div>
+  
+<div id="errorMessage" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background-color: #f44336; color: white; padding: 10px; border-radius: 5px; font-size: 14px; z-index: 1000; max-width: 300px;">
+  <!-- Error message will appear here -->
+</div>
+
+<div id="successMessage" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px; font-size: 14px; z-index: 1000; max-width: 300px;">
+  <!-- Success message will appear here -->
+</div>
+  
 
     <!-- Search Bar and Dropdown Filters -->
     <div class="mb-4 flex items-center justify-between flex-wrap gap-4">
@@ -71,20 +80,20 @@
                 <td class="p-4"><%= category.gender %></td>
                 <td class="p-4">
                   <% if (category.isListed) { %>
-                    <button  class="w-24 h-10  text-white bg-green-500 rounded ">
-                      <a href="/admin/listCategory?id=<%= category._id %>">Block</a>
+                    <button class="w-24 h-10 text-white bg-green-500 rounded" onclick="confirmBlock('/admin/listCategory?id=<%= category._id %>')">
+                      Block
                     </button>
                   <% } else { %>
-                    <button  class="w-24 h-10  text-white bg-red-500 rounded ">
-                      <a href="/admin/unlistCategory?id=<%= category._id %>">Unblock</a>
+                    <button class="w-24 h-10 text-white bg-red-500 rounded" onclick="confirmUnblock('/admin/unlistCategory?id=<%= category._id %>')">
+                      Unblock
                     </button>
                   <% } %>
                 </td>
-                <td class="p-4">
-                  <button class="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600">
-                    <a href="/admin/editCategory?id=<%= category._id %>">Edit</a>
-                  </button>
-                </td>
+                  <td class="p-4">
+                    <button class="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600" onclick="openEditModal('<%= category._id %>', '<%= category.name %>', '<%= category.description %>', '<%= category.gender %>')">
+                      Edit
+                    </button>
+                  </td>
               </tr>
             <% }) %>
           <% } else { %>
@@ -169,6 +178,49 @@
   </div>
 </div>
 
+<!-- edit category modal -->
+ <!-- Add Category Modal (for editing) -->
+<div id="editCategoryModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" style="display: none;">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-xl font-bold text-yellow-500 mb-4">Edit Category</h2>
+    
+    <!-- Form -->
+    <form method="post" action="/admin/editCategory" id="editCategoryForm" onsubmit="return handleEditFormSubmit(event)">
+      <input type="hidden" id="categoryId" name="categoryId" />
+      <div class="mb-4">
+        <label for="editName" class="block text-gray-700 font-medium">Category Name</label>
+        <input type="text" id="editName" name="name" placeholder="Enter category name" 
+          class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <div id="name-error" class="error-message"></div>
+      </div>
+      <div class="mb-4">
+        <label for="editDescription" class="block text-gray-700 font-medium">Description</label>
+        <textarea id="editDescription" name="description" placeholder="Enter description" rows="3" 
+          class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
+          <div id="description-error" class="error-message"></div>
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium">Gender</label>
+        <div class="flex space-x-4">
+          <label>
+            <input type="radio" name="gender" value="Men" class="mr-2" id="editMen"> Men
+          </label>
+          <label>
+            <input type="radio" name="gender" value="Women" class="mr-2" id="editWomen"> Women
+          </label>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+          Cancel
+        </button>
+        <button type="submit" class="ml-3 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+          Update
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
   <script>
 
@@ -324,8 +376,6 @@ function resetForm() {
   }
 }
 
-
-
         function clearErrorMessage(){
            const errorElements = document.getElementsByClassName("error-message");
            Array.from(errorElements).forEach((element)=>{
@@ -334,15 +384,14 @@ function resetForm() {
            });
         }
   
-        // search bar
       // Function to escape special characters in the search query
 function escapeRegex(string) {
-  return string.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, '\\$&');  // Escape special regex characters
+  return string.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, '\\$&');  
 }
 
 document.getElementById('searchBar').addEventListener('input', function () {
   const searchValue = this.value.trim();  // Get the search term
-  const escapedSearchValue = escapeRegex(searchValue);  // Escape special characters
+  const escapedSearchValue = escapeRegex(searchValue);  
   
   // Use the Fetch API to send the escaped search query to the server
   fetch(`/admin/category?search=${encodeURIComponent(escapedSearchValue)}&page=1`)
@@ -352,11 +401,187 @@ document.getElementById('searchBar').addEventListener('input', function () {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
       const newTableBody = doc.querySelector('#categoryTable').innerHTML;
-      document.querySelector('#categoryTable').innerHTML = newTableBody;  // Update table
+      document.querySelector('#categoryTable').innerHTML = newTableBody;  
     })
     .catch(error => console.error('Error fetching search results:', error));
 });
 
+// Open the edit modal and fill in the current data
+function openEditModal(id, name, description, gender) {
+  // Log the ID to verify it's being passed correctly
+  console.log('Editing Category ID:', id);
+
+  document.getElementById('editCategoryModal').style.display = 'flex';
+  
+  // Ensure you're setting the ID in a hidden input field
+  document.getElementById('categoryId').value = id;
+  document.getElementById('editName').value = name;
+  document.getElementById('editDescription').value = description;
+  
+  // Set the gender radio button based on the current gender
+  const menRadio = document.getElementById('editMen');
+  const womenRadio = document.getElementById('editWomen');
+  
+  if (gender === 'Men') {
+    menRadio.checked = true;
+  } else {
+    womenRadio.checked = true;
+  }
+}
+
+
+// edit categoty
+document.getElementById('updateButton').addEventListener('click', function() {
+  if (!validateEditForm()) {
+    return;
+  }
+
+  const categoryId = document.getElementById('categoryId').value;
+  const categoryName = document.getElementById('editName').value.trim();
+  const categoryDescription = document.getElementById('editDescription').value.trim();
+  const categoryGender = document.querySelector('input[name="gender"]:checked').value;
+
+  const updatedCategory = {
+    categoryId: categoryId,
+    name: categoryName,
+    description: categoryDescription,
+    gender: categoryGender
+  };
+
+  fetch('/admin/editCategory', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedCategory),
+    redirect: 'manual', 
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json(); 
+    } else {
+      return response.json().then(err => {
+        throw new Error(err.message || 'Error updating category');
+      });
+    }
+  })
+  .then(data => {
+    if (data.success) {
+      showMessage(data.message, 'success');
+    } else {
+      showMessage(data.message, 'error');
+    }
+  })
+  .catch(error => {
+    showMessage(error.message, 'error');
+  });
+});
+function showMessage(message, type) {
+  const messageDiv = type === 'error' ? document.getElementById('errorMessage') : document.getElementById('successMessage');
+  messageDiv.textContent = message;
+  messageDiv.style.display = 'block';
+  setTimeout(() => {
+    messageDiv.style.display = 'none';
+  }, 5000);
+}
+
+function closeModal() {
+  document.getElementById('categoryModal').style.display = 'none';
+}
+
+function handleEditFormSubmit(event) {
+  event.preventDefault();
+
+  const formData = {
+    categoryId: document.getElementById('categoryId').value,
+    name: document.getElementById('editName').value,
+    description: document.getElementById('editDescription').value,
+    gender: document.querySelector('input[name="gender"]:checked').value
+  };
+
+  fetch('/admin/editCategory', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(formData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: data.message,
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        // Redirect after showing message
+        window.location.href = data.redirectUrl;
+      });
+    } else {
+      // Show error message
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: data.message
+      });
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'An unexpected error occurred'
+    });
+  });
+
+  // Close the modal
+  document.getElementById('editCategoryModal').style.display = 'none';
+  return false;
+}
+
+// Add these functions for block/unblock confirmation
+function confirmBlock(url) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "Do you want to block this category?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, block it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = url;
+    }
+  });
+}
+
+function confirmUnblock(url) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "Do you want to unblock this category?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, unblock it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = url;
+    }
+  });
+}
+
+// Add this function to close the edit modal
+function closeEditModal() {
+  document.getElementById('editCategoryModal').style.display = 'none';
+}
 
   </script>
 

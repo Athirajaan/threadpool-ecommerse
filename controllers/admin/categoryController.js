@@ -1,15 +1,15 @@
-const Category = require("../../models/categorySchema");
+const Category = require('../../models/categorySchema');
 
 // Display category
 const categoryInfo = async (req, res) => {
   try {
-    const searchQuery = req.query.search || "";
+    const searchQuery = req.query.search || '';
     const page = parseInt(req.query.page) || 1;
     const limit = 5;
     const skip = (page - 1) * limit;
 
     const filter = searchQuery
-      ? { name: { $regex: searchQuery, $options: "i" } }
+      ? { name: { $regex: searchQuery, $options: 'i' } }
       : {};
 
     const categoryData = await Category.find(filter)
@@ -20,15 +20,15 @@ const categoryInfo = async (req, res) => {
     const totalCategories = await Category.countDocuments(filter);
     const totalPages = Math.ceil(totalCategories / limit);
 
-    res.render("category", {
+    res.render('category', {
       cat: categoryData,
       currentPage: page,
       totalPages: totalPages,
       totalCategories: totalCategories,
     });
   } catch (error) {
-    console.error("Error in fetching categories:", error);
-    res.redirect("/pageerror");
+    console.error('Error in fetching categories:', error);
+    res.redirect('/pageerror');
   }
 };
 
@@ -49,58 +49,97 @@ const addCategory = async (req, res) => {
       gender,
     });
     await newCategory.save();
-    return res.json({ message: "Category added successfully" });
+    return res.json({ message: 'Category added successfully' });
   } catch (error) {
-    console.error("Error in adding category:", error);
+    console.error('Error in adding category:', error);
     if (error.code === 11000) {
       return res.status(400).json({
-        error: "Duplicate category found. Please check the name and gender.",
+        error: 'Duplicate category found. Please check the name and gender.',
       });
     }
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-
-
-
-const getListCategory =async (req,res)=>{
+const getListCategory = async (req, res) => {
   try {
-    let id=req.query.id;
-    await Category.updateOne({_id:id},{$set:{isListed:false}});
+    let id = req.query.id;
+    await Category.updateOne({ _id: id }, { $set: { isListed: false } });
     res.redirect('/admin/category');
   } catch (error) {
-    res.redirect('/pageerror')
+    res.redirect('/pageerror');
   }
-}
+};
 
-
-const getUnListCategory  = async (req,res)=>{
+const getUnListCategory = async (req, res) => {
   try {
-    let id= req.query.id;
-    await Category.updateOne({_id:id},{$set:{isListed:true}})
+    let id = req.query.id;
+    await Category.updateOne({ _id: id }, { $set: { isListed: true } });
     res.redirect('/admin/category');
   } catch (error) {
-    res.redirect('/pageerror')
+    res.redirect('/pageerror');
   }
-}
+};
 
+const EditCategory = async (req, res) => {
+  const { categoryId, name, description, gender } = req.body;
 
-const getEditCategory =async (req,res)=>{
-try {
-  const id=req.Query.id;
-  const category = await Category.findOne({_id:id})
-  res.render('/admin/category',{category:category})
-} catch (error) {
-  res.redirect('/pageerror')
-}
-}
+  // Validate incoming data
+  if (!categoryId) {
+    return res.status(400).json({
+      success: false,
+      message: 'Category ID is required',
+    });
+  }
 
+  try {
+    // Check if the category already exists
+    const existingCategory = await Category.findOne({
+      name,
+      gender,
+      _id: { $ne: categoryId },
+    });
+
+    if (existingCategory) {
+      return res.status(400).json({
+        success: false,
+        message: 'Category with this name already exists for this gender',
+      });
+    }
+
+    // Update the category
+    const updatedCategory = await Category.findByIdAndUpdate(
+      categoryId,
+      { name, description, gender },
+      { new: true }
+    );
+
+    if (!updatedCategory) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found',
+      });
+    }
+
+    // Return success response
+    return res.status(200).json({
+      success: true,
+      message: 'Category updated successfully',
+      redirectUrl: '/admin/category', // Add redirect URL
+    });
+  } catch (error) {
+    console.error('Error updating category:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error updating category',
+    });
+  }
+};
 
 module.exports = {
   categoryInfo,
   addCategory,
   getListCategory,
   getUnListCategory,
-  getEditCategory
+  EditCategory,
 };

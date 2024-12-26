@@ -1,371 +1,447 @@
 <%- include('../partials/user/userheader') %> 
-<div class=" mx-10 mt-6 flex flex-col md:flex-row items-start justify-between">
-  <!-- Breadcrumbs -->
-  <nav class="text-sm text-gray-500 mb-4 md:mb-0">
-      <a href="/" class="hover:text-yellow-500">home</a> &gt;
-      <a href="#" class="hover:text-yellow-500">productPage</a> &gt;
-      <a href="#" class="hover:text-yellow-500">Cart</a> &gt;
-      <a href="#" class="text-gray-800">checkOut</a>
+
+<style>
+  /* Scoped styles for the success page overlay */
+  #order-success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    display: none;  /* Hide initially */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; 
+  }
+
+  body.no-scroll {
+  overflow: hidden;  /* Disable scrolling */
+}
+  #order-success {
+    text-align: center;
+  }
+
+  iframe {
+    display: block;
+    margin: 0 auto;
+  }
+        /* Update overlay styles */
+        #order-success-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw; /* Use viewport width */
+          height: 100vh; /* Use viewport height */
+          background-color: white;
+          display: none;
+          justify-content: center;
+          align-items: center;
+          z-index: 999999; /* Very high z-index */
+          margin: 0;
+          padding: 0;
+        }
+
+        /* Ensure the body doesn't scroll when overlay is shown */
+        body.overlay-active {
+          overflow: hidden;
+          position: fixed;
+          width: 100%;
+          height: 100%;
+        }
+      
+
+</style>
+
+
+
+<div class="container mx-auto px-4 py-8">
+  <!-- Breadcrumb with new design -->
+  <nav class="bg-white shadow-md rounded-lg p-4 mb-8">
+    <ol class="flex items-center space-x-4">
+        <li class="inline-flex items-center">
+            <a href="/" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-yellow-600">
+                <svg class="w-3 h-3 mr-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
+                </svg>
+                Home
+            </a>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-3 h-3 mx-1 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                </svg>
+                <a href="#" class="ml-1 text-sm font-medium text-gray-700 hover:text-yellow-600 md:ml-2">Products</a>
+            </div>
+        </li>
+        <li>
+            <div class="flex items-center">
+                <svg class="w-3 h-3 mx-1 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                </svg>
+                <a href="#" class="ml-1 text-sm font-medium text-gray-700 hover:text-yellow-600 md:ml-2">Cart</a>
+            </div>
+        </li>
+        <li aria-current="page">
+            <div class="flex items-center">
+                <svg class="w-3 h-3 mx-1 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                </svg>
+                <span class="ml-1 text-sm font-medium text-yellow-500 md:ml-2">Checkout</span>
+            </div>
+        </li>
+    </ol>
   </nav>
 
-</div>
-  <div class="max-w-7xl mx-auto bg-white shadow-md rounded-lg flex divide-x divide-gray-300">
-    <!-- Left Section -->
-    <div class="w-2/3 p-6 space-y-6">
-      <!-- Delivery Info -->
-      <div class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
-        <i class="fas fa-truck text-yellow-500 text-3xl"></i>
-        <div>
-          <p class="text-gray-700 font-medium">Delivery expected in 8 days</p>
-          <p class="text-gray-500 text-sm flex items-center">
-            <i class="fas fa-tag text-green-500 mr-2"></i> Free Shipping Available
-          </p>
-        </div>
-      </div>
-    
-      <div id="notification" class="hidden fixed top-12 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg text-white shadow-lg transition-opacity duration-500 z-50"></div>
-     <!-- Address Section -->
-<div class="space-y-6">
-  <h2 class="text-xl font-semibold text-gray-700 flex items-center">
-    <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i> Shipping Address
-  </h2>
-  
-  <div class="border border-gray-300 rounded-lg p-6">
-    <!-- Default Address -->
-    <% addresses.forEach(function(addr) { %>
-      <% if (addr.isDefault) { %> <!-- Show only the default address here -->
-        <label class="flex items-center">
-          <input type="radio" name="address" class="mr-3" value="<%= addr._id %>" checked />
-          <span>
-            <%= addr.addressType %>, <%= addr.name %>, <%= addr.city %>, <%= addr.landMark %>, 
-            <%= addr.state %>, <%= addr.pincode %>
-          </span>
-        </label>
-      <% } %>
-    <% }); %>
-    <!-- Option to Select Another Address -->
-    <div class="mt-4">
-      <label class="flex items-center">
-        <input type="radio" name="address" class="mr-3" id="selectAnotherAddress">
-        <span>Select another address</span>
-      </label>
-    
-      <!-- Dropdown to Select Another Address (Initially hidden) -->
-      <select id="addressDropdown" class="w-full p-2 mt-2 border rounded-md bg-white hidden">
-        <option value="" disabled selected>Select an address</option>
-        <% addresses.forEach(function(addr) { %>
-          <% if (!addr.isDefault) { %> <!-- Exclude the default address from this list -->
-            <option value="<%= addr._id %>">
-              <%= addr.addressType %>, <%= addr.name %>, <%= addr.city %>, <%= addr.landMark %>, 
-              <%= addr.state %>, <%= addr.pincode %>
-            </option>
-          <% } %>
-        <% }); %>
-      </select>
-    
-      <!-- Textarea for entering a custom address (Initially hidden) -->
-      <textarea id="addressTextarea" 
-                class="w-full p-3 mt-2 border rounded-md bg-white hidden resize-none" 
-                rows="4" 
-                placeholder="Enter your address here"></textarea>
-    </div>
-    <!-- Button to Add New Address -->
-    <button  id="openModalBtn" class="text-blue-500 hover:underline text-sm flex items-center mt-4">
-      <i class="fas fa-plus-circle text-green-500 mr-2"></i> Add New Address
-    </button>
-  
-  </div>
-</div>
-
-
-      <!-- Phone Section -->
-      <div class="space-y-6">
-        <h2 class="text-xl font-semibold text-gray-700 flex items-center">
-          <i class="fas fa-phone text-yellow-500 mr-2"></i> Contact Information
-        </h2>
-        <div class="border border-gray-300 rounded-lg p-6 flex justify-between items-center">
-          <!-- Display Mode -->
-          <span id="phoneNumberDisplay" class="text-gray-700"><%= phoneNumber %></span>
-      
-          <!-- Edit Mode -->
-          <input
-            type="text"
-            id="phoneNumberInput"
-            class="hidden w-full border border-gray-300 rounded-md p-2 text-gray-700"
-            placeholder="Enter new phone number"
-            maxlength="10"
-          />
-      
-          <!-- Buttons -->
-          <div class="flex space-x-2">
-            <button
-              id="editPhoneNumberBtn"
-              class="text-blue-500 hover:underline text-sm flex items-center"
-            >
-              <i class="fas fa-edit text-gray-500 mr-1"></i> Edit
-            </button>
-            <button
-              id="savePhoneNumberBtn"
-              class="hidden text-green-500 hover:underline text-sm flex items-center"
-            >
-              <i class="fas fa-check text-gray-500 mr-1"></i> Save
-            </button>
-            <button
-              id="cancelPhoneNumberBtn"
-              class="hidden text-red-500 hover:underline text-sm flex items-center"
-            >
-              <i class="fas fa-times text-gray-500 mr-1"></i> Cancel
-            </button>
+  <!-- Main Content Grid with enhanced styling -->
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- Left Section with improved card design -->
+    <div class="w-full lg:w-2/3 space-y-6">
+      <!-- Delivery Address Section -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">Delivery Address</h2>
+        <!-- Delivery Info -->
+        <div class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
+          <i class="fas fa-truck text-yellow-500 text-3xl"></i>
+          <div>
+            <p class="text-gray-700 font-medium">Delivery expected in 8 days</p>
+            <p class="text-gray-500 text-sm flex items-center">
+              <i class="fas fa-tag text-green-500 mr-2"></i> Free Shipping Available
+            </p>
           </div>
         </div>
-        <div id="phoneError" class="text-red-500 hidden mt-2">Please enter a valid 10-digit phone number.</div>
-      </div>
       
-
-      <!-- Payment Section -->
+        <div id="notification" class="hidden fixed top-12 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg text-white shadow-lg transition-opacity duration-500 z-50"></div>
+       <!-- Address Section -->
       <div class="space-y-6">
         <h2 class="text-xl font-semibold text-gray-700 flex items-center">
-          <i class="fas fa-credit-card text-yellow-500 mr-2"></i> Payment Method
+          <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i> Shipping Address
         </h2>
-        <div class="border border-gray-300 rounded-lg p-6 space-y-4">
-          <label class="flex items-center">
-            <input type="radio" name="payment" class="mr-3" checked>
-            <span>Credit Card</span>
-          </label>
-          <div class="pl-6 space-y-2">
-            <input type="text" placeholder="Card Number" class="w-full border rounded-md p-2">
-            <input type="text" placeholder="Name on Card" class="w-full border rounded-md p-2">
-            <input type="text" placeholder="Expiration Date (MM/YY)" class="w-full border rounded-md p-2">
-            <input type="text" placeholder="Security Code" class="w-full border rounded-md p-2">
-          </div>
-          <label class="flex items-center">
-            <input type="radio" name="payment" class="mr-3">
-            <span class="flex items-center">
-                <i class="fab fa-google-pay text-blue-500 mr-2"></i> Google Pay
-
-            </span>
-          </label>
-          <label class="flex items-center">
-            <input type="radio" name="payment" class="mr-3">
-            <span class="flex items-center">
-                <i class="fab fa-paypal text-blue-500 mr-2"></i> 
-                PayPal
-            </span>
-          </label>
-          <label class="flex items-center">
-            <input type="radio" name="payment" class="mr-3">
-            <span><i class="fas fa-cash-register text-green-500 mr-2"></i> Cash on Delivery
+        
+        <div class="border border-gray-300 rounded-lg p-6">
+          <!-- Default Address -->
+          <% addresses.forEach(function(addr) { %>
+            <% if (addr.isDefault) { %> <!-- Show only the default address here -->
+              <label class="flex items-center">
+                <input type="radio" name="address" class="mr-3" value="<%= addr._id %>" checked />
+                <span>
+                  <%= addr.addressType %>, <%= addr.name %>, <%= addr.city %>, <%= addr.landMark %>, 
+                  <%= addr.state %>, <%= addr.pincode %>
                 </span>
-          </label>
+              </label>
+            <% } %>
+          <% }); %>
+          <!-- Option to Select Another Address -->
+          <div class="mt-4">
+            <label class="flex items-center">
+              <input type="radio" name="address" class="mr-3" id="selectAnotherAddress">
+              <span>Select another address</span>
+            </label>
+          
+            <!-- Dropdown to Select Another Address (Initially hidden) -->
+            <select id="addressDropdown" class="w-full p-2 mt-2 border rounded-md bg-white hidden">
+              <option value="" disabled selected>Select an address</option>
+              <% addresses.forEach(function(addr) { %>
+                <% if (!addr.isDefault) { %> <!-- Exclude the default address from this list -->
+                  <option value="<%= addr._id %>">
+                    <%= addr.addressType %>, <%= addr.name %>, <%= addr.city %>, <%= addr.landMark %>, 
+                    <%= addr.state %>, <%= addr.pincode %>
+                  </option>
+                <% } %>
+              <% }); %>
+            </select>
+          
+            <!-- Textarea for entering a custom address (Initially hidden) -->
+            <textarea id="addressTextarea" 
+                      class="w-full p-3 mt-2 border rounded-md bg-white hidden resize-none" 
+                      rows="4" 
+                      placeholder="Enter your address here"></textarea>
+          </div>
+          <!-- Button to Add New Address -->
+          <button  id="openModalBtn" class="text-blue-500 hover:underline text-sm flex items-center mt-4">
+            <i class="fas fa-plus-circle text-green-500 mr-2"></i> Add New Address
+          </button>
+        
         </div>
       </div>
 
-      <!-- Place Order Button -->
-      <form action="/create-order" method="POST">
-        <button type="submit"  id="order-button" onclick="confirmOrder()" class="mt-6 w-full bg-yellow-500 hover:bg-yellow-600 text-white text-lg font-semibold py-3 rounded-lg">
-          Place Order
-        </button>
-      </form>
 
-      <div id="confirmation-box" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div class="bg-white text-green-500 p-8 rounded-lg text-xl font-semibold border-2 border-green-500 opacity-0 transform scale-0 transition-all duration-1000 ease-in-out" id="confirmation-message">
-          Order Confirmed
-        </div>
-      </div>
-      <audio id="order-sound" src="/sounds/short-success.mp3.mp3"></audio>
-      
-    </div>
-
-    <!-- Right Section -->
-    <div class="w-1/3 p-6">
-      <!-- Product List -->
-      <h3 class="text-lg font-semibold mb-4">Products (<%= cartItems.length %> Items)</h3>
-      <div class="space-y-4 mb-6">
-        <% cartItems.forEach(function(item) { %>
-          <div class="flex items-center space-x-4">
-            <img src="<%= item.productImage %>" alt="<%= item.productName %>" class="w-12 h-12 rounded-lg">
-            <div class="flex-1">
-              <p class="text-gray-700 font-medium"><%= item.productName %></p>
-              <p class="text-sm text-gray-500">₹<%= item.salePrice %></p>
+        <!-- Phone Section -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">Phone Number</h2>
+          <div class="border border-gray-300 rounded-lg p-6 flex justify-between items-center">
+            <!-- Display Mode -->
+            <span id="phoneNumberDisplay" class="text-gray-700"><%= phoneNumber %></span>
+        
+            <!-- Edit Mode -->
+            <input
+              type="text"
+              id="phoneNumberInput"
+              class="hidden w-full border border-gray-300 rounded-md p-2 text-gray-700"
+              placeholder="Enter new phone number"
+              maxlength="10"
+            />
+        
+            <!-- Buttons -->
+            <div class="flex space-x-2">
+              <button
+                id="editPhoneNumberBtn"
+                class="text-blue-500 hover:underline text-sm flex items-center"
+              >
+                <i class="fas fa-edit text-gray-500 mr-1"></i> Edit
+              </button>
+              <button
+                id="savePhoneNumberBtn"
+                class="hidden text-green-500 hover:underline text-sm flex items-center"
+              >
+                <i class="fas fa-check text-gray-500 mr-1"></i> Save
+              </button>
+              <button
+                id="cancelPhoneNumberBtn"
+                class="hidden text-red-500 hover:underline text-sm flex items-center"
+              >
+                <i class="fas fa-times text-gray-500 mr-1"></i> Cancel
+              </button>
             </div>
           </div>
-        <% }); %>
+          <div id="phoneError" class="text-red-500 hidden mt-2">Please enter a valid 10-digit phone number.</div>
+        </div>
+        
+        <!-- Payment Section -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">Payment Method</h2>
+          <div class="space-y-4">
+            <label class="flex items-center">
+              <input type="radio" name="payment" value="wallet" class="mr-3">
+              <span class="flex items-center">
+                <i class="fas fa-wallet text-purple-500 mr-2"></i> Wallet
+              </span>
+            </label>
+
+            <label class="flex items-center">
+              <input type="radio" name="payment" value="Razorpay" class="mr-3">
+              <span class="flex items-center">
+                <svg class="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="#072654">
+                  <path d="M8.84 11.12h2.917L8.843 19.4h-2.9l2.897-8.28zm9.182-8.28l-4.368 12.498h-2.898l4.366-12.498h2.9zM13.037 11.12h2.898L13.02 19.4h-2.9l2.917-8.28z"/>
+                </svg>
+                Razorpay
+              </span>
+            </label>
+
+            <label class="flex items-center">
+              <input type="radio" name="payment" value="Cash on Delivery" class="mr-3">
+              <span class="flex items-center">
+                <i class="fas fa-money-bill-wave text-green-500 mr-2"></i> Cash on Delivery
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Place Order Button with enhanced styling -->
+        <form action="/create-order" method="POST">
+          <button type="submit" id="order-button" onclick="placeOrder()" 
+            class="w-full bg-yellow-500 hover:bg-yellow-600 text-white text-lg font-semibold py-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-[1.02]">
+            Place Order
+          </button>
+        </form>
+      </div>
+    
+      <!-- Success Animation Modal with improved styling -->
+      <div id="order-success-overlay" class="fixed inset-0 bg-white flex items-center justify-center z-[999999] top-0 left-0 right-0 bottom-0 w-full h-full">
+        <div id="order-success" class="text-center max-w-md mx-auto transform transition-all">
+          <h2 class="text-2xl font-bold text-gray-800 mb-4">Your Order Was Successful!</h2>
+          <!-- iframe for Lottie Animation -->
+          <iframe id="lottie-animation" width="300" height="300" src="https://lottie.host/embed/cc3a47c0-b93f-4d46-bbaf-ab7b1547380b/SLSK1gW1UQ.lottie" frameborder="0"></iframe>
+        </div>
+      </div>
+
+      <!-- Success Sound -->
+      <audio id="order-sound" src="/sounds/short-success.mp3.mp3"></audio>
+    </div>
+
+    <!-- Right Section with improved card design -->
+    <div class="w-full lg:w-1/3 space-y-6">
+      <!-- Products List -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold mb-4 text-gray-800">Products (<%= cartItems.length %> Items)</h3>
+        <div class="space-y-4 mb-6">
+          <% cartItems.forEach(function(item) { %>
+            <div class="flex items-center space-x-4">
+              <img src="<%= item.productImage %>" alt="<%= item.productName %>" class="w-12 h-12 rounded-lg">
+              <div class="flex-1">
+                <p class="text-gray-700 font-medium"><%= item.productName %></p>
+                <p class="text-sm text-gray-500">₹<%= item.salePrice %></p>
+              </div>
+            </div>
+          <% }); %>
+        </div>
       </div>
       
 
       <!-- Price Details -->
-      <h3 class="text-lg font-semibold mb-4">Price Details (<%= cartItems.length %> Items)</h3>
-      <div class="space-y-3">
-        <div class="flex justify-between text-sm text-gray-600">
-          <p>Total MRP:</p>
-          <p>₹<%= totalMRP %></p>
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold mb-4 text-gray-800">Price Details (<%= cartItems.length %> Items)</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between text-sm text-gray-600">
+            <p>Total MRP:</p>
+            <p>₹<%= totalMRP %></p>
+          </div>
+          <div class="flex justify-between text-sm text-gray-600">
+            <p>Discount on MRP:</p>
+            <p>-₹<%= discountOnMRP %></p>
+          </div>
+          <div class="flex justify-between text-sm text-gray-600">
+            <p>Coupon Discount:</p>
+            <p id="couponDiscount">-0</p>
+          </div>
+          
+          
+          <div class="flex justify-between text-sm text-gray-600">
+            <p>Shipping Fee:</p>
+            <p>₹<%= shippingFee %></p>
+          </div>
         </div>
-        <div class="flex justify-between text-sm text-gray-600">
-          <p>Discount on MRP:</p>
-          <p>-₹<%= discountOnMRP %></p>
+        <div class="flex justify-between mt-6 text-lg font-semibold">
+          <p>Total Amount:</p>
+          <p id="totalAmount">₹<%= finalAmount %></p>
         </div>
-        <div class="flex justify-between text-sm text-gray-600">
-          <p>Coupon Discount:</p>
-          <p id="couponDiscount">-0</p>
-        </div>
-        <div class="flex justify-between text-sm text-gray-600">
-          <p>Platform Fee:</p>
-          <p>₹<%= platformFee %></p>
-        </div>
-        
-        <div class="flex justify-between text-sm text-gray-600">
-          <p>Shipping Fee:</p>
-          <p>₹<%= shippingFee %></p>
-        </div>
-      </div>
-      <div class="flex justify-between mt-6 text-lg font-semibold">
-        <p>Total Amount:</p>
-        <p id="totalAmount">₹<%= finalAmount %></p>
       </div>
     </div>
   </div>
 
+  <!-- Address Modal with enhanced styling -->
+  <div id="addAddressModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 m-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold">Add Address</h2>
+        <button id="closeModalBtn" class="text-gray-500 hover:text-black text-xl">&times;</button>
+      </div>
+      <form id="addressForm" class="mt-4">
+        <!-- Address Type -->
+        <div class="mb-4">
+          <label for="addressType" class="block text-sm font-medium">Address Type*</label>
+          <select
+            id="addressType"
+            name="addressType"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+            required
+          >
+            <option value="" disabled selected>Select type</option>
+            <option value="Home">Home</option>
+            <option value="Work">Work</option>
+            <option value="Office">Office</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
 
-  <!-- Modal for adress-->
-<div
-id="addAddressModal"
-class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden"
->
-<div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
-  <div class="flex justify-between items-center">
-    <h2 class="text-xl font-bold">Add Address</h2>
-    <button id="closeModalBtn" class="text-gray-500 hover:text-black text-xl">&times;</button>
+        <!-- Name -->
+        <div class="mb-4">
+          <label for="name" class="block text-sm font-medium">Name*</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+            placeholder="Full Name"
+            minlength="3"
+            maxlength="50"
+            required
+          />
+        </div>
+
+        <!-- City -->
+        <div class="mb-4">
+          <label for="city" class="block text-sm font-medium">City*</label>
+          <input
+            type="text"
+            id="city"
+            name="city"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+            placeholder="City"
+            minlength="2"
+            maxlength="100"
+            required
+          />
+        </div>
+
+        <!-- Landmark -->
+        <div class="mb-4">
+          <label for="landMark" class="block text-sm font-medium">Landmark*</label>
+          <input
+            type="text"
+            id="landMark"
+            name="landMark"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+            placeholder="Landmark"
+            maxlength="100"
+            required
+          />
+        </div>
+
+        <!-- State -->
+        <div class="mb-4">
+          <label for="state" class="block text-sm font-medium">State*</label>
+          <input
+            type="text"
+            id="state"
+            name="state"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+            placeholder="State"
+            required
+          />
+        </div>
+
+        <!-- Pincode -->
+        <div class="mb-4">
+          <label for="pincode" class="block text-sm font-medium">Pincode*</label>
+          <input
+            type="number"
+            id="pincode"
+            name="pincode"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+            placeholder="6-digit Pincode"
+            min="100000"
+            max="999999"
+            required
+          />
+        </div>
+        <div>
+          <label class="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="isDefault"
+              class="form-checkbox h-4 w-4 text-blue-600"
+              onchange="handleDefaultAddressCheckbox()"
+            />
+            <span>Set as Default Address</span>
+          </label>
+        </div>
+        <div id="error-message" class="text-red-500"></div>
+
+
+        <!-- Buttons -->
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mr-2"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            id="cancelModalBtn"
+            class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
-  <form id="addressForm" class="mt-4">
-    <!-- Address Type -->
-    <div class="mb-4">
-      <label for="addressType" class="block text-sm font-medium">Address Type*</label>
-      <select
-        id="addressType"
-        name="addressType"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-        required
-      >
-        <option value="" disabled selected>Select type</option>
-        <option value="Home">Home</option>
-        <option value="Work">Work</option>
-        <option value="Office">Office</option>
-        <option value="Other">Other</option>
-      </select>
-    </div>
 
-    <!-- Name -->
-    <div class="mb-4">
-      <label for="name" class="block text-sm font-medium">Name*</label>
-      <input
-        type="text"
-        id="name"
-        name="name"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-        placeholder="Full Name"
-        minlength="3"
-        maxlength="50"
-        required
-      />
-    </div>
-
-    <!-- City -->
-    <div class="mb-4">
-      <label for="city" class="block text-sm font-medium">City*</label>
-      <input
-        type="text"
-        id="city"
-        name="city"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-        placeholder="City"
-        minlength="2"
-        maxlength="100"
-        required
-      />
-    </div>
-
-    <!-- Landmark -->
-    <div class="mb-4">
-      <label for="landMark" class="block text-sm font-medium">Landmark*</label>
-      <input
-        type="text"
-        id="landMark"
-        name="landMark"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-        placeholder="Landmark"
-        maxlength="100"
-        required
-      />
-    </div>
-
-    <!-- State -->
-    <div class="mb-4">
-      <label for="state" class="block text-sm font-medium">State*</label>
-      <input
-        type="text"
-        id="state"
-        name="state"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-        placeholder="State"
-        required
-      />
-    </div>
-
-    <!-- Pincode -->
-    <div class="mb-4">
-      <label for="pincode" class="block text-sm font-medium">Pincode*</label>
-      <input
-        type="number"
-        id="pincode"
-        name="pincode"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-        placeholder="6-digit Pincode"
-        min="100000"
-        max="999999"
-        required
-      />
-    </div>
-    <div>
-      <label class="flex items-center space-x-2">
-        <input
-          type="checkbox"
-          id="isDefault"
-          class="form-checkbox h-4 w-4 text-blue-600"
-          onchange="handleDefaultAddressCheckbox()"
-        />
-        <span>Set as Default Address</span>
-      </label>
-    </div>
-    <div id="error-message" class="text-red-500"></div>
-
-
-    <!-- Buttons -->
-    <div class="flex justify-end">
-      <button
-        type="submit"
-        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mr-2"
-      >
-        Save
-      </button>
-      <button
-        type="button"
-        id="cancelModalBtn"
-        class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded"
-      >
-        Cancel
-      </button>
-    </div>
-  </form>
-</div>
-</div>
-
-
-
-
-<script>
-
-
-
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
 
     const selectAnotherAddress = document.getElementById('selectAnotherAddress');
     const addressDropdown = document.getElementById('addressDropdown');
@@ -377,259 +453,479 @@ class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-5
 
 
     // Get modal elements
-const modal = document.getElementById("addAddressModal");
-const openModalBtn = document.getElementById("openModalBtn");
-const closeModalBtn = document.getElementById("closeModalBtn");
-const cancelModalBtn = document.getElementById("cancelModalBtn");
-const addressForm = document.getElementById("addressForm");
+    const modal = document.getElementById("addAddressModal");
+    const openModalBtn = document.getElementById("openModalBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const cancelModalBtn = document.getElementById("cancelModalBtn");
+    const addressForm = document.getElementById("addressForm");
 
-// Open modal
-openModalBtn.addEventListener("click", () => {
-  modal.classList.remove("hidden");
-  addressForm.reset(); // Reset the form fields when opening the modal
-});
-
-// Close modal
-[closeModalBtn, cancelModalBtn].forEach((btn) =>
-  btn.addEventListener("click", () => {
-    modal.classList.add("hidden");
-  })
-);
-
-// Close modal if clicked outside
-window.addEventListener("click", (event) => {
-  if (event.target === modal) {
-    modal.classList.add("hidden");
-  }
-});
-
-
-
-// Address form
-document.getElementById("addressForm").addEventListener("submit", async function(event) {
-  event.preventDefault(); 
-
-  const formData = {
-    addressType: document.getElementById("addressType").value,
-    name: document.getElementById("name").value,
-    city: document.getElementById("city").value,
-    landMark: document.getElementById("landMark").value,
-    state: document.getElementById("state").value,
-    pincode: document.getElementById("pincode").value,
-    isDefault: document.getElementById("isDefault").checked,
-  };
-
-  try {
-    const response = await fetch("http://localhost:3000/add-address", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+    // Open modal
+    openModalBtn.addEventListener("click", () => {
+      modal.classList.remove("hidden");
+      addressForm.reset(); // Reset the form fields when opening the modal
     });
 
-    const result = await response.json();
+    // Close modal
+    [closeModalBtn, cancelModalBtn].forEach((btn) =>
+      btn.addEventListener("click", () => {
+        modal.classList.add("hidden");
+      })
+    );
 
-    if (response.ok) {
-      localStorage.setItem("addressAdded", "true");
-  
+    // Close modal if clicked outside
+    window.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        modal.classList.add("hidden");
+      }
+    });
+
+
+
+    // Address form
+    document.getElementById("addressForm").addEventListener("submit", async function(event) {
+      event.preventDefault(); 
+
+      const formData = {
+        addressType: document.getElementById("addressType").value,
+        name: document.getElementById("name").value,
+        city: document.getElementById("city").value,
+        landMark: document.getElementById("landMark").value,
+        state: document.getElementById("state").value,
+        pincode: document.getElementById("pincode").value,
+        isDefault: document.getElementById("isDefault").checked,
+      };
+
+      try {
+        const response = await fetch("http://localhost:3000/add-address", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem("addressAdded", "true");
+      
+          modal.classList.add("hidden");
+          addressForm.reset(); 
+        
+        } else {
+          localStorage.setItem("addressAdded", "error");
+        }
+        location.reload()
+      } catch (error) {
+        console.error("Error:", error);
+        localStorage.setItem("addressAdded", "error");
+        location.reload();
+      }
+    });
+
+
+    document.getElementById("cancelModalBtn").addEventListener("click", function() {
       modal.classList.add("hidden");
       addressForm.reset(); 
-    
-    } else {
-      localStorage.setItem("addressAdded", "error");
+    });
+
+    window.addEventListener("load", () => {
+      const addressAdded = localStorage.getItem("addressAdded");
+
+      if (addressAdded === "true") {
+        showNotification("Address added successfully!,check the select another adress ..!", "bg-green-500");
+      } else if (addressAdded === "error") {
+        showNotification("Something went wrong. Please try again.", "bg-red-500");
+      }
+      localStorage.removeItem("addressAdded");
+    });
+
+
+
+
+
+    function showNotification(message, bgColor) {
+      const notification = document.getElementById("notification");
+      notification.textContent = message;
+
+      // Apply the background color using Tailwind
+      notification.classList.remove("hidden");
+      notification.classList.add("show", bgColor); // Dynamically add the color class
+
+      // Show notification for 5 seconds (5000ms)
+      setTimeout(() => {
+        notification.classList.remove("show");
+        notification.classList.add("hidden");
+      }, 4000); // Change this to 5000ms for 5 seconds
     }
-    location.reload()
-  } catch (error) {
-    console.error("Error:", error);
-    localStorage.setItem("addressAdded", "error");
-    location.reload();
-  }
-});
-
-
-document.getElementById("cancelModalBtn").addEventListener("click", function() {
-  modal.classList.add("hidden");
-  addressForm.reset(); 
-});
-
-window.addEventListener("load", () => {
-  const addressAdded = localStorage.getItem("addressAdded");
-
-  if (addressAdded === "true") {
-    showNotification("Address added successfully!,check the select another adress ..!", "bg-green-500");
-  } else if (addressAdded === "error") {
-    showNotification("Something went wrong. Please try again.", "bg-red-500");
-  }
-  localStorage.removeItem("addressAdded");
-});
 
 
 
 
+    // phone number dom elements and validation
+    const phoneNumberDisplay = document.getElementById('phoneNumberDisplay');
+    const phoneNumberInput = document.getElementById('phoneNumberInput');
+    const editPhoneNumberBtn = document.getElementById('editPhoneNumberBtn');
+    const savePhoneNumberBtn = document.getElementById('savePhoneNumberBtn');
+    const cancelPhoneNumberBtn = document.getElementById('cancelPhoneNumberBtn');
+    const phoneError = document.getElementById('phoneError');
 
-function showNotification(message, bgColor) {
-  const notification = document.getElementById("notification");
-  notification.textContent = message;
+    editPhoneNumberBtn.addEventListener('click', () => {
+      phoneNumberInput.value = phoneNumberDisplay.textContent; // Populate input with current number
+      toggleEditMode(true);
+    });
 
-  // Apply the background color using Tailwind
-  notification.classList.remove("hidden");
-  notification.classList.add("show", bgColor); // Dynamically add the color class
+    savePhoneNumberBtn.addEventListener('click', () => {
+      console.log('Save button clicked'); // Debug log
+      const newPhoneNumber = phoneNumberInput.value.trim();
 
-  // Show notification for 5 seconds (5000ms)
-  setTimeout(() => {
-    notification.classList.remove("show");
-    notification.classList.add("hidden");
-  }, 4000); // Change this to 5000ms for 5 seconds
-}
+      if (!/^\d{10}$/.test(newPhoneNumber) || /^0+$/.test(newPhoneNumber)) {
+        phoneError.textContent = 'Please enter a valid 10-digit phone number.';
+        phoneError.classList.remove('hidden');
+        return;
+      }
 
-
-
-
-// phone number dom elements and validation
-const phoneNumberDisplay = document.getElementById('phoneNumberDisplay');
-const phoneNumberInput = document.getElementById('phoneNumberInput');
-const editPhoneNumberBtn = document.getElementById('editPhoneNumberBtn');
-const savePhoneNumberBtn = document.getElementById('savePhoneNumberBtn');
-const cancelPhoneNumberBtn = document.getElementById('cancelPhoneNumberBtn');
-const phoneError = document.getElementById('phoneError');
-
-editPhoneNumberBtn.addEventListener('click', () => {
-  phoneNumberInput.value = phoneNumberDisplay.textContent; // Populate input with current number
-  toggleEditMode(true);
-});
-
-savePhoneNumberBtn.addEventListener('click', () => {
-  const newPhoneNumber = phoneNumberInput.value.trim();
-
-  if (!/^\d{10}$/.test(newPhoneNumber) || /^0+$/.test(newPhoneNumber)) {
-    phoneError.textContent = 'Please enter a valid 10-digit phone number.';
-    phoneError.classList.remove('hidden');
-    return;
-  }
-
-  phoneError.classList.add('hidden'); 
-  phoneNumberDisplay.textContent = newPhoneNumber; 
-});
-
-cancelPhoneNumberBtn.addEventListener('click', () => {
-  phoneError.classList.add('hidden');
-  toggleEditMode(false);
-});
-
-function toggleEditMode(isEditing) {
-  phoneNumberDisplay.classList.toggle('hidden', isEditing);
-  phoneNumberInput.classList.toggle('hidden', !isEditing);
-  editPhoneNumberBtn.classList.toggle('hidden', isEditing);
-  savePhoneNumberBtn.classList.toggle('hidden', !isEditing);
-  cancelPhoneNumberBtn.classList.toggle('hidden', !isEditing);
-}
+      phoneError.classList.add('hidden'); 
+      phoneNumberDisplay.textContent = newPhoneNumber; 
+      toggleEditMode(false); // Ensure display mode is toggled back
+    });
 
 
-document.querySelector('.bg-yellow-500').addEventListener('click', async function(event) {
-   event.preventDefault();
-   try {
-     // Validate address selection
-     const addressInput = document.querySelector('input[name="address"]:checked');
-     if (!addressInput) throw new Error('Please select a delivery address');
-     const address = addressInput.value;
+    cancelPhoneNumberBtn.addEventListener('click', () => {
+      phoneError.classList.add('hidden');
+      toggleEditMode(false);
+    });
 
-     // Validate phone number
-     const phoneNumberElement = document.querySelector('#phoneNumberDisplay');
-     if (!phoneNumberElement) throw new Error('Phone number not found');
-     const phoneNumber = phoneNumberElement.textContent.trim();
-
-     // Validate payment method
-     const paymentMethodInput = document.querySelector('input[name="payment"]:checked');
-     if (!paymentMethodInput) throw new Error('Please select a payment method');
-     const paymentMethod = paymentMethodInput.closest('label').innerText.trim();
-
-     // Fetch cart items (ensure this is defined)
-     const orderedItems = <%- JSON.stringify(cartItems) %>;
-     if (orderedItems.length === 0) throw new Error('Cart is empty');
-
-     // Access finalAmount in JavaScript
-     const finalAmount = document.getElementById('totalAmount').textContent.replace('₹', '').trim();
-     console.log('Final Amount:', finalAmount);
-
-     // Construct order data with full details
-     const orderData = {
-       orderedItems: orderedItems.map(item => ({
-         product: item.productId,           // Ensure this is the correct field
-         quantity: item.quantity,
-         price: item.salePrice,             // Use salePrice
-         size: item.size || 'M'             // Default to 'M' if size is missing
-       })),
-       phoneNumber,
-       finalAmount,
-       address,
-       paymentMethod,
-       status: 'Pending',
-       paymentStatus: 'Pending'
-     };
-
-     console.log('Order Data:', orderData);
-
-     // Send data to backend
-     const response = await fetch('/create-order', {
-       method: 'POST',
-       headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify(orderData),
-     });
-
-     const data = await response.json();
-     if (response.ok) {
-       showNotification('Order placed successfully!', 'success');
-       clearCart();
-     } else {
-       showNotification(data.message || 'Error placing order.', 'error');
-     }
-   } catch (error) {
-     console.error('Order placement error:', error);
-     showNotification(error.message || 'Error placing order. Please try again.', 'error');
-   }
-});
+    function toggleEditMode(isEditing) {
+      phoneNumberDisplay.classList.toggle('hidden', isEditing);
+      phoneNumberInput.classList.toggle('hidden', !isEditing);
+      editPhoneNumberBtn.classList.toggle('hidden', isEditing);
+      savePhoneNumberBtn.classList.toggle('hidden', !isEditing);
+      cancelPhoneNumberBtn.classList.toggle('hidden', !isEditing);
+    }
 
 
-  // Show notification
-  function showNotification(message, type) {
-    const notification = document.getElementById('notification');
-    notification.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
-    notification.classList.add(type === 'success' ? 'bg-green-500' : 'bg-red-500');
-    notification.textContent = message;
-    notification.classList.add('opacity-100');
-    setTimeout(() => {
-      notification.classList.remove('opacity-100');
-    }, 5000); 
-  }
+    document.querySelector('.bg-yellow-500').addEventListener('click', async function(event) {
+      event.preventDefault();
+      try {
+        const selectedAddressRadio = document.querySelector('input[name="address"]:checked');
+        if (!selectedAddressRadio) throw new Error('Please select a delivery address');
 
-function confirmOrder() {
-  if (!cartItems || cartItems.length === 0) {
-    alert('Your cart is empty!');
-    return;
-  } 
-  const confirmationBox = document.getElementById('confirmation-box');
-  const confirmationMessage = document.getElementById('confirmation-message');
-  const orderSound = document.getElementById('order-sound');
+        let address;
+        if (selectedAddressRadio.id === 'selectAnotherAddress') {
+          const dropdown = document.getElementById('addressDropdown');
+          if (dropdown && !dropdown.classList.contains('hidden')) {
+            address = dropdown.value;
+            if (!address) throw new Error('Please select an address from the dropdown');
+          }
 
- 
-  confirmationBox.classList.remove('hidden'); 
-  setTimeout(() => {
-    confirmationMessage.classList.remove('opacity-0', 'scale-0');
-    confirmationMessage.classList.add('opacity-100', 'scale-100');
-  }, 100); 
+          const textarea = document.getElementById('addressTextarea');
+          if (textarea && !textarea.classList.contains('hidden')) {
+            address = textarea.value.trim();
+            if (!address) throw new Error('Please enter an address in the textarea');
+          }
+        } else {
+          address = selectedAddressRadio.value;
+        }
 
- 
-  orderSound.play();
+        if (!address) throw new Error('Invalid address selection');
 
- 
-  setTimeout(() => {
-    confirmationBox.classList.add('hidden');
-    confirmationMessage.classList.add('opacity-0', 'scale-0');
-  }, 3000);
-}
 
+         // Validate phone number
+         const phoneNumberElement = document.querySelector('#phoneNumberDisplay');
+         if (!phoneNumberElement) throw new Error('Phone number not found');
+         const phoneNumber = phoneNumberElement.textContent.trim();
+
+         // Validate payment method
+         const paymentMethodInput = document.querySelector('input[name="payment"]:checked');
+         if (!paymentMethodInput) throw new Error('Please select a payment method');
+         const paymentMethod = paymentMethodInput.value;
+
+
+         // Get the final amount
+         const finalAmount = document.getElementById('totalAmount').textContent.replace('₹', '').trim();
+
+         // If Razorpay is selected, initiate Razorpay payment
+         if (paymentMethod === 'Razorpay') {
+           try {
+             // First create Razorpay order
+             const response = await fetch('/create-razorpay-order', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ 
+                 amount: Math.round(finalAmount * 100) // Convert to paise and ensure it's a whole number
+               })
+             });
+             
+             if (!response.ok) {
+               throw new Error('Failed to create Razorpay order');
+             }
+
+             const orderData = await response.json();
+             
+             if (!orderData.id) {
+               throw new Error('Invalid Razorpay order response');
+             }
+
+             const options = {
+               key: '<%= process.env.RAZORPAY_KEY_ID %>',
+               amount: orderData.amount,
+               currency: "INR",
+               name: "Your Store Name",
+               description: "Purchase Payment",
+               order_id: orderData.id,
+               handler: async function (response) {
+                 try {
+                   console.log('Razorpay payment successful:', response);
+                   
+                   // Create order in your system
+                   const orderResponse = await fetch('/create-order', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                       phoneNumber,
+                       finalAmount,
+                       address,
+                       paymentMethod: 'Razorpay',
+                       razorpay_payment_id: response.razorpay_payment_id,
+                       razorpay_order_id: response.razorpay_order_id,
+                       razorpay_signature: response.razorpay_signature
+                     })
+                   });
+
+                   const result = await orderResponse.json();
+
+                   if (result.success) {
+                     showOrderSuccess();
+                     await clearCart();
+                   } else {
+                     throw new Error(result.message || 'Failed to create order');
+                   }
+                 } catch (error) {
+                   console.error('Order creation error:', error);
+                   showNotification(error.message || 'Failed to create order', 'bg-red-500');
+                 }
+               },
+               prefill: {
+                 name: "Customer Name",
+                 email: "customer@example.com",
+                 contact: phoneNumber
+               },
+               theme: {
+                 color: "#F59E0B"
+               },
+               modal: {
+                 ondismiss: function() {
+                   console.log('Checkout form closed');
+                   showNotification('Payment cancelled', 'bg-yellow-500');
+                 }
+               }
+             };
+
+             const rzp1 = new Razorpay(options);
+             
+             rzp1.on('payment.failed', function (response) {
+               console.error('Payment failed:', response.error);
+               showNotification('Payment failed: ' + response.error.description, 'bg-red-500');
+             });
+
+             rzp1.open();
+
+           } catch (error) {
+             console.error('Razorpay initialization error:', error);
+             showNotification(error.message || 'Failed to initialize payment', 'bg-red-500');
+           }
+         } else if (paymentMethod === 'Cash on Delivery') {
+           try {
+             const orderResponse = await fetch('/create-order', {
+               method: 'POST',
+               headers: { 
+                 'Content-Type': 'application/json'
+               },
+               body: JSON.stringify({
+                 phoneNumber,
+                 finalAmount,
+                 address,
+                 paymentMethod: 'Cash on Delivery'
+               })
+             });
+
+             const result = await orderResponse.json();
+
+             if (result.success) {
+               showOrderSuccess();
+               await clearCart();
+             } else {
+               throw new Error(result.message || 'Failed to create order');
+             }
+           } catch (error) {
+             console.error('Cash on Delivery error:', error);
+             showNotification(error.message || 'Failed to create Cash on Delivery order', 'bg-red-500');
+           }
+         } else {
+           // Handle other payment methods (COD, Wallet) with existing logic
+           const orderResponse = await fetch('/create-order', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({
+               phoneNumber,
+               finalAmount,
+               address,
+               paymentMethod
+             })
+           });
+
+           if (orderResponse.ok) {
+             showOrderSuccess();
+             clearCart();
+           } else {
+             throw new Error('Failed to create order');
+           }
+         }
+      } catch (error) {
+        console.error('Order placement error:', error);
+        showNotification(error.message || 'Error placing order', 'bg-red-500');
+      }
+    });
+
+
+      // Show notification
+      function showNotification(message, type) {
+        const notification = document.getElementById('notification');
+        notification.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
+        notification.classList.add(type === 'success' ? 'bg-green-500' : 'bg-red-500');
+        notification.textContent = message;
+        notification.classList.add('opacity-100');
+        setTimeout(() => {
+          notification.classList.remove('opacity-100');
+        }, 5000); 
+      }
+
+
+    function showOrderSuccess() {
+          // Show the success overlay (this will be displayed on top of the page)
+          document.getElementById('order-success-overlay').style.display = 'flex';
+
+          // Get the audio and animation elements
+          const audio = document.getElementById('order-sound');
+          const iframe = document.getElementById('lottie-animation');
+
+          // Play the animation
+          iframe.contentWindow.postMessage({ method: "play" }, "*");
+
+          // Start the audio after a small delay (e.g., 2 seconds)
+          setTimeout(() => {
+            audio.play();
+          }, 500);  // Adjust the delay to your liking (in milliseconds)
+
+          // Redirect to homepage after animation finishes (44 seconds animation length)
+          setTimeout(() => {
+            window.location.href = '/';  // Redirect to homepage
+          }, 1485);  // 44 seconds for the whole animation
+        }
+
+
+    async function clearCart(userId) {
+      try {
+        const response = await fetch('/clear-cart', {
+          method: 'POST', // Or 'DELETE' if you prefer REST conventions
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          console.log('Cart cleared successfully:', data.message);
+        } else {
+          console.error('Failed to clear cart:', data.message);
+        }
+      } catch (error) {
+        console.error('Error clearing cart:', error);
+      }
+    }
+
+    async function submitCoupon(event) {
+        event.preventDefault();
+        
+        // ... your existing validation code ...
+
+        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+        
+        if (paymentMethod === 'razorpay') {
+            const amount = document.getElementById('totalAmount').textContent.replace('₹', '').trim();
+            
+            try {
+                const response = await fetch('/create-razorpay-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: amount * 100 // Convert to paise
+                    })
+                });
+
+                const order = await response.json();
+                
+                const options = {
+                    key: '<%= process.env.RAZORPAY_KEY_ID %>', 
+                    amount: amount * 100,
+                    currency: "INR",
+                    name: "Your Store Name",
+                    description: "Purchase Payment",
+                    order_id: order.id,
+                    handler: async function (response) {
+                        // Verify payment
+                        try {
+                            const verifyResponse = await fetch('/verify-payment', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature
+                                })
+                            });
+
+                            const verifyResult = await verifyResponse.json();
+                            
+                            if (verifyResult.success) {
+                                // Show success animation
+                                showOrderSuccess();
+                                // Clear cart
+                                clearCart();
+                            } else {
+                                alert('Payment verification failed');
+                            }
+                        } catch (error) {
+                            console.error('Payment verification error:', error);
+                            alert('Payment verification failed');
+                        }
+                    },
+                    prefill: {
+                        name: "Customer Name",
+                        email: "customer@example.com",
+                        contact: document.getElementById('phoneNumberDisplay').textContent
+                    },
+                    theme: {
+                        color: "#3399cc"
+                    }
+                };
+
+                const rzp1 = new Razorpay(options);
+                rzp1.open();
+                
+            } catch (error) {
+                console.error('Error creating Razorpay order:', error);
+                alert('Failed to initialize payment');
+            }
+        } else {
+            // Handle other payment methods as before
+            // ... your existing payment handling code ...
+        }
+    }
   </script>
-  </div>
+</div>
 
 <%- include('../partials/user/userfooter') %> 

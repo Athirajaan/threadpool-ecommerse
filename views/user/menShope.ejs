@@ -1,217 +1,332 @@
-<%- include('../partials/user/userheader') %> 
+<%- include('../partials/user/userheader') %>
 
-<section class="relative w-full h-[300px] bg-cover bg-center" style="background-image: url(/img/dc\ comics.jpg);">
-    <div class="absolute inset-0 bg-black bg-opacity-50"></div> 
-  </section>
-  <div class="w-full p-0 m-0">
-    <div class="grid grid-cols-[auto_1fr] gap-0">
-      <!-- Filter Sidebar -->
-      
-      <aside class="bg-white p-6 shadow rounded-lg sticky top-6 hidden md:block h-screen overflow-y-auto w-60">
+<!-- Hero Video Section -->
+<section class="relative w-full h-[400px]">
+  <video 
+    class="w-full h-full object-cover brightness-75" 
+    autoplay 
+    loop 
+    muted 
+    playsinline>
+    <source src="/videos/maleShop.mp4" type="video/mp4" />
+  </video>
+  <div class="absolute inset-0 flex items-center justify-center">
+    <h1 class="text-4xl md:text-5xl font-bold text-white tracking-wide">Men’s Gymwear: Built for Strength</h1>
+  </div>
+</section>
+
+<!-- Main Shopping Section -->
+<div class="container mx-auto px-4 py-8">
+  <div class="flex gap-8">
+    <!-- Sticky Filter Sidebar -->
+    <aside class="w-64 flex-shrink-0">
+      <div class="bg-white rounded-lg shadow-lg p-6 sticky top-24">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="font-semibold text-xl text-gray-800">Filter Products</h2>
-          <button id="resetFilters" class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition">Reset</button>
+          <h2 class="text-lg font-semibold text-gray-800">Filters</h2>
+          <button id="resetFilters" class="text-sm text-blue-600 hover:text-blue-800 hidden">
+            Clear All
+          </button>
         </div>
-      
-        <!-- Categories Section -->
-        <div class="mb-6">
-          <h3 class="text-lg font-medium text-gray-700 mb-4">Category</h3>
-          <div class="flex flex-col gap-2">
-            <label class="flex items-center">
-              <input type="checkbox" class="category-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="Clothing">
-              <span class="text-gray-700">Clothing</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="category-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="Electronics">
-              <span class="text-gray-700">Electronics</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="category-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="Home">
-              <span class="text-gray-700">Home</span>
-            </label>
-          </div>
-        </div>
-      
-        <!-- Sizes Section -->
-        <div class="mb-6">
-          <h3 class="text-lg font-medium text-gray-700 mb-4">Size</h3>
-          <div id="sizeOptions" class="flex flex-wrap gap-2">
-            <div class="size-option border rounded-full px-3 py-1 text-gray-700 cursor-pointer hover:bg-gray-200 transition">
-              S
-            </div>
-            <div class="size-option border rounded-full px-3 py-1 text-gray-700 cursor-pointer hover:bg-gray-200 transition">
-              M
-            </div>
-            <div class="size-option border rounded-full px-3 py-1 text-gray-700 cursor-pointer hover:bg-gray-200 transition">
-              L
-            </div>
-            <div class="size-option border rounded-full px-3 py-1 text-gray-700 cursor-pointer hover:bg-gray-200 transition">
-              XL
-            </div>
-          </div>
-        </div>
-      
-        <!-- Price Range Section -->
-        <div class="mb-6">
-          <h3 class="text-lg font-medium text-gray-700 mb-4">Price Range</h3>
-          <div class="flex flex-col gap-2">
-            <label class="flex items-center">
-              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="under500">
-              <span class="text-gray-700">Under ₹500</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="500to799">
-              <span class="text-gray-700">₹500 - ₹799</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="800to999">
-              <span class="text-gray-700">₹800 - ₹999</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="1000to1999">
-              <span class="text-gray-700">₹1000 - ₹1999</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="2000to4000">
-              <span class="text-gray-700">₹2000 - ₹4000</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="price-checkbox mr-2 rounded text-blue-500 focus:ring-blue-500" value="4000above">
-              <span class="text-gray-700">₹4000 and Above</span>
-            </label>
-          </div>
-        </div>
-      </aside>
-      
 
-      <!-- Main Product Section -->
-      <main class="w-full">
-        <!-- Sort Button Section -->
-        <div class="flex justify-end mb-6 relative">
-          <!-- Sort Button Section -->
-          <div class="relative w-48">
-            <button id="sortButton" class="flex items-center justify-between w-full px-4 py-2 my-2 bg-gray-300 text-black rounded shadow-md hover:bg-gray-400 transition">
-              <span id="selectedSort">Popular</span>
-              <i class="fas fa-chevron-down transform transition-transform duration-200"></i>
-            </button>
-            <!-- Dropdown Menu -->
-            <ul id="sortMenu" class="absolute mt-1 w-full bg-white shadow-lg rounded-lg hidden z-20">
-              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="Popular">Popular</li>
-              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="Low to High">Price: Low to High</li>
-              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="High to Low">Price: High to Low</li>
-              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="Ratings">Average Ratings</li>
-              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="New">New Arrivals</li>
-              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="aA-zZ">aA-zZ</li>
-              <li class="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer" data-sort="zZ-aA">zZ-aA</li>
-              
-            </ul>
+        <!-- Categories -->
+        <div class="mb-6">
+          <h3 class="text-md font-medium text-gray-700 mb-3">Categories</h3>
+          <div class="space-y-2">
+            <% category.forEach(cat => { %>
+              <label class="flex items-center group cursor-pointer">
+                <input type="checkbox" 
+                       class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out" 
+                       value="<%= cat._id %>">
+                <span class="ml-2 text-gray-600 group-hover:text-gray-900"><%= cat.name %></span>
+              </label>
+            <% }) %>
           </div>
         </div>
-        
 
-    <!-- Products Grid -->
-<!-- Products Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-  <% products.forEach(product => { %>
-    <!-- Product Card -->
-    <a href="/productDetails?id=<%= product._id %>" class="block">
-      <div class="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow relative">
-        <!-- Product Image -->
-        <div class="h-72 bg-gray-100 flex items-center justify-center overflow-hidden relative group">
-          <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
+        <!-- Sizes -->
+        <div class="mb-6">
+          <h3 class="text-md font-medium text-gray-700 mb-3">Sizes</h3>
+          <div class="flex flex-wrap gap-2">
+            <% ['S', 'M', 'L', 'XL'].forEach(size => { %>
+              <button 
+                class="size-option px-3 py-1 rounded-full border-2 border-gray-200 text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-colors"
+                data-size="<%= size %>">
+                <%= size %>
+              </button>
+            <% }) %>
+          </div>
         </div>
-        <!-- Wishlist Icon -->
-        <div class="absolute bottom-12 right-4 cursor-pointer z-10">
-          <i class="fas fa-heart text-gray-500 hover:text-red-500"></i>
-        </div>
-        <!-- Product Details -->
-        <div class="p-4">
-          <h3 class="font-semibold text-lg text-gray-800 mb-2 truncate"><%= product.productName %></h3>
-          <div class="flex items-center">
-            <span class="text-xl font-bold text-gray-900">$<%= product.salePrice %></span>
-            <span class="text-sm text-gray-500 line-through ml-2">$<%= product.regularPrice %></span>
-            <span class="text-sm text-green-600 font-semibold ml-auto">
-              <%= ((product.regularPrice - product.salePrice) / product.regularPrice * 100).toFixed(0) %>% Off
-            </span>
+
+        <!-- Price Range -->
+        <div class="mb-6">
+          <h3 class="text-md font-medium text-gray-700 mb-3">Price Range</h3>
+          <div class="space-y-2">
+            <% const priceRanges = [
+              { value: 'under500', label: 'Under ₹500' },
+              { value: '500to799', label: '₹500 - ₹799' },
+              { value: '800to999', label: '₹800 - ₹999' },
+              { value: '1000to1999', label: '₹1000 - ₹1999' },
+              { value: '2000plus', label: '₹2000+' }
+            ] %>
+            <% priceRanges.forEach(range => { %>
+              <label class="flex items-center group cursor-pointer">
+                <input type="checkbox" 
+                       class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out" 
+                       value="<%= range.value %>">
+                <span class="ml-2 text-gray-600 group-hover:text-gray-900"><%= range.label %></span>
+              </label>
+            <% }) %>
           </div>
         </div>
       </div>
-    </a>
-  <% }); %>
-</div>
+    </aside>
 
+    <!-- Products Section -->
+    <div class="flex-1">
+      <!-- Sort Options -->
+      <div class="flex justify-end mb-6">
+        <form action="/menShop" method="GET" class="w-64">
+          <select 
+            name="sort" 
+            onchange="this.form.submit()"
+            class="w-full bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="newest" <%= locals.sortOption === 'newest' ? 'selected' : '' %>>Newest First</option>
+            <option value="priceAsc" <%= locals.sortOption === 'priceAsc' ? 'selected' : '' %>>Price: Low to High</option>
+            <option value="priceDesc" <%= locals.sortOption === 'priceDesc' ? 'selected' : '' %>>Price: High to Low</option>
+            <option value="nameAsc" <%= locals.sortOption === 'nameAsc' ? 'selected' : '' %>>Name: A to Z</option>
+            <option value="nameDesc" <%= locals.sortOption === 'nameDesc' ? 'selected' : '' %>>Name: Z to A</option>
+          </select>
+        </form>
+      </div>
 
-          <!-- Repeat Product Card -->
-        
-          <!-- Add more product cards as needed -->
-        </div>
-      </main>
+      <!-- Products Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% products.forEach(product => { %>
+          <div class="group">
+            <div class="relative bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <!-- Product Image with Hover Effect -->
+              <a href="/productDetails?id=<%= product._id %>" class="block">
+              <div class="aspect-w-1 aspect-h-1 w-full relative overflow-hidden">
+                <img 
+                  src="<%= product.productImage[0] %>" 
+                  alt="<%= product.productName %>" 
+                  class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0">
+                <img 
+                  src="<%= product.productImage[1] || product.productImage[0] %>" 
+                  alt="<%= product.productName %>" 
+                  class="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              </div>
+              </a>
+              
+              <!-- Quick Actions -->
+              <div class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button 
+                  class="wishlist-btn p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
+                  data-product-id="<%= product._id %>"
+                  data-in-wishlist="<%= wishlistProducts.includes(product._id.toString()) ? 'true' : 'false' %>"
+                >
+                  <svg class="w-5 h-5 wishlist-icon <%= wishlistProducts.includes(product._id.toString()) ? 'text-red-500' : 'text-gray-400' %>" 
+                       fill="currentColor" 
+                       viewBox="0 0 24 24">
+                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Product Info -->
+              <div class="p-4">
+                <h3 class="text-lg font-medium text-gray-900 mb-2"><%= product.productName %></h3>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-baseline">
+                    <span class="text-lg font-bold text-gray-900">₹<%= product.salePrice %></span>
+                    <span class="ml-2 text-sm text-gray-500 line-through">₹<%= product.regularPrice %></span>
+                  </div>
+                  <span class="text-sm font-medium text-green-600">
+                    <%= Math.round((product.regularPrice - product.salePrice) / product.regularPrice * 100) %>% OFF
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
     </div>
   </div>
+</div>
 
-  <script>
-   
-   const sortButton = document.getElementById('sortButton');
-const sortMenu = document.getElementById('sortMenu');
-const selectedSort = document.getElementById('selectedSort');
-const arrowIcon = sortButton.querySelector('i');
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const filterInputs = document.querySelectorAll('input[type="checkbox"]');
+  const sizeButtons = document.querySelectorAll('.size-option');
+  const productsGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3.gap-6');
+  const resetButton = document.getElementById('resetFilters');
 
-// Toggle dropdown visibility and animate arrow
-sortButton.addEventListener('click', () => {
-  sortMenu.classList.toggle('hidden');
-  arrowIcon.classList.toggle('rotate-180'); // Add rotation animation
-});
+  // Load saved filters from localStorage
+  function loadSavedFilters() {
+    const savedFilters = JSON.parse(localStorage.getItem('shopFilters') || '{}');
+    
+    // Restore category filters
+    if (savedFilters.categories) {
+      savedFilters.categories.forEach(categoryId => {
+        const input = document.querySelector(`input[value="${categoryId}"]`);
+        if (input) input.checked = true;
+      });
+    }
 
-// Update selected value and close dropdown
-sortMenu.addEventListener('click', (e) => {
-  if (e.target.tagName === 'LI') {
-    selectedSort.textContent = e.target.dataset.sort;
-    sortMenu.classList.add('hidden');
-    arrowIcon.classList.remove('rotate-180');
+    // Restore size filters
+    if (savedFilters.sizes) {
+      savedFilters.sizes.forEach(size => {
+        const button = document.querySelector(`.size-option[data-size="${size}"]`);
+        if (button) {
+          button.classList.add('border-blue-500', 'text-blue-500');
+        }
+      });
+    }
+
+    // Restore price range filters
+    if (savedFilters.priceRanges) {
+      savedFilters.priceRanges.forEach(range => {
+        const input = document.querySelector(`input[value="${range}"]`);
+        if (input) input.checked = true;
+      });
+    }
+
+    // Show reset button if there are any filters
+    const hasFilters = (savedFilters.categories?.length || savedFilters.sizes?.length || savedFilters.priceRanges?.length);
+    resetButton.classList.toggle('hidden', !hasFilters);
+
+    // Update products if there are any filters
+    if (hasFilters) {
+      updateProducts();
+    }
   }
-});
 
-// Close dropdown when clicking outside
-document.addEventListener('click', (e) => {
-  if (!sortButton.contains(e.target) && !sortMenu.contains(e.target)) {
-    sortMenu.classList.add('hidden');
-    arrowIcon.classList.remove('rotate-180');
+  // Function to save filters to localStorage
+  function saveFilters(filters) {
+    localStorage.setItem('shopFilters', JSON.stringify(filters));
   }
+
+  // Function to get selected filters
+  function getSelectedFilters() {
+    const categories = Array.from(document.querySelectorAll('input[value]:checked'))
+      .filter(input => !input.value.includes('to') && !input.value.startsWith('under') && !input.value.endsWith('plus'))
+      .map(input => input.value);
+    
+    const sizes = Array.from(document.querySelectorAll('.size-option.border-blue-500'))
+      .map(button => button.dataset.size);
+    
+    const priceRanges = Array.from(document.querySelectorAll('input[value]:checked'))
+      .filter(input => input.value.includes('to') || input.value.startsWith('under') || input.value.endsWith('plus'))
+      .map(input => input.value);
+
+    return { categories, sizes, priceRanges };
+  }
+
+  // Function to update products
+  async function updateProducts() {
+    const filters = getSelectedFilters();
+    const currentSort = document.querySelector('select[name="sort"]').value;
+
+    // Save filters to localStorage
+    saveFilters(filters);
+
+    try {
+      const response = await fetch(`/filter-products?sort=${currentSort}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(filters)
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        productsGrid.innerHTML = data.html;
+        
+        // Reinitialize wishlist buttons for new products
+        initializeWishlistButtons();
+        
+        // Show/hide reset button based on if any filters are selected
+        resetButton.classList.toggle('hidden', 
+          !filters.categories.length && !filters.sizes.length && !filters.priceRanges.length);
+      } else {
+        console.error('Error:', data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Add event listeners to all filter inputs
+  filterInputs.forEach(input => {
+    input.addEventListener('change', updateProducts);
+  });
+
+  // Add event listeners to size buttons
+  sizeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      button.classList.toggle('border-blue-500');
+      button.classList.toggle('text-blue-500');
+      updateProducts();
+    });
+  });
+
+  // Reset filters
+  resetButton.addEventListener('click', () => {
+    // Clear localStorage
+    localStorage.removeItem('shopFilters');
+    
+    // Reset UI
+    filterInputs.forEach(input => input.checked = false);
+    sizeButtons.forEach(button => {
+      button.classList.remove('border-blue-500', 'text-blue-500');
+    });
+    updateProducts();
+  });
+
+  // Initialize wishlist buttons function
+  function initializeWishlistButtons() {
+    document.querySelectorAll('.wishlist-btn').forEach(button => {
+      button.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const productId = this.dataset.productId;
+        const icon = this.querySelector('.wishlist-icon');
+        
+        try {
+          const response = await fetch('/wishlist/toggle', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            const isInWishlist = this.dataset.inWishlist === 'true';
+            this.dataset.inWishlist = (!isInWishlist).toString();
+            icon.classList.toggle('text-red-500');
+            icon.classList.toggle('text-gray-400');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      });
+    });
+  }
+
+  // Initialize wishlist buttons on page load
+  initializeWishlistButtons();
+
+  // Load saved filters on page load
+  loadSavedFilters();
 });
+</script>
 
-
-// Toggle size selection for multiple selections
-document.querySelectorAll('.size-option').forEach((size) => {
-  size.addEventListener('click', () => {
-    size.classList.toggle('bg-blue-500');
-    size.classList.toggle('text-white');
-  });
-});
-
-// Reset filters
-document.getElementById('resetFilters').addEventListener('click', () => {
-  // Reset categories
-  document.querySelectorAll('.category-checkbox').forEach((checkbox) => {
-    checkbox.checked = false;
-  });
-
-  // Reset size options
-  document.querySelectorAll('.size-option').forEach((size) => {
-    size.classList.remove('bg-blue-500', 'text-white');
-  });
-
-  // Reset price range
-  document.querySelectorAll('.price-checkbox').forEach((checkbox) => {
-    checkbox.checked = false;
-  });
-});
-
-
-  </script>
-
-
-
-<%- include('../partials/user/userfooter') %> 
+<%- include('../partials/user/userfooter') %>
 
 
 

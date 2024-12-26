@@ -1,0 +1,144 @@
+<%- include('../partials/user/userheader') %>
+
+<!-- Search Results Header -->
+<div class="bg-gray-100 py-8">
+  <div class="container mx-auto px-4">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Search Results</h1>
+    <p class="text-gray-600">
+      Showing results for "<span class="font-medium"><%= searchQuery %></span>"
+    </p>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 py-8">
+  <!-- Products Section -->
+  <div class="flex-1">
+    <!-- Sort Options -->
+    <div class="flex justify-end mb-6">
+      <div class="relative">
+        <select id="sortSelect" class="bg-white px-4 py-2 rounded-lg shadow-sm border appearance-none pr-8">
+          <option value="newest" <%= sortOption === 'newest' ? 'selected' : '' %>>Newest First</option>
+          <option value="priceAsc" <%= sortOption === 'priceAsc' ? 'selected' : '' %>>Price: Low to High</option>
+          <option value="priceDesc" <%= sortOption === 'priceDesc' ? 'selected' : '' %>>Price: High to Low</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <% if (products.length === 0) { %>
+        <div class="col-span-full text-center py-12">
+          <h3 class="text-xl text-gray-600">No products found matching your search.</h3>
+          <p class="mt-2 text-gray-500">Try adjusting your search terms.</p>
+        </div>
+      <% } else { %>
+        <% products.forEach(product => { %>
+          <%- include('../partials/productCard', { product: product }) %>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="hidden text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-blue-600"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentPage = 1;
+let loading = false;
+let hasMore = <%= hasMore %>;
+const searchQuery = '<%= searchQuery %>';
+
+// Infinite scroll function
+function loadMoreProducts() {
+  if (loading || !hasMore) return;
+  
+  loading = true;
+  const loadingIndicator = document.getElementById('loadingIndicator');
+  loadingIndicator.classList.remove('hidden');
+  
+  const sortSelect = document.getElementById('sortSelect');
+  const sortValue = sortSelect.value;
+  
+  fetch(`/search?q=${searchQuery}&page=${currentPage + 1}&sort=${sortValue}`, {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      const productsGrid = document.getElementById('productsGrid');
+      
+      data.products.forEach(product => {
+        const productCard = createProductCard(product);
+        productsGrid.insertAdjacentHTML('beforeend', productCard);
+      });
+      
+      currentPage++;
+      hasMore = data.hasMore;
+      loading = false;
+      loadingIndicator.classList.add('hidden');
+    })
+    .catch(error => {
+      console.error('Error loading more products:', error);
+      loading = false;
+      loadingIndicator.classList.add('hidden');
+    });
+}
+
+// Create product card HTML
+function createProductCard(product) {
+  return `
+    <div class="group">
+      <div class="relative bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+        <a href="/productDetails?id=${product._id}" class="block">
+          <div class="aspect-w-1 aspect-h-1 w-full relative overflow-hidden">
+            <img src="${product.productImage[0]}" 
+                 alt="${product.productName}" 
+                 class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0">
+            <img src="${product.productImage[1] || product.productImage[0]}" 
+                 alt="${product.productName}" 
+                 class="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          </div>
+        </a>
+        <div class="p-4">
+          <h3 class="text-lg font-medium text-gray-900 mb-2">${product.productName}</h3>
+          <div class="flex items-center justify-between">
+            <div class="flex items-baseline">
+              <span class="text-lg font-bold text-gray-900">₹${product.salePrice}</span>
+              <span class="ml-2 text-sm text-gray-500 line-through">₹${product.regularPrice}</span>
+            </div>
+            <span class="text-sm font-medium text-green-600">
+              ${Math.round((product.regularPrice - product.salePrice) / product.regularPrice * 100)}% OFF
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Intersection Observer for infinite scroll
+const observer = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting && !loading) {
+    loadMoreProducts();
+  }
+});
+
+// Observe the loading indicator
+observer.observe(document.getElementById('loadingIndicator'));
+
+// Sort change handler
+document.getElementById('sortSelect').addEventListener('change', (e) => {
+  currentPage = 1;
+  hasMore = true;
+  const productsGrid = document.getElementById('productsGrid');
+  productsGrid.innerHTML = '';
+  loadMoreProducts();
+});
+</script>
+
+<%- include('../partials/user/userfooter') %> 

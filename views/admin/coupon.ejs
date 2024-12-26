@@ -1,0 +1,533 @@
+<%- include('../partials/admin/header') %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Coupon Management</h1>
+    <button
+      onclick="openAddCouponModal()"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center gap-2"
+    >
+      <svg
+        class="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4v16m8-8H4"
+        ></path>
+      </svg>
+      Add New Coupon
+    </button>
+  </div>
+
+  <!-- Coupon Table -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Name
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Min Purchase
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Discount
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Max Discount
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Expiry
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Edit
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Status
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <!-- Dummy Data Row 1 -->
+        <tr>
+          <td
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          >
+            WELCOME50
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            ₹1000
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹50</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            ₹500
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            01/05/2024
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <button class="text-blue-600 hover:text-blue-900">
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                ></path>
+              </svg>
+            </button>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <button
+              class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+            >
+              Active
+            </button>
+          </td>
+        </tr>
+
+        <!-- Dummy Data Row 2 -->
+        <tr>
+          <td
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          >
+            SUMMER25
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            ₹500
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹25</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            ₹250
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            15/04/2024
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <button class="text-blue-600 hover:text-blue-900">
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                ></path>
+              </svg>
+            </button>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <button
+              class="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800"
+            >
+              Inactive
+            </button>
+          </td>
+        </tr>
+
+        <!-- Dummy Data Row 3 -->
+        <tr>
+          <td
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          >
+            SPECIAL75
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            ₹1500
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹75</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            ₹750
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            30/06/2024
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <button class="text-blue-600 hover:text-blue-900">
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                ></path>
+              </svg>
+            </button>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <button
+              class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+            >
+              Active
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Add Coupon Modal -->
+  <div
+    id="addCouponModal"
+    class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50"
+  >
+    <div
+      class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+    >
+      <div class="mt-3">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Add New Coupon</h3>
+        <form id="addCouponForm" onsubmit="submitCoupon(event)">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700"
+              >Coupon Name</label
+            >
+            <input
+              type="text"
+              name="name"
+              id="couponName"
+              required
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              onkeyup="validateCouponName()"
+            />
+            <div id="nameError" class="text-red-500 text-xs mt-1 hidden"></div>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700"
+              >Minimum Purchase Amount</label
+            >
+            <input
+              type="number"
+              name="minimumPrice"
+              id="minimumPrice"
+              required
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              onkeyup="validateMinimumPrice()"
+            />
+            <div
+              id="minPriceError"
+              class="text-red-500 text-xs mt-1 hidden"
+            ></div>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700"
+              >Discount Type</label
+            >
+            <select
+              name="discountType"
+              id="discountType"
+              required
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              onchange="validateDiscountAmount()"
+            >
+              <option value="">Select Discount Type</option>
+              <option value="fixed">Fixed Amount</option>
+              <option value="percentage">Percentage</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700"
+              >Discount Amount</label
+            >
+            <input
+              type="number"
+              name="offerPrice"
+              id="discountAmount"
+              required
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              onkeyup="validateDiscountAmount()"
+            />
+            <div
+              id="discountError"
+              class="text-red-500 text-xs mt-1 hidden"
+            ></div>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700"
+              >Maximum Discount</label
+            >
+            <input
+              type="number"
+              name="maxDiscount"
+              id="maxDiscount"
+              required
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              onkeyup="validateMaxDiscount()"
+            />
+            <div
+              id="maxDiscountError"
+              class="text-red-500 text-xs mt-1 hidden"
+            ></div>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700"
+              >Expiry Date</label
+            >
+            <input
+              type="date"
+              name="expireOn"
+              id="expiryDate"
+              required
+              min="<%= new Date().toISOString().split('T')[0] %>"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              onchange="validateExpiryDate()"
+            />
+            <div
+              id="expiryError"
+              class="text-red-500 text-xs mt-1 hidden"
+            ></div>
+          </div>
+
+          <div class="flex justify-end gap-3">
+            <button
+              type="button"
+              onclick="closeAddCouponModal()"
+              class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              id="submitButton"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Add Coupon
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  id="successToast"
+  class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-green-500 text-white rounded-lg shadow-lg transition-all duration-500 flex items-center space-x-2"
+>
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <span>Coupon added successfully!</span>
+</div>
+
+<script>
+  function openAddCouponModal() {
+    document.getElementById('addCouponModal').classList.remove('hidden');
+  }
+
+  function closeAddCouponModal() {
+    document.getElementById('addCouponModal').classList.add('hidden');
+    // Reset form and error messages
+    document.getElementById('addCouponForm').reset();
+    document
+      .querySelectorAll('.text-red-500')
+      .forEach((el) => el.classList.add('hidden'));
+  }
+
+  function showError(elementId, message) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.textContent = message;
+    errorElement.classList.remove('hidden');
+  }
+
+  function hideError(elementId) {
+    document.getElementById(elementId).classList.add('hidden');
+  }
+
+  function validateCouponName() {
+    const nameInput = document.getElementById('couponName');
+    const letterCount = (nameInput.value.match(/[a-zA-Z]/g) || []).length;
+
+    if (letterCount < 3) {
+      showError('nameError', 'Coupon name must contain at least 3 letters');
+      return false;
+    }
+    hideError('nameError');
+    return true;
+  }
+
+  function validateMinimumPrice() {
+    const minPrice = parseFloat(document.getElementById('minimumPrice').value);
+
+    if (minPrice < 100) {
+      showError(
+        'minPriceError',
+        'Minimum purchase amount must be at least ₹100'
+      );
+      return false;
+    }
+    hideError('minPriceError');
+    return true;
+  }
+
+  function validateDiscountAmount() {
+    const discountType = document.getElementById('discountType').value;
+    const discountAmount = parseFloat(
+      document.getElementById('discountAmount').value
+    );
+    const minPrice = parseFloat(document.getElementById('minimumPrice').value);
+
+    if (!discountAmount) return false;
+
+    if (discountType === 'percentage') {
+      if (discountAmount > 80) {
+        showError('discountError', 'Percentage discount cannot exceed 80%');
+        return false;
+      }
+    } else if (discountType === 'fixed') {
+      if (discountAmount >= minPrice) {
+        showError(
+          'discountError',
+          'Fixed discount cannot be greater than or equal to minimum purchase amount'
+        );
+        return false;
+      }
+    }
+    hideError('discountError');
+    return true;
+  }
+
+  function validateMaxDiscount() {
+    const maxDiscount = document.getElementById('maxDiscount').value;
+
+    if (!/^\d+$/.test(maxDiscount)) {
+      showError(
+        'maxDiscountError',
+        'Maximum discount must contain only numbers'
+      );
+      return false;
+    }
+    hideError('maxDiscountError');
+    return true;
+  }
+
+  function validateExpiryDate() {
+    const expiryDate = document.getElementById('expiryDate').value;
+    const today = new Date().toISOString().split('T')[0];
+
+    if (expiryDate < today) {
+      showError('expiryError', 'Expiry date must be today or later');
+      return false;
+    }
+    hideError('expiryError');
+    return true;
+  }
+
+  function showSuccessToast() {
+    const toast = document.getElementById('successToast');
+    toast.classList.remove('hidden');
+    toast.classList.add('transform', 'translate-y-0', 'opacity-100');
+
+    // Hide toast after 3 seconds
+    setTimeout(() => {
+      toast.classList.add('transform', 'translate-y-2', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 500);
+    }, 3000);
+  }
+
+  async function submitCoupon(event) {
+    event.preventDefault();
+
+    // Run all validations
+    const isNameValid = validateCouponName();
+    const isMinPriceValid = validateMinimumPrice();
+    const isDiscountValid = validateDiscountAmount();
+    const isMaxDiscountValid = validateMaxDiscount();
+    const isExpiryValid = validateExpiryDate();
+
+    // Check if all validations pass
+    if (
+      !isNameValid ||
+      !isMinPriceValid ||
+      !isDiscountValid ||
+      !isMaxDiscountValid ||
+      !isExpiryValid
+    ) {
+      return;
+    }
+
+    const formData = new FormData(event.target);
+    const couponData = {
+      name: formData.get('name'),
+      minPurchase: Number(formData.get('minimumPrice')),
+      couponType: formData.get('discountType'),
+      discountPrice: Number(formData.get('offerPrice')),
+      maximumPrice: Number(formData.get('maxDiscount')),
+      expireOn: formData.get('expireOn'),
+    };
+
+    try {
+      const response = await fetch('/admin/coupon/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(couponData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Close modal
+        closeAddCouponModal();
+        // Show success toast
+        showSuccessToast();
+        // Reload table data after short delay
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
+      } else {
+        alert(data.message || 'Failed to add coupon');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to add coupon');
+    }
+  }
+</script>
+
+<%- include('../partials/admin/footer') %>

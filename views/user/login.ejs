@@ -51,19 +51,6 @@
         <% } %>
         <h2 class="text-3xl font-bold text-gray-800 text-center mb-4">Sign In Page</h2>
 
-        <!-- Google Sign In Button -->
-        <div class="mb-4">
-          <button class="w-full flex items-center justify-center py-2 border border-gray-300 rounded-lg hover:bg-gray-100">
-            <img src="https://img.icons8.com/color/24/000000/google-logo.png" alt="Google Logo" class="mr-2">
-            <span class="text-gray-700 font-semibold">Continue with Google</span>
-          </button>
-        </div>
-
-        <div class="flex items-center justify-center mb-4">
-          <hr class="flex-grow border-gray-300">
-          <span class="px-2 text-gray-500">OR</span>
-          <hr class="flex-grow border-gray-300">
-        </div>
         
         <!-- Form Fields -->
         <form  action="/login" method="POST" class="space-y-4">
@@ -83,6 +70,17 @@
             Sign In
           </button>
         </form>
+
+        <div class="flex items-center justify-center mb-4">
+          <hr class="flex-grow border-gray-300">
+          <span class="px-2 text-gray-500">OR</span>
+          <hr class="flex-grow border-gray-300">
+        </div>
+
+        <a href="/auth/google" class="w-full flex items-center justify-center py-2 border border-gray-300 rounded-lg hover:bg-gray-100">
+          <img src="https://img.icons8.com/color/24/000000/google-logo.png" alt="Google Logo" class="mr-2">
+          <span class="text-gray-700 font-semibold">Continue with Google</span>
+        </a>
 
         <p class="text-center text-gray-600 mt-4">
           Don't have an account? 

@@ -1,66 +1,84 @@
 <%- include('../partials/user/userheader') %> 
 <%- include('../partials/user/userProfile') %>
+<div class="ml-64 flex-1">
+  <!-- Stylish Breadcrumbs -->
+  <nav class="px-8 py-5">
+    <ol class="flex items-center">
+      <li class="flex items-center">
+        <a href="/" class="text-xs uppercase tracking-wider text-gray-500 hover:text-gray-700 transition-colors duration-200">
+          Home
+        </a>
+      </li>
+      <li class="flex items-center">
+        <span class="mx-3 inline-block">
+          <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5l7 7-7 7"/>
+          </svg>
+        </span>
+        <span class="text-xs uppercase tracking-wider text-gray-900 font-medium">
+          Profile
+        </span>
+      </li>
+    </ol>
+  </nav>
+</div>
+
+
 
     <!-- Main Content -->
     <main class="flex-grow p-1">
      
   <div class="w-full max-w-4xl mx-auto px-1 sm:px-1 lg:px-1 py-3">
-    <!-- Page Title -->
-  
-    <!-- Contact Details -->
-    <div class="mb-12">
-      <h2 class="text-lg font-medium text-gray-800 mb-6">Personal Information</h2>
+    <!-- Profile Section with Edit Button -->
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-lg font-medium text-gray-800">Personal Information</h2>
+      <button id="editProfileBtn" class="text-yellow-600 hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md border border-yellow-600 hover:border-yellow-800 transition duration-200 ease-in-out">
+        <i class="fas fa-user-edit mr-2"></i> Edit Profile
+      </button>
+    </div>
+
+    <!-- Profile Information -->
+    <div class="mb-12 bg-white rounded-lg shadow-sm p-6">
       <div class="divide-y divide-gray-300">
-        <!-- Field -->
-        <div id="notification" class="hidden fixed top-12 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg text-white shadow-lg transition-opacity duration-500 z-50"></div>
+        <div id="notification" class="hidden fixed top-20 right-4 px-6 py-3 rounded-lg text-white shadow-lg transition-opacity duration-500 z-50"></div>
+        
+        <!-- Name Field -->
         <div class="flex items-start justify-between py-4">
           <div>
             <span class="block text-gray-600 text-sm">Your Name</span>
             <span class="block text-gray-900 font-medium text-base mt-1"><%= user.name %></span>
           </div>
-          <a href="#" class="text-black hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md  transition duration-200 ease-in-out self-center inline-block flex items-center">
-            <i class="fas fa-pencil-alt mr-2"></i> Change
-          </a>
-          
-          
         </div>
-        <!-- Field -->
-        <div class="flex items-start justify-between py-4">
-          <div>
-            <span class="block text-gray-600 text-sm">Email Address</span>
-            <span class="block text-gray-900 font-medium text-base mt-1"><%= user.email%></span>
-          </div>
-          <a href="#" class="text-black hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md  transition duration-200 ease-in-out self-center inline-block flex items-center">
-            <i class="fas fa-pencil-alt mr-2"></i> Change
-          </a>
-          
-        </div>
-        <!-- Field -->
+
+        <!-- Phone Field -->
         <div class="flex items-start justify-between py-4">
           <div>
             <span class="block text-gray-600 text-sm">Phone Number</span>
             <span class="block text-gray-900 font-medium text-base mt-1"><%= user.phone || "Not provided" %></span>
           </div>
-          <a href="#" class="text-black hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md  transition duration-200 ease-in-out self-center inline-block flex items-center">
-            <i class="fas fa-pencil-alt mr-2"></i> Change
-          </a>
-          
         </div>
-        <!-- Field -->
+
+        <!-- Email Field (Read-only) -->
+        <div class="flex items-start justify-between py-4">
+          <div>
+            <span class="block text-gray-600 text-sm">Email Address</span>
+            <span class="block text-gray-900 font-medium text-base mt-1"><%= user.email%></span>
+          </div>
+        </div>
+
+        <!-- Password Field -->
         <div class="flex items-start justify-between py-4">
           <div>
             <span class="block text-gray-600 text-sm">Password</span>
             <span class="block text-gray-900 font-medium text-base mt-1">********</span>
           </div>
-          <a href="#" class="text-black hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md  transition duration-200 ease-in-out self-center inline-block flex items-center">
-            <i class="fas fa-pencil-alt mr-2"></i> Change
-          </a>
-          
+          <button id="changePasswordBtn" class="text-black hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md transition duration-200 ease-in-out">
+            <i class="fas fa-key mr-2"></i> Change Password
+          </button>
         </div>
-        <div class="flex items-start justify-between py-4">
       </div>
     </div>
-  
+
     <!-- Address Section -->
     <div class="mb-8">
       <div class="flex justify-between items-center mb-6">
@@ -104,6 +122,69 @@
   </div>
 </main>
 
+<!-- Edit Profile Modal -->
+<div id="editProfileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold">Edit Profile</h2>
+      <button class="closeModal text-gray-500 hover:text-black text-xl">&times;</button>
+    </div>
+    <form id="editProfileForm">
+      <div class="mb-4">
+        <label for="editName" class="block text-sm font-medium">Name</label>
+        <input type="text" id="editName" name="name" value="<%= user.name %>" 
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500" required>
+        <div id="nameError" class="text-red-500 text-sm mt-1 hidden"></div>
+      </div>
+      <div class="mb-4">
+        <label for="editPhone" class="block text-sm font-medium">Phone Number</label>
+        <input type="tel" id="editPhone" name="phone" value="<%= user.phone %>" 
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500" required>
+        <div id="phoneError" class="text-red-500 text-sm mt-1 hidden"></div>
+      </div>
+      <div id="editProfileError" class="text-red-500 text-sm mb-4 hidden"></div>
+      <div class="flex justify-end gap-2">
+        <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">Save Changes</button>
+        <button type="button" class="closeModal bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div id="changePasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold">Change Password</h2>
+      <button class="closeModal text-gray-500 hover:text-black text-xl">&times;</button>
+    </div>
+    <form id="changePasswordForm">
+      <div class="mb-4">
+        <label for="currentPassword" class="block text-sm font-medium">Current Password</label>
+        <input type="password" id="currentPassword" name="currentPassword" 
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500" required>
+        <div id="currentPasswordError" class="text-red-500 text-sm mt-1 hidden"></div>
+      </div>
+      <div class="mb-4">
+        <label for="newPassword" class="block text-sm font-medium">New Password</label>
+        <input type="password" id="newPassword" name="newPassword" 
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500" required>
+        <div id="newPasswordError" class="text-red-500 text-sm mt-1 hidden"></div>
+      </div>
+      <div class="mb-4">
+        <label for="confirmPassword" class="block text-sm font-medium">Confirm New Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" 
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500" required>
+        <div id="confirmPasswordError" class="text-red-500 text-sm mt-1 hidden"></div>
+      </div>
+      <div id="passwordFormError" class="text-red-500 text-sm mb-4 hidden"></div>
+      <div class="flex justify-end gap-2">
+        <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">Update Password</button>
+        <button type="button" class="closeModal bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <!-- Modal -->
 <div
@@ -351,6 +432,149 @@ function showNotification(message, bgColor) {
   }, 4000); // Change this to 5000ms for 5 seconds
 }
 
+// Modal handling
+const editProfileModal = document.getElementById('editProfileModal');
+const changePasswordModal = document.getElementById('changePasswordModal');
+const editProfileBtn = document.getElementById('editProfileBtn');
+const changePasswordBtn = document.getElementById('changePasswordBtn');
+const closeButtons = document.querySelectorAll('.closeModal');
+
+// Open modals
+editProfileBtn.addEventListener('click', () => editProfileModal.classList.remove('hidden'));
+changePasswordBtn.addEventListener('click', () => changePasswordModal.classList.remove('hidden'));
+
+// Close modals
+closeButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    editProfileModal.classList.add('hidden');
+    changePasswordModal.classList.add('hidden');
+  });
+});
+
+// Edit Profile Form Validation and Submission
+document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  // Reset error messages
+  document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+  
+  const formData = {
+    name: document.getElementById('editName').value.trim(),
+    phone: document.getElementById('editPhone').value.trim()
+  };
+
+  let hasError = false;
+
+  // Name validation
+  if (!formData.name || formData.name.length < 2) {
+    document.getElementById('nameError').textContent = "Name must be at least 2 characters long";
+    document.getElementById('nameError').classList.remove('hidden');
+    hasError = true;
+  }
+
+  // Phone validation
+  if (!formData.phone || !/^\d{10}$/.test(formData.phone)) {
+    document.getElementById('phoneError').textContent = "Please enter a valid 10-digit phone number";
+    document.getElementById('phoneError').classList.remove('hidden');
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+  try {
+    const response = await fetch('/update-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      editProfileModal.classList.add('hidden');
+      showNotification("Profile updated successfully!", "bg-green-500");
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      document.getElementById('editProfileError').textContent = data.message || "Failed to update profile";
+      document.getElementById('editProfileError').classList.remove('hidden');
+    }
+  } catch (error) {
+    document.getElementById('editProfileError').textContent = "Something went wrong. Please try again.";
+    document.getElementById('editProfileError').classList.remove('hidden');
+  }
+});
+
+// Change Password Form Validation and Submission
+document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  // Reset error messages
+  document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+  
+  const currentPassword = document.getElementById('currentPassword').value;
+  const newPassword = document.getElementById('newPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+
+  let hasError = false;
+
+  // Password validation
+  if (!currentPassword) {
+    document.getElementById('currentPasswordError').textContent = "Current password is required";
+    document.getElementById('currentPasswordError').classList.remove('hidden');
+    hasError = true;
+  }
+
+  if (newPassword.length < 6) {
+    document.getElementById('newPasswordError').textContent = "Password must be at least 6 characters long";
+    document.getElementById('newPasswordError').classList.remove('hidden');
+    hasError = true;
+  }
+
+  if (newPassword !== confirmPassword) {
+    document.getElementById('confirmPasswordError').textContent = "Passwords don't match";
+    document.getElementById('confirmPasswordError').classList.remove('hidden');
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+  try {
+    const response = await fetch('/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      changePasswordModal.classList.add('hidden');
+      document.getElementById('changePasswordForm').reset();
+      showNotification("Password changed successfully!", "bg-green-500");
+    } else {
+      document.getElementById('passwordFormError').textContent = data.message || "Failed to change password";
+      document.getElementById('passwordFormError').classList.remove('hidden');
+    }
+  } catch (error) {
+    document.getElementById('passwordFormError').textContent = "Something went wrong. Please try again.";
+    document.getElementById('passwordFormError').classList.remove('hidden');
+  }
+});
+
+// Update notification position styles
+function showNotification(message, bgColor) {
+  const notification = document.getElementById("notification");
+  notification.textContent = message;
+  notification.classList.remove("hidden");
+  notification.classList.add("show", bgColor);
+  
+  setTimeout(() => {
+    notification.classList.remove("show");
+    notification.classList.add("hidden");
+  }, 4000);
+}
+
   </script>
+  </div>
 
 <%- include('../partials/user/userfooter') %> 

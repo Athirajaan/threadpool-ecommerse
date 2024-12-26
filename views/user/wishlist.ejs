@@ -1,0 +1,232 @@
+<%- include('../partials/user/userheader') %>
+
+<div class="container mx-auto px-4 py-8">
+  <!-- Page Title -->
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">My Wishlist</h1>
+  </div>
+
+  <% if (products && products.length > 0) { %>
+    <!-- Wishlist Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <% products.forEach(product => { %>
+        <!-- Product Card -->
+        <div class="group relative bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          <div class="relative aspect-w-1 aspect-h-1">
+            <!-- Product Image with Hover Effect -->
+            <img 
+              src="<%= product.productImage %>" 
+              alt="<%= product.productName %>" 
+              class="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-105"
+            >
+            
+            <!-- Remove from Wishlist Button -->
+            <button 
+              class="remove-from-wishlist absolute top-4 right-4 p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors"
+              data-product-id="<%= product._id %>"
+            >
+              <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+              </svg>
+            </button>
+
+            <!-- Size Selection Bar (Hidden by default, shown on hover) -->
+            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div class="flex justify-center items-center space-x-2 p-2">
+                <% ['S', 'M', 'L', 'XL'].forEach(size => { %>
+                  <button 
+                    class="size-btn w-8 h-8 text-sm font-medium rounded-full transition-colors
+                      <%= product.stock[size] > 0 
+                        ? 'bg-white text-gray-900 hover:bg-blue-50 border border-gray-300' 
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed' %>"
+                    <%= product.stock[size] > 0 ? '' : 'disabled' %>
+                    data-product-id="<%= product._id %>"
+                    data-size="<%= size %>"
+                    onclick="addToCartAndRemoveFromWishlist(this)"
+                    title="<%= product.stock[size] === 0 ? 'Out of stock' : `Size ${size}` %>"
+                  >
+                    <%= size %>
+                  </button>
+                <% }); %>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Product Info -->
+          <div class="p-4">
+            <h3 class="text-lg font-medium text-gray-900 mb-2">
+              <%= product.productName %>
+            </h3>
+            <div class="flex items-center justify-between">
+              <div class="flex items-baseline">
+                <span class="text-lg font-bold text-gray-900">₹<%= product.salePrice %></span>
+                <% if (product.regularPrice > product.salePrice) { %>
+                  <span class="ml-2 text-sm text-gray-500 line-through">₹<%= product.regularPrice %></span>
+                  <span class="ml-2 text-sm font-medium text-green-600">
+                    <%= Math.round((product.regularPrice - product.salePrice) / product.regularPrice * 100) %>% OFF
+                  </span>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <!-- Empty State with Small Buttons -->
+    <div class="min-h-[70vh] flex items-center justify-center bg-gradient-to-b from-white to-gray-50 px-4">
+      <div class="max-w-2xl w-full text-center">
+        <!-- Heart Icon -->
+        <div class="mb-6">
+          <svg class="w-16 h-16 mx-auto text-red-500" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </div>
+
+        <!-- Content -->
+        <h3 class="text-2xl font-bold text-gray-900 mb-3">Your Wishlist is Empty</h3>
+        <p class="text-gray-600 mb-8">Discover and save items you love to your wishlist.</p>
+        
+        <!-- Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <a href="/menShop" 
+             class="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+            Shop Men's
+          </a>
+          <a href="/womenShop" 
+             class="px-6 py-2 text-sm font-medium text-blue-600 bg-white border border-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+            Shop Women's
+          </a>
+        </div>
+      </div>
+    </div>
+   
+        <!-- Decorative Pattern -->
+        <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-100 to-transparent -z-10"></div>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<script>
+// Add this new function to handle adding to cart and removing from wishlist
+async function addToCartAndRemoveFromWishlist(button) {
+  const productId = button.dataset.productId;
+  const selectedSize = button.dataset.size;
+
+  try {
+    // First, add to cart
+    const cartResponse = await fetch('/addToCart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        productId, 
+        selectedSize,
+        quantity: 1
+      })
+    });
+
+    const cartData = await cartResponse.text();
+    
+    if (cartResponse.ok) {
+      // Then remove from wishlist
+      const wishlistResponse = await fetch('/wishlist/toggle', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId })
+      });
+
+      const wishlistData = await wishlistResponse.json();
+      
+      if (wishlistData.success) {
+        // Show success message
+        Swal.fire({
+          icon: 'success',
+          title: 'Added to Cart!',
+          text: 'Item moved from wishlist to cart',
+          showConfirmButton: false,
+          timer: 1500,
+          position: 'top-right',
+          toast: true
+        });
+
+        // Remove the product card from the UI
+        const productCard = button.closest('.group');
+        productCard.remove();
+
+        // Check if wishlist is empty after removal
+        const remainingProducts = document.querySelectorAll('.group');
+        if (remainingProducts.length === 0) {
+          location.reload(); // Reload to show empty state
+        }
+      }
+    } else {
+      throw new Error(cartData);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: error.message || 'Something went wrong! Please try again.',
+      position: 'top-right',
+      toast: true,
+      showConfirmButton: false,
+      timer: 3000
+    });
+  }
+}
+
+// Remove existing add to cart event listeners since we're handling it differently now
+document.addEventListener('DOMContentLoaded', function() {
+    // Keep only the remove from wishlist functionality
+    document.querySelectorAll('.remove-from-wishlist').forEach(button => {
+        button.addEventListener('click', async function() {
+            const productId = this.dataset.productId;
+            try {
+                const response = await fetch('/wishlist/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ productId })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    // Remove the product card from the UI
+                    const productCard = this.closest('.group');
+                    productCard.remove();
+
+                    // Check if wishlist is empty after removal
+                    const remainingProducts = document.querySelectorAll('.group');
+                    if (remainingProducts.length === 0) {
+                        location.reload(); // Reload to show empty state
+                    }
+
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Removed from Wishlist',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong! Please try again.',
+                });
+            }
+        });
+    });
+});
+</script>
+
+<%- include('../partials/user/userfooter') %>

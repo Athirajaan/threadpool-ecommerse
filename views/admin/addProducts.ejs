@@ -4,32 +4,34 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <div class="flex-1">
-    <div class="mb-6 flex flex-col md:flex-row items-start justify-between">
+  <div class="flex-1 px-6 py-8">
+    <div class="mb-2 flex flex-col md:flex-row items-start justify-between">
       <!-- Breadcrumbs -->
-      <nav class="text-sm text-gray-500 mb-4 md:mb-0">
-          <a href="#" class="hover:text-yellow-500">Dashboard</a> &gt;
-          <a href="#" class="hover:text-yellow-500">All Products</a> &gt;
-          <a href="#" class="text-gray-800">Add Product</a>
+      <nav class="text-sm font-medium mb-0 md:mb-0">
+          <a href="#" class="text-gray-600 hover:text-yellow-500 transition-colors">Dashboard</a> 
+          <span class="text-gray-400 mx-2">></span>
+          <a href="#" class="text-gray-600 hover:text-yellow-500 transition-colors">All Products</a>
+          <span class="text-gray-400 mx-2">></span>
+          <span class="text-yellow-500">Add Product</span>
       </nav>
   
   </div>
 
 
     <!-- Add Product Form -->
-    <div class="w-full max-w-5xl bg-white rounded-lg shadow-lg p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="w-full max-w-6xl mx-auto bg-white rounded-xl shadow-xl p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
 
       <!-- Left Side -->
-      <div>
+      <div class="space-y-6">
         <form method="post" action="/admin/addProducts" enctype="multipart/form-data" onsubmit="return validateForm(event)">
         <!-- Product Name -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-600">Product Name</label>
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Product Name</label>
           <input
             type="text"
             id="productName"
             placeholder="Enter product name"
-            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400"
+            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all"
           />
           <div id="productName-error" class="text-red-500 text-sm mt-1 error-message"></div>
         </div>
@@ -92,51 +94,51 @@
         </div>
   
         <!-- Size Variants -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-600">Size Variants</label>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-3">Size Variants</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
             <!-- Size Fields  S-->
-            <div>
-              <label class="block text-xs font-medium text-gray-600">S</label>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <label class="block text-sm font-medium text-gray-700 mb-2">S</label>
               <input
                 type="number"
                 id="sizeSQty"
                 placeholder="Qty"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all"
               />
               <div id="sizeSQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
             </div>
             <!-- M -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600">M</label>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <label class="block text-sm font-medium text-gray-700 mb-2">M</label>
               <input
                 type="number"
                 id="sizeMQty"
                 placeholder="Qty"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all"
               />
-              <div id="sizeSQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
+              <div id="sizeMQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
             </div>
 
             <!-- L -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600">L</label>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <label class="block text-sm font-medium text-gray-700 mb-2">L</label>
               <input
                 type="number"
                 id="sizeLQty"
                 placeholder="Qty"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all"
               />
               <div id="sizeLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
             </div>
             <!-- XL -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600">XL</label>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <label class="block text-sm font-medium text-gray-700 mb-2">XL</label>
               <input
                 type="number"
                 id="sizeXLQty"
                 placeholder="Qty"
-                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all"
               />
               <div id="sizeXLQty-error" class="text-red-500 text-sm mt-1 error-message"></div>
             </div>
@@ -147,9 +149,9 @@
  
   
       <!-- Uploaded Images Section -->
-      <div class="max-w-md p-4 bg-white border rounded shadow-md">
+      <div class="bg-gray-50 rounded-xl p-6">
         <!-- File Input -->
-        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-gray-500">
+        <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 hover:border-yellow-400 transition-colors">
           <input type="file" id="imageInput" class="hidden" accept="image/*" multiple />
           <label for="imageInput" class="cursor-pointer flex flex-col items-center">
             <svg
@@ -185,12 +187,12 @@
         </div>
         </div>
         <!-- Uploaded Images Section -->
-        <div id="imagePreview" class="mt-4 space-y-2"></div>
-        <div class="mt-20">
+        <div id="imagePreview" class="mt-6 space-y-4"></div>
+        <div class="mt-8">
           <button
             type="submit"
             id="submitButton"
-            class="w-full bg-yellow-500 text-white font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+            class="w-full bg-yellow-500 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-yellow-600 transform hover:scale-[1.02] transition-all duration-200"
           >
             Submit Product
           </button>

@@ -1,0 +1,805 @@
+<%- include('../partials/user/userheader') %>
+<%- include('../partials/user/userProfile') %>
+
+<div class="ml-64 flex-1">
+  <!-- Stylish Breadcrumbs -->
+  <nav class="px-8 py-5">
+    <ol class="flex items-center">
+      <li class="flex items-center">
+        <a href="/" class="text-xs uppercase tracking-wider text-gray-500 hover:text-gray-700 transition-colors duration-200">
+          Home
+        </a>
+      </li>
+      <li class="flex items-center">
+        <span class="mx-3 inline-block">
+          <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5l7 7-7 7"/>
+          </svg>
+        </span>
+        <a href="/profile" class="text-xs uppercase tracking-wider text-gray-500 hover:text-gray-700 transition-colors duration-200">
+          Account
+        </a>
+      </li>
+      <li class="flex items-center">
+        <span class="mx-3 inline-block">
+          <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5l7 7-7 7"/>
+          </svg>
+        </span>
+        <span class="text-xs uppercase tracking-wider text-gray-900 font-medium">
+          Orders
+        </span>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Rest of the content -->
+  <div class="px-8">
+    <h1 class="text-2xl font-bold mb-4">Order Details</h1>
+    <div class="space-y-6">
+      <% orders.forEach(order => { %>
+        <div class="bg-white shadow-sm border border-gray-100 rounded-xl overflow-hidden mb-6 
+                    transform transition-all duration-300 ease-in-out cursor-pointer
+                    hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] group">
+          <!-- Enhanced Order Header -->
+          <div class="px-6 py-4 border-b flex justify-between items-center bg-white">
+            <div class="flex items-center space-x-6">
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span class="font-medium text-gray-700">Order ID: <%= order.orderId %></span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Ordered on: <%= new Date(order.orderDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+              </div>
+            </div>
+            <button 
+              onclick="showModal('<%= order.orderId %>')" 
+              class="group inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 
+                     border border-gray-200 hover:border-blue-500 rounded-md 
+                     transition-all duration-200 ease-in-out 
+                     hover:shadow-sm 
+                     bg-white">
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                   class="h-4 w-4 mr-1.5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" 
+                   fill="none" 
+                   viewBox="0 0 24 24" 
+                   stroke="currentColor">
+                <path stroke-linecap="round" 
+                      stroke-linejoin="round" 
+                      stroke-width="2" 
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" 
+                      stroke-linejoin="round" 
+                      stroke-width="2" 
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              View Order
+            </button>
+          </div>
+
+          <!-- Order Items Container -->
+          <div class="divide-y divide-blue-50">
+            <% order.orderedItems.forEach(item => { %>
+              <div class="p-6 transition-all duration-300 ease-in-out">
+                <div class="flex items-center justify-between">
+                  <!-- Enhanced Product Info -->
+                  <div class="flex space-x-4">
+                    <div class="flex-shrink-0">
+                      <img src="<%= item.productImage %>" alt="<%= item.productName %>" 
+                        class="w-24 h-24 object-cover rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    </div>
+                    <div class="flex flex-col justify-between py-1">
+                      <div>
+                        <h3 class="text-base font-medium text-gray-900 hover:text-blue-600 transition-colors duration-150">
+                          <%= item.productName %>
+                        </h3>
+                        <div class="mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                          <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                            <span>Size: <%= item.size %></span>
+                          </div>
+                          <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                            </svg>
+                            <span>Qty: <%= item.quantity %></span>
+                          </div>
+                          <div class="flex items-center font-medium text-gray-900">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>₹<%= item.price * item.quantity %></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Enhanced Status and Actions -->
+                  <div class="flex items-center space-x-6">
+                    <!-- Centered Status Badge -->
+                    <div class="flex items-center space-x-2">
+                      <% let statusColor = ""; let textColor = ""; let bgColor = ""; %>
+                      <% if (item.status === "Shipped" || item.status === "out for delivery") { %>
+                        <% statusColor = "bg-yellow-100"; textColor = "text-yellow-800"; bgColor = "bg-yellow-400" %>
+                      <% } else if (item.status === "Delivered") { %>
+                        <% statusColor = "bg-green-100"; textColor = "text-green-800"; bgColor = "bg-green-400" %>
+                      <% } else if (item.status === "Pending") { %>
+                        <% statusColor = "bg-blue-100"; textColor = "text-blue-800"; bgColor = "bg-blue-400" %>
+                      <% } else if (item.status === "Cancelled" || item.status === "Returned") { %>
+                        <% statusColor = "bg-red-100"; textColor = "text-red-800"; bgColor = "bg-red-400" %>
+                      <% } %>
+                      <div class="flex items-center px-3 py-1 rounded-full <%= statusColor %> <%= textColor %>">
+                        <div class="w-2 h-2 <%= bgColor %> rounded-full mr-2"></div>
+                        <span class="text-sm font-medium"><%= item.status %></span>
+                      </div>
+                    </div>
+
+                    <!-- Right-aligned Action Buttons -->
+                    <div class="flex items-center space-x-2">
+                      <% if (["Pending", "Shipped", "out for delivery"].includes(item.status)) { %>
+                        <!-- Track Order Button -->
+                        <button 
+                          onclick="toggleTracking('<%= order.orderId %>', '<%= item.product._id %>')"
+                          class="inline-flex items-center px-4 py-2 border border-green-500 text-green-600 rounded-md hover:bg-green-50 transition-all duration-150 text-sm hover:shadow-sm">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          </svg>
+                          Track
+                        </button>
+
+                        <!-- Cancel Button -->
+                        <button 
+                          onclick="confirmCancellation('<%= order.orderId %>', '<%= item.product && item.product._id %>','<%= item.quantity %>','<%= item.size %>')"
+                          class="inline-flex items-center px-4 py-2 border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-all duration-150 text-sm hover:shadow-sm">
+                          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                          Cancel
+                        </button>
+                      <% } else if (item.status === "Delivered") { %>
+                        <!-- Rate and Return buttons for delivered items -->
+                        <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 transition-all duration-150 text-sm hover:shadow-sm">
+                          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                          </svg>
+                          Rate Product
+                        </button>
+                        <button class="inline-flex items-center px-4 py-2 border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-all duration-150 text-sm hover:shadow-sm">
+                          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/>
+                          </svg>
+                          Return
+                        </button>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tracking Section with enhanced design -->
+              <div id="tracking-<%= order.orderId %>-<%= item.product._id %>" 
+                   class="hidden w-full overflow-hidden transition-all duration-500 ease-in-out border-t border-blue-50">
+                <div class="p-6 bg-white animate-fadeIn">
+                  <!-- Enhanced Header -->
+                  <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                      <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        </svg>
+                      </div>
+                      <h3 class="text-lg font-semibold text-blue-900">Track Your Order</h3>
+                    </div>
+                    <span class="text-sm text-blue-600 font-medium">Order ID: <%= order.orderId %></span>
+                  </div>
+
+                  <!-- Timeline -->
+                  <div class="relative mt-8">
+                    <!-- Animated Progress Line -->
+                    <div class="absolute top-5 left-0 w-full h-1 bg-gradient-to-r from-blue-50 to-blue-100 rounded-full">
+                      <div class="progress-bar h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-700 ease-out" 
+                           id="progress-<%= order.orderId %>-<%= item.product._id %>"></div>
+                    </div>
+
+                    <!-- Enhanced Status Points -->
+                    <div class="relative flex justify-between">
+                      <% const statuses = ['Pending', 'Shipped', 'Out for Delivery', 'Delivered'] %>
+                      <% statuses.forEach((status, index) => { %>
+                        <div class="flex flex-col items-center animate-slideUp" 
+                             style="animation-delay: <%= index * 150 %>ms">
+                          <!-- Status Point -->
+                          <div class="status-point relative">
+                            <div class="w-12 h-12 rounded-full bg-white border-2 border-blue-200 
+                                        flex items-center justify-center z-10 transition-all duration-300
+                                        shadow-sm hover:shadow-md hover:border-blue-500">
+                              <svg class="w-6 h-6 text-blue-500 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <% if (status === 'Pending') { %>
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <% } else if (status === 'Shipped') { %>
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                <% } else if (status === 'Out for Delivery') { %>
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                                <% } else { %>
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                <% } %>
+                              </svg>
+                            </div>
+                          </div>
+                          <!-- Status Text with Animation -->
+                          <p class="mt-3 text-sm font-semibold text-blue-900 animate-fadeIn" 
+                             style="animation-delay: <%= (index * 150) + 200 %>ms">
+                            <%= status %>
+                          </p>
+                          <!-- Date with Animation -->
+                          <p class="text-xs text-blue-600 mt-1 animate-fadeIn" 
+                             style="animation-delay: <%= (index * 150) + 300 %>ms"
+                             id="date-<%= status.toLowerCase().replace(/ /g, '-') %>-<%= order.orderId %>-<%= item.product._id %>">
+                          </p>
+                        </div>
+                      <% }) %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <!--view detail Modal -->
+  <div id="dynamicModalContainer"></div>
+
+    <!-- cancel modal  -->
+  <div id="cancelModal" class="hidden fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-50">
+    <div class="bg-white rounded-lg shadow-lg w-96">
+      <div class="p-4">
+        <p class="text-lg font-semibold mb-4">Do you want to cancel this product?</p>
+        <div class="flex justify-end space-x-4">
+          <button onclick="closeCancelModal()" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+            No
+          </button>
+          <button id="confirmCancelButton" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+            Yes, Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <script>
+    function showModal(orderId) {
+      const modalContainer = document.getElementById('dynamicModalContainer');
+
+      // Fetch order details from the server
+      fetch(`/order-details/${orderId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          // Dynamically generate modal content with Tailwind
+          modalContainer.innerHTML = `
+            <div class="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-50" id="orderModal">
+              <div class="bg-white rounded-lg overflow-hidden shadow-lg w-96">
+                <div class="p-4 border-b">
+                  <h5 class="text-xl font-semibold">Order Details</h5>
+                  <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">&times;</button>
+                </div>
+                <div class="p-4">
+                  <p><strong>Order ID:</strong> ${data.orderId}</p>
+                  <p><strong>Order Date:</strong> ${new Date(data.orderDate).toLocaleDateString()}</p>
+                  <p><strong>Total Amount:</strong> $${data.totalAmount}</p>
+                  <p><strong>Status:</strong> ${data.status}</p>
+                  <!-- Add more order details as needed -->
+                </div>
+                <div class="p-4 border-t">
+                  <button onclick="closeModal()" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Close</button>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Open the modal by showing the container
+          modalContainer.style.display = 'block';
+        })
+        .catch((error) => {
+          console.error('Error fetching order details:', error);
+        });
+    }
+
+    function closeModal() {
+      const modalContainer = document.getElementById('dynamicModalContainer');
+      modalContainer.style.display = 'none';
+    }
+// Function to confirm the cancellation and update the UI
+function confirmCancellation(orderId, productId, quantity, size) {
+    // Show the modal
+    const cancelModal = document.getElementById('cancelModal');
+    cancelModal.classList.remove('hidden');
+
+    // Set up the confirm button inside the modal
+    const confirmCancelButton = document.getElementById('confirmCancelButton');
+    confirmCancelButton.onclick = function () {
+        const requestData = { orderId, productId, quantity, size };
+        console.log('Sending cancel request with data:', requestData);
+
+        // Send a request to cancel the order
+        fetch('/cancel-order', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(requestData),
+        })
+        .then(response => response.json())  // Ensure we parse the JSON response
+        .then((data) => {
+            console.log('Response data:', data);
+
+            // Handle success and update the UI
+            if (data.success && data.updatedItem) {
+                const orderItemElement = document.getElementById(`order-${orderId}-${productId}`);
+
+                if (orderItemElement) {
+                    const statusElement = orderItemElement.querySelector('.status-text');
+                    const statusIndicator = orderItemElement.querySelector('.status-indicator');
+
+                    if (statusElement && statusIndicator) {
+                        // Update status
+                        statusElement.textContent = 'Cancelled';
+                        statusIndicator.classList.remove('bg-yellow-500', 'bg-green-500', 'bg-blue-500');
+                        statusIndicator.classList.add('bg-red-500');
+                    }
+
+                    // Increase the quantity (assuming you're reducing one quantity on cancel)
+                    const quantityElement = orderItemElement.querySelector('.quantity');
+                    if (quantityElement) {
+                        let updatedQuantity = parseInt(quantityElement.textContent) + parseInt(quantity);
+                        quantityElement.textContent = updatedQuantity;
+                    }
+
+                    // Optionally, remove the cancel button or disable it
+                    const cancelButton = orderItemElement.querySelector('button[onclick^="confirmCancellation"]');
+                    if (cancelButton) {
+                        cancelButton.remove();
+                    }
+
+                    // Show success message with some flair
+                    Swal.fire({
+                    icon: 'success',
+                    text: 'Your cancellation request was a success.',
+                    showConfirmButton: true, // Show the OK button
+                     confirmButtonText: 'OK', // Text on the button
+                     position: 'center', // Position in the center of the screen
+                    customClass: {
+                     popup: 'swal-popup',
+                    title: 'swal-title',
+                   text: 'swal-text'
+                    }
+                    });
+
+
+
+                } else {
+                    console.error('Order item element not found.');
+                }
+            } else {
+                throw new Error(data.message || 'Oops! Something went wrong with cancelling the order.');
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: "Oops, something went wrong!",
+                text: error.message || 'We couldn’t cancel your order. Try again later.',
+                confirmButtonText: 'Retry',
+                confirmButtonColor: '#FF6B6B',
+            });
+        });
+
+        // Close the cancel modal after the action
+        closeCancelModal();
+    };
+}
+
+// Function to close the cancel modal
+function closeCancelModal() {
+    const cancelModal = document.getElementById('cancelModal');
+    cancelModal.classList.add('hidden');
+}
+
+function showNotification(message, bgColor) {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-md shadow-lg z-50 transition-all duration-500 transform translate-x-full`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+}
+
+// Update the track order function with better error handling
+function trackOrder(orderId, productId) {
+    console.log('Tracking order:', { orderId, productId });
+    
+    if (!orderId || !productId) {
+        console.error('Missing parameters:', { orderId, productId });
+        showNotification('Missing order or product information', 'bg-red-500');
+        return;
+    }
+
+    // Encode the URL parameters
+    const encodedOrderId = encodeURIComponent(orderId);
+    const encodedProductId = encodeURIComponent(productId);
+    const url = `/track-order/${encodedOrderId}/${encodedProductId}`;
+    
+    console.log('Fetching from URL:', url);
+
+    fetch(url, {
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error('Response not OK:', response.status, response.statusText);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Received data:', data);
+        
+        if (!data || !data.productName) {
+            throw new Error('Invalid data received from server');
+        }
+
+        const modal = document.getElementById('trackingModal');
+        const productNameEl = document.getElementById('trackingProductName');
+        
+        // Set product name
+        productNameEl.textContent = data.productName;
+
+        // Calculate dates
+        const orderDate = new Date(data.orderDate);
+        const shippedDate = new Date(orderDate);
+        shippedDate.setDate(orderDate.getDate() + 2);
+        
+        const outForDeliveryDate = new Date(shippedDate);
+        outForDeliveryDate.setDate(shippedDate.getDate() + 2);
+        
+        const deliveredDate = new Date(outForDeliveryDate);
+        deliveredDate.setDate(outForDeliveryDate.getDate() + 1);
+
+        // Format dates
+        const formatDate = (date) => {
+            return date.toLocaleDateString('en-US', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        };
+
+        // Set dates in modal
+        document.getElementById('pendingDate').textContent = formatDate(orderDate);
+        document.getElementById('shippedDate').textContent = formatDate(shippedDate);
+        document.getElementById('outForDeliveryDate').textContent = formatDate(outForDeliveryDate);
+        document.getElementById('deliveredDate').textContent = formatDate(deliveredDate);
+        document.getElementById('expectedDeliveryDate').textContent = formatDate(deliveredDate);
+
+        // Update timeline points based on current status
+        const timelinePoints = modal.querySelectorAll('.z-10');
+        const statuses = ['Pending', 'Shipped', 'out for delivery', 'Delivered'];
+        const currentStatusIndex = statuses.indexOf(data.status);
+
+        timelinePoints.forEach((point, index) => {
+            if (index <= currentStatusIndex) {
+                point.classList.remove('bg-gray-300');
+                point.classList.add('bg-blue-500');
+            } else {
+                point.classList.remove('bg-blue-500');
+                point.classList.add('bg-gray-300');
+            }
+        });
+
+        // Show modal
+        modal.classList.remove('hidden');
+    })
+    .catch(error => {
+        console.error('Tracking error:', error);
+        showNotification(`Error: ${error.message}`, 'bg-red-500');
+    });
+}
+
+function closeTrackingModal() {
+    document.getElementById('trackingModal').classList.add('hidden');
+}
+
+function toggleTracking(orderId, productId) {
+    const trackingDiv = document.getElementById(`tracking-${orderId}-${productId}`);
+    const isHidden = trackingDiv.classList.contains('hidden');
+    
+    if (isHidden) {
+        // Show tracking
+        trackingDiv.classList.remove('hidden');
+        trackingDiv.style.maxHeight = '0';
+        setTimeout(() => {
+            trackingDiv.style.maxHeight = trackingDiv.scrollHeight + 'px';
+        }, 10);
+        
+        // Fetch tracking data
+        fetch(`/track-order/${encodeURIComponent(orderId)}/${encodeURIComponent(productId)}`)
+            .then(response => response.json())
+            .then(data => {
+                updateTrackingStatus(orderId, productId, data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } else {
+        // Hide tracking with animation
+        trackingDiv.style.maxHeight = '0';
+        setTimeout(() => {
+            trackingDiv.classList.add('hidden');
+        }, 500);
+    }
+}
+
+function updateTrackingStatus(orderId, productId, data) {
+    const statuses = ['pending', 'shipped', 'out for delivery', 'delivered'];
+    const currentStatus = data.status.toLowerCase();
+    const currentIndex = statuses.indexOf(currentStatus);
+    
+    console.log('Order Date:', data.orderDate);
+    console.log('Current Status:', currentStatus);
+    
+    // Calculate all dates based on order date
+    const orderDate = new Date(data.orderDate);
+    
+    // Calculate expected dates for each status
+    const expectedDates = {
+        'pending': orderDate,
+        'shipped': new Date(orderDate.getTime() + (2 * 24 * 60 * 60 * 1000)),
+        'out for delivery': new Date(orderDate.getTime() + (4 * 24 * 60 * 60 * 1000)),
+        'delivered': new Date(orderDate.getTime() + (6 * 24 * 60 * 60 * 1000))
+    };
+
+    // Format dates
+    const formatDate = (date) => {
+        return date.toLocaleDateString('en-US', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    };
+
+    // Update progress bar
+    const progressBar = document.getElementById(`progress-${orderId}-${productId}`);
+    progressBar.style.width = `${((currentIndex + 1) / statuses.length) * 100}%`;
+    
+    // Update status points and dates
+    const trackingDiv = document.getElementById(`tracking-${orderId}-${productId}`);
+    const statusPoints = trackingDiv.querySelectorAll('.status-point');
+    
+    statusPoints.forEach((point, index) => {
+        const status = statuses[index];
+        const statusElement = point.querySelector('svg').parentElement;
+        const dateElementId = `date-${status.replace(/ /g, '-')}-${orderId}-${productId}`;
+        const dateElement = document.getElementById(dateElementId);
+        
+        if (dateElement) {
+            // Always show the expected date for each status point
+            const expectedDate = expectedDates[status];
+            dateElement.textContent = formatDate(expectedDate);
+            
+            if (index <= currentIndex) {
+                // Active/completed status
+                statusElement.classList.remove('border-blue-200');
+                statusElement.classList.add('border-blue-500');
+                statusElement.querySelector('svg').classList.remove('text-blue-400');
+                statusElement.querySelector('svg').classList.add('text-blue-500');
+                dateElement.classList.add('text-blue-600');
+                dateElement.classList.remove('text-gray-400');
+            } else {
+                // Future status
+                statusElement.classList.remove('border-blue-500');
+                statusElement.classList.add('border-blue-200');
+                statusElement.querySelector('svg').classList.remove('text-blue-500');
+                statusElement.querySelector('svg').classList.add('text-blue-400');
+                dateElement.classList.remove('text-blue-600');
+                dateElement.classList.add('text-gray-400');
+            }
+        }
+
+        // Update pulse animation
+        const pulseElement = point.querySelector('.animate-ping-slow');
+        if (pulseElement) {
+            if (index === currentIndex) {
+                pulseElement.classList.remove('scale-0');
+            } else {
+                pulseElement.classList.add('scale-0');
+            }
+        }
+    });
+
+    console.log('Expected Dates:', expectedDates);
+}
+
+    </script>
+
+
+<%- include('../partials/user/userfooter') %>
+
+<!-- Tracking Modal -->
+<div id="trackingModal" 
+     class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 transition-all duration-300">
+  <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-[600px] shadow-xl rounded-md bg-white">
+    <!-- Modal Header -->
+    <div class="border-b pb-4">
+      <h3 id="trackingProductName" class="text-xl font-semibold text-gray-800"></h3>
+      <p class="text-sm text-gray-600 mt-1">Expected Delivery: <span id="expectedDeliveryDate"></span></p>
+      <button onclick="closeTrackingModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Timeline -->
+    <div class="py-6">
+      <div class="relative">
+        <!-- Timeline line -->
+        <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gray-200"></div>
+
+        <!-- Timeline points -->
+        <div class="space-y-8">
+          <!-- Order Placed -->
+          <div class="flex items-center justify-between">
+            <div class="w-5/12 text-right pr-8">
+              <h3 class="text-sm font-semibold text-gray-900">Order Placed</h3>
+              <p id="pendingDate" class="text-xs text-gray-500"></p>
+            </div>
+            <div class="z-10 flex items-center justify-center w-6 h-6 bg-blue-500 rounded-full">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+              </svg>
+            </div>
+            <div class="w-5/12 pl-8"></div>
+          </div>
+
+          <!-- Shipped -->
+          <div class="flex items-center justify-between">
+            <div class="w-5/12 text-right pr-8">
+              <h3 class="text-sm font-semibold text-gray-900">Shipped</h3>
+              <p id="shippedDate" class="text-xs text-gray-500"></p>
+            </div>
+            <div class="z-10 flex items-center justify-center w-6 h-6 bg-gray-300 rounded-full">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+              </svg>
+            </div>
+            <div class="w-5/12 pl-8"></div>
+          </div>
+
+          <!-- Out for Delivery -->
+          <div class="flex items-center justify-between">
+            <div class="w-5/12 text-right pr-8">
+              <h3 class="text-sm font-semibold text-gray-900">Out for Delivery</h3>
+              <p id="outForDeliveryDate" class="text-xs text-gray-500"></p>
+            </div>
+            <div class="z-10 flex items-center justify-center w-6 h-6 bg-gray-300 rounded-full">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+              </svg>
+            </div>
+            <div class="w-5/12 pl-8"></div>
+          </div>
+
+          <!-- Delivered -->
+          <div class="flex items-center justify-between">
+            <div class="w-5/12 text-right pr-8">
+              <h3 class="text-sm font-semibold text-gray-900">Delivered</h3>
+              <p id="deliveredDate" class="text-xs text-gray-500"></p>
+            </div>
+            <div class="z-10 flex items-center justify-center w-6 h-6 bg-gray-300 rounded-full">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+              </svg>
+            </div>
+            <div class="w-5/12 pl-8"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="border-t pt-4 mt-4">
+      <button onclick="closeTrackingModal()" class="w-full px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors duration-200">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-slideUp {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  /* Progress bar animation */
+  .progress-bar {
+    transform-origin: left;
+    animation: progressGrow 0.7s ease-out forwards;
+  }
+
+  @keyframes progressGrow {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes ping-slow {
+    0% {
+      transform: scale(0);
+      opacity: 0.5;
+    }
+    50% {
+      transform: scale(1.5);
+      opacity: 0.25;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+
+  .animate-ping-slow {
+    animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+</style>
