@@ -10,9 +10,9 @@ const bcrypt = require('bcrypt');
 //pageNotFound
 const pageNotFound = async (req, res) => {
   try {
-    res.render('page-404');
+    res.render('pageNotFound');
   } catch (error) {
-    res.redirect('/pageNotFound');
+    res.status(500).send('server error');
   }
 };
 

@@ -1,42 +1,67 @@
 const Product = require('../../models/productSchema');
-const Category =require('../../models/categorySchema');
-const User =require('../../models/userSchema');
+const { calculatePrice } = require('../../utils/priceCalculator');
 
+const productDetails = async (req, res) => {
+  try {
+    const productId = req.query.id;
+    const product = await Product.findById(productId).populate('category');
 
-
-
-const productDetails = async (req,res)=>{
-    try {
-        
-        const userId= req.session.user;
-        const isLoggedIn = req.session && req.session.user; 
-        const userData = await User.findById(userId);
-        const productId = req.query.id;
-        const product = await Product.findById(productId).populate('category')
-        const findCategory =product.category;
-        res.render("product-details", { product, isLoggedIn })
-
-    } catch (error) {
-        res.redirect('/page-404')
+    if (!product) {
+      return res.status(404).redirect('/pageNotFound');
     }
-}
 
+    // Calculate price with any applicable offers
+    const priceDetails = await calculatePrice(product, product.category);
 
+    // Add offer details to the product object
+    const productWithOffer = {
+      ...product.toObject(),
+      finalPrice: priceDetails.finalPrice,
+      totalDiscount: priceDetails.totalDiscount,
+      offer: priceDetails.offer,
+      regularPrice: product.regularPrice,
+    };
+
+    res.render('product-details', {
+      product: productWithOffer,
+    });
+  } catch (error) {
+    console.error('Error in product details:', error);
+    res.status(500).redirect('/pageNotFound');
+  }
+};
+
+// Add the getPrice function
 const getPrice = async (req, res) => {
-    try {
-        const product = await Product.findById(req.params.id);
-        if (!product) return res.status(404).send('Product not found');
-        res.render('product', { product });
-    } catch (error) {
-        res.status(500).send('Server Error');
+  try {
+    const { productId, size } = req.body;
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
     }
-}
 
+    // Calculate price with any applicable offers
+    const priceDetails = await calculatePrice(product, product.category);
 
+    // Apply size-based pricing if needed
+    let finalPrice = priceDetails.finalPrice;
+    if (size === 'L' || size === 'XL') {
+      finalPrice = Math.round(finalPrice + 0.1 * product.regularPrice);
+    }
 
+    res.json({
+      success: true,
+      price: finalPrice,
+      offer: priceDetails.offer,
+    });
+  } catch (error) {
+    console.error('Error getting price:', error);
+    res.status(500).json({ error: 'Failed to get price' });
+  }
+};
 
 module.exports = {
-    productDetails,
-    getPrice,
-
-}
+  productDetails,
+  getPrice, // Export the getPrice function
+};

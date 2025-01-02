@@ -212,13 +212,46 @@
         <div class="bg-white rounded-lg shadow-md p-6">
           <h2 class="text-xl font-semibold mb-4 text-gray-800">Payment Method</h2>
           <div class="space-y-4">
-            <label class="flex items-center">
-              <input type="radio" name="payment" value="wallet" class="mr-3">
-              <span class="flex items-center">
-                <i class="fas fa-wallet text-purple-500 mr-2"></i> Wallet
-              </span>
-            </label>
+            <!-- Wallet Option -->
+            <div class="border rounded-lg p-3 space-y-2">
+              <!-- Top row with radio and title -->
+              <label class="flex items-center">
+                <input type="radio" 
+                       name="payment" 
+                       value="wallet" 
+                       class="mr-3"
+                       <%= !isWalletSufficient ? 'disabled' : '' %>>
+                <div class="flex items-center">
+                  <i class="fas fa-wallet text-purple-500 mr-2"></i>
+                  <span class="font-medium">Pay with Wallet</span>
+                </div>
+              </label>
 
+              <!-- Bottom row with balance info -->
+              <div class="ml-6 flex justify-between items-center">
+                <div>
+                  <span class="text-sm <%= walletBalance >= finalAmount ? 'text-green-600' : 'text-red-600' %>">
+                    Available Balance: ₹<%= walletBalance %>
+                  </span>
+                  <% if (walletBalance >= finalAmount) { %>
+                    <span class="text-xs text-green-600 ml-2">
+                      (Sufficient for this order)
+                    </span>
+                  <% } else { %>
+                    <div class="text-xs text-red-500">
+                      Insufficient balance (Required: ₹<%= finalAmount %>)
+                    </div>
+                  <% } %>
+                </div>
+                <% if (!isWalletSufficient) { %>
+                  <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
+                    Add ₹<%= finalAmount - walletBalance %> more
+                  </span>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Other payment options remain the same -->
             <label class="flex items-center">
               <input type="radio" name="payment" value="Razorpay" class="mr-3">
               <span class="flex items-center">
@@ -240,7 +273,7 @@
 
         <!-- Place Order Button with enhanced styling -->
         <form action="/create-order" method="POST">
-          <button type="submit" id="order-button" onclick="placeOrder()" 
+          <button type="submit" id="order-button" 
             class="w-full bg-yellow-500 hover:bg-yellow-600 text-white text-lg font-semibold py-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-[1.02]">
             Place Order
           </button>
@@ -293,7 +326,7 @@
           </div>
           <div class="flex justify-between text-sm text-gray-600">
             <p>Coupon Discount:</p>
-            <p id="couponDiscount">-0</p>
+            <p id="couponDiscount">-₹<%= couponDiscount %></p>
           </div>
           
           
@@ -630,7 +663,6 @@
 
         if (!address) throw new Error('Invalid address selection');
 
-
          // Validate phone number
          const phoneNumberElement = document.querySelector('#phoneNumberDisplay');
          if (!phoneNumberElement) throw new Error('Phone number not found');
@@ -640,7 +672,6 @@
          const paymentMethodInput = document.querySelector('input[name="payment"]:checked');
          if (!paymentMethodInput) throw new Error('Please select a payment method');
          const paymentMethod = paymentMethodInput.value;
-
 
          // Get the final amount
          const finalAmount = document.getElementById('totalAmount').textContent.replace('₹', '').trim();
@@ -762,24 +793,30 @@
              console.error('Cash on Delivery error:', error);
              showNotification(error.message || 'Failed to create Cash on Delivery order', 'bg-red-500');
            }
-         } else {
-           // Handle other payment methods (COD, Wallet) with existing logic
-           const orderResponse = await fetch('/create-order', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({
-               phoneNumber,
-               finalAmount,
-               address,
-               paymentMethod
-             })
-           });
+         } else if (paymentMethod === 'wallet') {
+           try {
+             const orderResponse = await fetch('/create-order', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({
+                 phoneNumber,
+                 finalAmount,
+                 address,
+                 paymentMethod: 'Wallet'
+               })
+             });
 
-           if (orderResponse.ok) {
-             showOrderSuccess();
-             clearCart();
-           } else {
-             throw new Error('Failed to create order');
+             const result = await orderResponse.json();
+
+             if (result.success) {
+               showOrderSuccess();
+               await clearCart();
+             } else {
+               throw new Error(result.message || 'Insufficient wallet balance');
+             }
+           } catch (error) {
+             console.error('Wallet payment error:', error);
+             showNotification(error.message || 'Failed to process wallet payment', 'bg-red-500');
            }
          }
       } catch (error) {

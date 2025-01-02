@@ -109,10 +109,10 @@
     <!-- Right Section: Product Details -->
     <div class="p-6 flex flex-col justify-between">
       <!-- Product Title -->
-      <h1 class="text-4xl font-extrabold text-gray-900 "><%= product.productName %></h1>
+      <h1 class="text-4xl font-extrabold text-gray-900 mb-2 "><%= product.productName %></h1>
 
       <!-- Rating -->
-      <div class="flex items-center space-x-2 text-yellow-400 ">
+      <div class="flex items-center space-x-2 text-yellow-400  mb-2">
         <div class="flex space-x-1">
           <i class="fas fa-star"></i>
           <i class="fas fa-star"></i>
@@ -129,11 +129,21 @@
       <div class="mb-2">
         <p class="text-lg font-semibold text-gray-500 line-through">₹<%= product.regularPrice %></p>
         <div class="flex items-center space-x-2">
-          <p class="text-2xl font-semibold text-blue-600">₹<%= product.salePrice %></p>
+          <p class="text-2xl font-semibold text-blue-600">₹<%= product.finalPrice %></p>
           <span class="text-sm font-medium text-green-600">
-            <%= Math.round((product.regularPrice - product.salePrice) / product.regularPrice * 100) %>% OFF
+            <%= Math.round((product.regularPrice - product.finalPrice) / product.regularPrice * 100) %>% OFF
           </span>
         </div>
+        
+        <% if (product.offer) { %>
+            <div class="mt-2 p-2 bg-yellow-50 rounded-lg border border-yellow-200">
+                <p class="text-sm text-yellow-800">
+                    <span class="font-semibold">Special Offer:</span> 
+                    <%= product.offer.percentage %>% off 
+                    on <%= product.offer.offerType.toLowerCase() %>
+                </p>
+            </div>
+        <% } %>
       </div>
       
       <!-- Size Selection -->
@@ -151,7 +161,7 @@
             class="size-btn px-4 py-2 w-12 h-12 text-lg font-medium rounded-full border transition-all duration-300 ease-in-out 
               <% if (isDisabled) { %> bg-gray-200 text-gray-500 border-gray-300 cursor-not-allowed 
               <% } else { %> bg-white text-gray-800 border-gray-300 hover:border-gray-400 hover:bg-gray-100 <% } %>"
-            <% if (!isDisabled) { %> data-size="<%= size %>" data-saleprice="<%= product.salePrice %>" data-regularprice="<%= product.regularPrice %>" <% } %>
+            <% if (!isDisabled) { %> data-size="<%= size %>" data-saleprice="<%= product.salePrice %>" <% } %>
             <% if (isDisabled) { %> disabled <% } %>
           >
             <%= size %>
@@ -389,90 +399,87 @@ const sizeButtons = document.querySelectorAll('.size-btn');
 // Update size selection when a size button is clicked
 sizeButtons.forEach(button => {
   button.addEventListener('click', () => {
-    selectedSize = button.getAttribute('data-size');
+    // Remove selected class from all buttons
+    sizeButtons.forEach(btn => btn.classList.remove('selected'));
+    // Add selected class to clicked button
+    button.classList.add('selected');
 
-    // Highlight the selected button
-    sizeButtons.forEach(btn => btn.classList.remove('border-blue-500', 'bg-blue-100'));
-    button.classList.add('border-blue-500', 'bg-blue-100');
+    // Your existing size selection code remains unchanged
+    selectedSize = button.getAttribute('data-size');
   });
 });
-document.getElementById('addToCartButton').addEventListener('click', function() {
-  if (!selectedSize) {
-    Swal.fire({
-      title: "Don't forget to pick your size before adding this to your cart.",
-      position: 'top-right',  // Position at the top-right (centered horizontally)
-      toast: true,  // Makes it behave like a toast
-      showConfirmButton: false,  // Hides the "OK" button
-      timer: 3000,  // Duration in milliseconds before it hides
-      timerProgressBar: true,  // Shows a progress bar during the timer
-      customClass: {
-        popup: 'custom-toast-warning' // Custom class for warning toast
-      },
-      background: '#f8d7da',  // Light red background for warning
-      color: '#721c24',  // Dark red text color
-    });
-    return;
-  }
-
-  const productId = this.dataset.productId; 
-  const quantity = 1; 
-
-  fetch('/addToCart', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ productId, quantity, selectedSize }),
-  })
-  .then(response => {
-    if (response.status === 400) {
-      return response.text().then(message => {
+document.getElementById('addToCartButton').addEventListener('click', async function() {
+    if (!selectedSize) {
         Swal.fire({
-          title: message,
-          position: 'top-right',  // Position at the top-right (centered horizontally)
-          showConfirmButton: false,
-          timer: 3000,
-          toast: true,
-          customClass: {
-            popup: 'custom-toast-error'  // Apply custom class for error message
-          },
-          background: '#dc3545',  // Red background for error
-          color: '#ffffff'  // White text color
+            title: "Please select a size",
+            icon: "warning",
+            toast: true,
+            position: 'top-right',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
         });
-      });
-    } else {
-      return response.text().then(message => {
-        Swal.fire({
-          title: message,
-          position: 'top-right',  // Position at the top-right (centered horizontally)
-          showConfirmButton: false,
-          timer: 3000,
-          toast: true,
-          customClass: {
-            popup: 'custom-toast-success'  // Apply custom class for success message
-          },
-          background: '#28a745',  // Green background for success
-          color: '#ffffff'  // White text color
-        });
-      });
+        return;
     }
-  })
-  .catch(error => {
-    console.error("Error adding to cart:", error);
-    Swal.fire({
-      title: 'Error!',
-      text: 'Failed to add the product to the cart. Please try again.',
-      position: 'top-right',  // Position at the top-right (centered horizontally)
-      showConfirmButton: false,
-      timer: 3000,
-      toast: true,
-      customClass: {
-        popup: 'custom-toast-error'  // Apply custom class for error message
-      },
-      background: '#dc3545',  // Red background for error
-      color: '#ffffff'  // White text color
-    });
-  });
+
+    const productId = this.dataset.productId;
+    const quantity = 1;
+
+    try {
+        const response = await fetch('/addToCart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId, quantity, selectedSize }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            Swal.fire({
+                title: data.message, 
+                toast: true,
+                position: 'top-right',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                background: '#28a745',
+                color: '#ffffff'
+            });
+
+            // Update cart count if needed
+            const cartCountElement = document.querySelector('.cart-count');
+            if (cartCountElement && data.cartCount) {
+                cartCountElement.textContent = data.cartCount;
+            }
+        } else {
+            Swal.fire({
+                title: data.message,  // Show error message
+                icon: "error",
+                toast: true,
+                position: 'top-right',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                background: '#dc3545',
+                color: '#ffffff'
+            });
+        }
+    } catch (error) {
+        console.error("Error adding to cart:", error);
+        Swal.fire({
+            title: 'Failed to add the product to cart',
+            icon: "error",
+            toast: true,
+            position: 'top-right',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            background: '#dc3545',
+            color: '#ffffff'
+        });
+    }
 });
 
 
@@ -484,22 +491,9 @@ const priceElement = document.querySelector('.text-2xl.font-semibold.text-blue-6
 
 sizeButtons.forEach(button => {
   button.addEventListener('click', () => {
-    // Get size, sale price, and regular price from the data attributes
+    // Get size and sale price from the data attributes
     const selectedSize = button.getAttribute('data-size');
-    const salePrice = parseFloat(button.getAttribute('data-saleprice'));
-    const regularPrice = parseFloat(button.getAttribute('data-regularprice'));
-
-    // Calculate the price based on the selected size
-    let finalPrice;
-if (selectedSize === 'L' || selectedSize === 'XL') {
-    finalPrice = Math.round(salePrice + 0.1 * regularPrice); // Add 10% of regular price
-} else {
-    finalPrice = salePrice; // Use sale price for S and M
-}
-
-// Update the price element without decimals
-priceElement.textContent = `₹${finalPrice.toFixed(0)}`; // Ensures no decimals
-
+  
 
     // Update the yellow border for the selected size
     sizeButtons.forEach(btn => btn.classList.remove('border-yellow-500')); // Remove yellow border from all
@@ -615,6 +609,41 @@ document.addEventListener('DOMContentLoaded', async function() {
       wishlistMessage.classList.add('hidden');
     }, 3000);
   }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sizeButtons = document.querySelectorAll('.size-btn');
+    const priceElement = document.querySelector('.product-price');
+    
+    // Store the offer price when page loads
+    const offerPrice = parseFloat(priceElement.getAttribute('data-offer-price'));
+    const regularPrice = parseFloat(priceElement.getAttribute('data-regular-price'));
+    
+    // Initialize the display with offer price
+    priceElement.textContent = `₹${offerPrice}`;
+    
+    sizeButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+            // Remove selected class from all buttons
+            sizeButtons.forEach(btn => btn.classList.remove('border-yellow-500'));
+            
+            // Add selected class to clicked button
+            button.classList.add('border-yellow-500');
+            
+            // Update selected size
+            selectedSize = button.getAttribute('data-size');
+            
+            // Always maintain the offer price
+            priceElement.textContent = `₹${offerPrice}`;
+            
+            // Update any other price-related elements if they exist
+            const discountElement = document.querySelector('.discount-percentage');
+            if (discountElement) {
+                const discountPercentage = Math.round((regularPrice - offerPrice) / regularPrice * 100);
+                discountElement.textContent = `${discountPercentage}% OFF`;
+            }
+        });
+    });
 });
 
 </script> 

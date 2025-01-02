@@ -92,6 +92,14 @@ const orderSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  appliedCoupon: {
+    type: Schema.Types.ObjectId,
+    ref: 'Coupon',
+  },
+  couponDiscount: {
+    type: Number,
+    default: 0,
+  },
   paymentStatus: {
     type: String,
     enum: ['Pending', 'Completed', 'Failed'],

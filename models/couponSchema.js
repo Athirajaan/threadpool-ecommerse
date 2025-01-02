@@ -19,15 +19,18 @@ const couponSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: function (value) {
-        return value > this.createdOn;
+        if (this.isNew) {
+          return value > this.createdOn || value > new Date();
+        }
+        return value > new Date();
       },
-      message: 'Expiry date must be after creation date',
+      message: 'Expiry date must be a future date',
     },
   },
   couponType: {
     type: String,
     required: true,
-    enum: ['percentage', 'fixed,'],
+    enum: ['percentage', 'fixed'],
   },
   minPurchase: {
     type: Number,
@@ -47,6 +50,12 @@ const couponSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true,
+  },
+  usagePerUser: {
+    type: Number,
+    required: true,
+    min: [1, 'Usage per user must be at least 1'],
+    default: 1,
   },
   userId: [
     {

@@ -1,22 +1,34 @@
 <%- include('../partials/admin/header') %>  
 <style>
     .hidden {
-  display: none;
-}
-
+        display: none;
+    }
+    
+    /* Add these new styles */
+    .modal-open {
+        overflow: hidden;
+    }
+    
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(1px);
+        z-index: 9999;
+    }
 </style>
 <div class="container mx-auto p-4">
-
     <!-- Page Header -->
     <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow-md mb-1">
         <h1 class="text-xl font-semibold">Order Management</h1>
-        <button class="bg-yellow-500 hover:bg-yellow-600 text-black py-2 px-4 rounded-lg">
+        <!-- <button class="bg-yellow-500 hover:bg-yellow-600 text-black py-2 px-4 rounded-lg">
             Cancel/Return request
-        </button>
+        </button> -->
     </div>
 
     <!-- Orders Table -->
     <div class="bg-white p-4 rounded-lg shadow-md">
+        <!-- Single table header -->
         <table class="w-full table-auto border-collapse">
             <thead class="bg-gray-200">
                 <tr>
@@ -29,10 +41,27 @@
                 </tr>
             </thead>
             <tbody>
-              
-
-                <!-- Loop through orders using EJS -->
                 <% orders.forEach(order => { %>
+                    <!-- Order Header -->
+                    <tr class="bg-gray-50">
+                        <td colspan="6" class="px-4 py-2">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-semibold">Order ID: <%= order.orderId %></span>
+                                    <button 
+                                        class="bg-blue-100 text-blue-600 hover:bg-blue-200 px-2 py-1 rounded-md text-sm flex items-center gap-1"
+                                        onclick="showOrderDetails('<%= JSON.stringify(order) %>')"
+                                    >
+                                        <i class="fas fa-info-circle"></i>
+                                        Details
+                                    </button>
+                                </div>
+                              
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Order Items -->
                     <% order.items.forEach(item => { %>
                         <tr class="border-b">
                             <td class="px-4 py-2 flex items-center">
@@ -43,46 +72,39 @@
                             <td class="px-4 py-2"><%= item.size %> / <%= item.quantity %></td> 
                             <td class="px-4 py-2"><%= order.paymentMethod %></td>
                             <td class="px-4 py-2">
-                              <%= item.status %>
-                              <% if (item.status !== 'Delivered') { %>
-                                  <!-- Edit Icon -->
-                                  <i
-                                      class="fa fa-edit text-blue-500 cursor-pointer ml-2"
-                                      onclick="showStatusChange('<%= order._id %>', '<%= item.productId %>', '<%= item.size %>')"
-                                  ></i>
-                          
-                                  <!-- Hidden form for status change -->
-                                  <form id="status-form-<%= order._id %>-<%= item.productId %>" 
+                                <%= item.status %>
+                                <% if (item.status !== 'Delivered') { %>
+                                    <i class="fa fa-edit text-blue-500 cursor-pointer ml-2"
+                                        onclick="showStatusChange('<%= order._id %>', '<%= item.productId %>', '<%= item.size %>')"></i>
+                                    
+                                    <form id="status-form-<%= order._id %>-<%= item.productId %>" 
                                         action="/admin/update-status" 
                                         method="POST" 
                                         class="hidden mt-2">
-                                      <input type="hidden" name="orderId" value="<%= order._id %>">
-                                      <input type="hidden" name="productId" value="<%= item.productId %>">
-                                      <input type="hidden" name="size" value="<%= item.size %>">
-                                      <select name="status" class="p-1 border rounded">
-                                          <% if (item.status === 'Pending') { %>
-                                              <option value="Shipped">Shipped</option>
-                                              <option value="out for delivery">Out for Delivery</option>
-                                              <option value="Delivered">Delivered</option>
-                                          <% } else if (item.status === 'Shipped') { %>
-                                              <option value="out for delivery">Out for Delivery</option>
-                                              <option value="Delivered">Delivered</option>
-                                          <% } else if (item.status === 'out for delivery') { %>
-                                              <option value="Delivered">Delivered</option>
-                                          <% } %>
-                                      </select>
-                                      <button type="submit" class="ml-2 px-4 py-2 bg-blue-500 text-white rounded">Update</button>
-                                  </form>
-                              <% } else { %>
-                                  <!-- Status can't be changed -->
-                              <% } %>
-                          </td>
-                          
-                          
-                            
-                            <td class="px-4 py-2"><%= item.price %></td>
+                                        <input type="hidden" name="orderId" value="<%= order._id %>">
+                                        <input type="hidden" name="productId" value="<%= item.productId %>">
+                                        <input type="hidden" name="size" value="<%= item.size %>">
+                                        <select name="status" class="p-1 border rounded">
+                                            <% if (item.status === 'Pending') { %>
+                                                <option value="Shipped">Shipped</option>
+                                                <option value="out for delivery">Out for Delivery</option>
+                                                <option value="Delivered">Delivered</option>
+                                            <% } else if (item.status === 'Shipped') { %>
+                                                <option value="out for delivery">Out for Delivery</option>
+                                                <option value="Delivered">Delivered</option>
+                                            <% } else if (item.status === 'out for delivery') { %>
+                                                <option value="Delivered">Delivered</option>
+                                            <% } %>
+                                        </select>
+                                        <button type="submit" class="ml-2 px-4 py-2 bg-blue-500 text-white rounded">Update</button>
+                                    </form>
+                                <% } %>
+                            </td>
+                            <td class="px-4 py-2">₹<%= item.price %></td>
                         </tr>
                     <% }); %>
+                    <!-- Spacer row between orders -->
+                    <tr class="h-4"><td colspan="6"></td></tr>
                 <% }); %>
             </tbody>
         </table>
@@ -115,24 +137,138 @@
       </div>
       
 </div>
+
+<!-- Add this modal structure at the end of your body but before scripts -->
+<div id="orderDetailsModal" class="modal-overlay hidden">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="text-xl font-semibold text-gray-900" id="modalOrderId"></h3>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-500">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="mt-4 space-y-4">
+            <!-- Customer Details -->
+            <div class="border-b pb-4">
+                <h4 class="font-medium text-gray-800 mb-2">Customer Details</h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <p>Name: <span id="modalCustomerName"></span></p>
+                    <p>Email: <span id="modalCustomerEmail"></span></p>
+                    <p>Phone: <span id="modalPhone"></span></p>
+                    <p>Address: <span id="modalAddress"></span></p>
+                </div>
+            </div>
+
+            <!-- Payment Details -->
+            <div class="border-b pb-4">
+                <h4 class="font-medium text-gray-800 mb-2">Payment Information</h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <p>Method: <span id="modalPaymentMethod"></span></p>
+                    <p>Status: <span id="modalPaymentStatus"></span></p>
+                    <p>Total Amount: ₹<span id="modalAmount"></span></p>
+                    <p>Coupon Applied: <span id="modalCoupon"></span></p>
+                    <p>Coupon Discount: ₹<span id="modalDiscount"></span></p>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div>
+                <h4 class="font-medium text-gray-800 mb-2">Ordered Items</h4>
+                <div id="modalItems" class="space-y-2">
+                    <!-- Items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Order Timeline -->
+            <div class="border-t pt-4">
+                <h4 class="font-medium text-gray-800 mb-2">Order Timeline</h4>
+                <div class="text-sm">
+                    <p>Order Date: <span id="modalOrderDate"></span></p>
+                    <p>Last Updated: <span id="modalLastUpdate"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update your script section -->
 <script>
-   function showStatusChange(orderId, productId, size) {
-    const formId = `status-form-${orderId}-${productId}`;
-    const form = document.getElementById(formId);
-    
-    console.log('Order ID:', orderId);
-    console.log('Product ID:', productId);
-    console.log('Size:', size);
-    console.log('Form:', form);
-    
-    if (form) {
-        if (form.classList.contains('hidden')) {
-            form.classList.remove('hidden'); // Show the form
-        } else {
-            form.classList.add('hidden'); // Hide the form
+    function showStatusChange(orderId, productId, size) {
+        const formId = `status-form-${orderId}-${productId}`;
+        const form = document.getElementById(formId);
+        
+        if (form) {
+            if (form.classList.contains('hidden')) {
+                form.classList.remove('hidden');
+            } else {
+                form.classList.add('hidden');
+            }
         }
     }
-}
+
+    function showOrderDetails(orderData) {
+        const order = JSON.parse(orderData);
+        const modal = document.getElementById('orderDetailsModal');
+        
+        // Populate modal with order details
+        document.getElementById('modalOrderId').textContent = `Order ${order.orderId}`;
+        
+        // Customer Details
+        document.getElementById('modalPhone').textContent = order.customer.phone;
+        document.getElementById('modalCustomerName').textContent = order.customer.name;
+        document.getElementById('modalCustomerEmail').textContent = order.customer.email;
+        document.getElementById('modalAddress').textContent = order.address;
+        
+        // Payment Details
+        document.getElementById('modalPaymentMethod').textContent = order.paymentMethod;
+        document.getElementById('modalPaymentStatus').textContent = order.paymentStatus;
+        document.getElementById('modalAmount').textContent = order.finalAmount;
+        document.getElementById('modalCoupon').textContent = order.couponApplied ? 'Yes' : 'No';
+        document.getElementById('modalDiscount').textContent = order.couponDiscount || '0';
+        
+        // Format dates
+        const orderDate = new Date(order.createdAt).toLocaleString();
+        const updateDate = new Date(order.updatedAt).toLocaleString();
+        document.getElementById('modalOrderDate').textContent = orderDate;
+        document.getElementById('modalLastUpdate').textContent = updateDate;
+
+        // Populate items with images
+        const itemsContainer = document.getElementById('modalItems');
+        itemsContainer.innerHTML = order.items.map(item => `
+            <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <div class="flex items-center gap-4">
+                    <img src="${item.productImage}" alt="${item.productName}" 
+                         class="w-16 h-16 object-cover rounded">
+                    <div>
+                        <p class="font-medium">${item.productName}</p>
+                        <p class="text-sm text-gray-600">Size: ${item.size} | Quantity: ${item.quantity}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="font-medium">₹${item.price}</p>
+                    <p class="text-sm ${item.status === 'Delivered' ? 'text-green-600' : 'text-blue-600'}">${item.status}</p>
+                </div>
+            </div>
+        `).join('');
+
+        // Show modal
+        modal.classList.remove('hidden');
+        document.body.classList.add('modal-open');
+    }
+
+    function closeModal() {
+        document.getElementById('orderDetailsModal').classList.add('hidden');
+        document.body.classList.remove('modal-open');
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('orderDetailsModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
 </script>
 
 <%- include('../partials/admin/footer') %> 

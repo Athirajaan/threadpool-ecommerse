@@ -1,13 +1,456 @@
-<%- include('../partials/admin/header') %>  
- <!-- Include header from partials -->
+<%- include('../partials/admin/header') %>
 
-      <!-- Main Content Area -->
-       <main class="flex-1 p-8 ml-0 lg:ml-64 transition-all duration-300">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h1 class="text-3xl font-bold mb-4">Welcome to the Admin Dashboard</h1>
-            <p class="text-gray-700">Manage your website's products, orders, and other settings from this admin panel.</p>
+<div class="dashboard-wrapper">
+    <div class="main-content p-0">
+        <!-- Top Stats Strip -->
+        <div class="stats-strip mb-4">
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="stat-value"><%= totalSales %></h3>
+                    <p class="stat-label">Total Orders</p>
+                    <span class="trend positive">↑ 12%</span>
+                </div>
+            </div>
+
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="stat-value">₹<%= totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 }) %></h3>
+                    <p class="stat-label">Revenue</p>
+                    <span class="trend positive">↑ 8%</span>
+                </div>
+            </div>
+
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="stat-value">₹<%= totalDiscount.toLocaleString('en-IN', { maximumFractionDigits: 2 }) %></h3>
+                    <p class="stat-label">Discounts</p>
+                    <span class="trend negative">↓ 5%</span>
+                </div>
+            </div>
+
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="stat-value">₹<%= (totalAmount/totalSales).toLocaleString('en-IN', { maximumFractionDigits: 2 }) %></h3>
+                    <p class="stat-label">Avg. Order</p>
+                    <span class="trend positive">↑ 3%</span>
+                </div>
+            </div>
         </div>
-    </main>
+
+        <!-- Orders Table Section -->
+        <div class="orders-section">
+            <div class="orders-header">
+                <div class="header-left">
+                    <h2>Recent Orders</h2>
+                    <div class="time-filters flex gap-3 mt-2">
+                        <button onclick="filterOrders('today')" class="filter-btn">
+                            Today
+                        </button>
+                        <button onclick="filterOrders('week')" class="filter-btn">
+                            This Week
+                        </button>
+                        <button onclick="filterOrders('month')" class="filter-btn">
+                            This Month
+                        </button>
+                        <button onclick="filterOrders('all')" class="filter-btn active">
+                            All Orders
+                        </button>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <a href="/admin/export-pdf" class="btn-export pdf">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </a>
+                    <a href="/admin/export-excel" class="btn-export excel">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </a>
+                </div>
+            </div>
+
+            <div class="orders-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Products</th>
+                            <th>Amount</th>
+                            <th>Discount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td class="order-id">#<%= order.orderId %></td>
+                                <td>
+                                    <div class="customer-info">
+                                        <div class="avatar"><%= order.user.name.charAt(0) %></div>
+                                        <div class="details">
+                                            <div class="name"><%= order.user.name %></div>
+                                            <div class="phone"><%= order.phoneNumber %></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="products-list">
+                                        <% order.orderedItems.forEach(item => { %>
+                                            <div class="product">
+                                                <%= item.product.productName %> 
+                                                <span class="meta">(<%= item.size %> | <%= item.quantity %>)</span>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                </td>
+                                <td class="amount">₹<%= order.finalAmount.toFixed(2) %></td>
+                                <td class="discount">-₹<%= ((order.discount || 0) + (order.couponDiscount || 0)).toFixed(2) %></td>
+                                <td>
+                                    <div class="date">
+                                        <div><%= new Date(order.createdOn).toLocaleDateString() %></div>
+                                        <div class="time"><%= new Date(order.createdOn).toLocaleTimeString() %></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <% const itemStatus = order.orderedItems[0]?.status || 'Pending' %>
+                                    <span class="status <%= itemStatus.toLowerCase() %>"><%= itemStatus %></span>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
- 
-<%- include('../partials/admin/footer') %> 
+
+<style>
+/* Modern Dashboard Styles */
+.dashboard-wrapper {
+    min-height: 100vh;
+    background: #f0f2f5;
+    margin: 0;
+    padding: 0;
+}
+
+.main-content {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Stats Strip */
+.stats-strip {
+    display: flex;
+    background: linear-gradient(135deg, #2193b0, #6dd5ed);
+    padding: 2rem;
+    gap: 2rem;
+    color: white;
+}
+
+.stat-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+}
+
+.stat-details {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.stat-label {
+    margin: 0.25rem 0;
+    opacity: 0.9;
+}
+
+.trend {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.trend.positive { color: #4ade80; }
+.trend.negative { color: #f87171; }
+
+/* Orders Section */
+.orders-section {
+    background: white;
+    margin: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.header-left h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1f2937;
+}
+
+.search-container {
+    position: relative;
+    width: 300px;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.search-container i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+.btn-export {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-export.pdf {
+    background: #ef4444;
+    color: white;
+    margin-right: 1rem;
+}
+
+.btn-export.excel {
+    background: #22c55e;
+    color: white;
+}
+
+/* Table Styles */
+.orders-table {
+    padding: 1.5rem 2rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+}
+
+th {
+    text-align: left;
+    padding: 1rem;
+    color: #6b7280;
+    font-weight: 500;
+    background: #f9fafb;
+}
+
+td {
+    padding: 1rem;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+td:first-child { border-left: 1px solid #e5e7eb; border-radius: 0.5rem 0 0 0.5rem; }
+td:last-child { border-right: 1px solid #e5e7eb; border-radius: 0 0.5rem 0.5rem 0; }
+
+.customer-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.status {
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status.pending { background: #fff7ed; color: #f97316; }
+.status.delivered { background: #f0fdf4; color: #22c55e; }
+.status.cancelled { background: #fef2f2; color: #ef4444; }
+
+.products-list .product {
+    margin-bottom: 0.25rem;
+}
+
+.products-list .meta {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.amount { color: #059669; font-weight: 600; }
+.discount { color: #dc2626; font-weight: 600; }
+
+.date .time {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+@media (max-width: 1200px) {
+    .stats-strip {
+        flex-wrap: wrap;
+    }
+    
+    .stat-item {
+        flex: 1 1 calc(50% - 1rem);
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-strip {
+        padding: 1rem;
+    }
+    
+    .stat-item {
+        flex: 1 1 100%;
+    }
+    
+    .orders-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .header-left {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-container {
+        width: 100%;
+    }
+}
+
+.time-filters {
+    margin-top: 1rem;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    background: #e5e7eb;
+}
+
+.filter-btn.active {
+    background: #2193b0;
+    color: white;
+}
+</style>
+
+<script>
+function exportToPDF() {
+    alert('PDF export functionality will be implemented');
+}
+
+function exportToExcel() {
+    alert('Excel export functionality will be implemented');
+}
+
+async function filterOrders(period) {
+    try {
+        // Update active button state
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // Redirect to the filtered view
+        window.location.href = `/admin/filter-orders?period=${period}`;
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to filter orders');
+    }
+}
+
+// Add this to highlight the current active filter on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentPeriod = urlParams.get('period') || 'all';
+    
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.textContent.toLowerCase().includes(currentPeriod)) {
+            btn.classList.add('active');
+        }
+    });
+});
+</script>
+
+<%- include('../partials/admin/footer') %>

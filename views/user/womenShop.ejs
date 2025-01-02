@@ -137,14 +137,24 @@
               <!-- Product Info -->
               <div class="p-4">
                 <h3 class="text-lg font-medium text-gray-900 mb-2"><%= product.productName %></h3>
-                <div class="flex items-center justify-between">
-                  <div class="flex items-baseline">
-                    <span class="text-lg font-bold text-gray-900">₹<%= product.salePrice %></span>
-                    <span class="ml-2 text-sm text-gray-500 line-through">₹<%= product.regularPrice %></span>
-                  </div>
-                  <span class="text-sm font-medium text-green-600">
-                    <%= Math.round((product.regularPrice - product.salePrice) / product.regularPrice * 100) %>% OFF
-                  </span>
+                <div class="flex flex-col">
+                    <div class="flex items-baseline justify-between">
+                        <div class="flex items-baseline space-x-2">
+                            <span class="text-lg font-bold text-gray-900">₹<%= product.finalPrice %></span>
+                            <span class="text-sm text-gray-500 line-through">₹<%= product.regularPrice %></span>
+                        </div>
+                        <span class="text-sm font-medium text-green-600">
+                            <%= Math.round((product.regularPrice - product.finalPrice) / product.regularPrice * 100) %>% OFF
+                        </span>
+                    </div>
+                    
+                    <% if (product.offer) { %>
+                        <div class="mt-2">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                <%= product.offer.name %>: <%= product.offer.percentage %>% OFF
+                            </span>
+                        </div>
+                    <% } %>
                 </div>
               </div>
             </div>

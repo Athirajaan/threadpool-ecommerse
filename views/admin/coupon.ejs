@@ -1,5 +1,7 @@
 <%- include('../partials/admin/header') %>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container mx-auto px-4 py-8">
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Coupon Management</h1>
@@ -29,172 +31,74 @@
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Name
           </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Min Purchase
           </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Discount
           </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
-            Max Discount
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Usage 
           </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Expiry
           </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Edit
           </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Status
           </th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <!-- Dummy Data Row 1 -->
-        <tr>
-          <td
-            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-          >
-            WELCOME50
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            ₹1000
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹50</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            ₹500
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            01/05/2024
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            <button class="text-blue-600 hover:text-blue-900">
-              <svg
-                class="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                ></path>
-              </svg>
-            </button>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <button
-              class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
-            >
-              Active
-            </button>
-          </td>
-        </tr>
-
-        <!-- Dummy Data Row 2 -->
-        <tr>
-          <td
-            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-          >
-            SUMMER25
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            ₹500
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹25</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            ₹250
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            15/04/2024
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            <button class="text-blue-600 hover:text-blue-900">
-              <svg
-                class="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                ></path>
-              </svg>
-            </button>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <button
-              class="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800"
-            >
-              Inactive
-            </button>
-          </td>
-        </tr>
-
-        <!-- Dummy Data Row 3 -->
-        <tr>
-          <td
-            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-          >
-            SPECIAL75
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            ₹1500
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹75</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            ₹750
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            30/06/2024
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            <button class="text-blue-600 hover:text-blue-900">
-              <svg
-                class="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                ></path>
-              </svg>
-            </button>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <button
-              class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
-            >
-              Active
-            </button>
-          </td>
-        </tr>
+        <% if (coupons && coupons.length > 0) { %>
+          <% coupons.forEach(coupon => { %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <%= coupon.name %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                ₹<%= coupon.minPurchase %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= coupon.couponType === 'percentage' ? `${coupon.discountPrice}%` : `₹${coupon.discountPrice}` %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= coupon.usagePerUser %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= new Date(coupon.expireOn).toLocaleDateString('en-IN') %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <button class="text-blue-600 hover:text-blue-900" onclick="editCoupon('<%= coupon._id %>')">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                    </path>
+                  </svg>
+                </button>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <button 
+                    onclick="toggleCouponStatus('<%= coupon._id %>', <%= coupon.isActive %>)"
+                    class="px-3 py-1 rounded-full text-sm font-medium <%= coupon.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>"
+                >
+                    <%= coupon.isActive ? 'Active' : 'Inactive' %>
+                </button>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+              No coupons found
+            </td>
+          </tr>
+        <% } %>
       </tbody>
     </table>
   </div>
@@ -205,137 +109,246 @@
     class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50"
   >
     <div
-      class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+      class="relative top-10 mx-auto p-8 border w-[1000px] shadow-2xl rounded-xl bg-white"
     >
-      <div class="mt-3">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Add New Coupon</h3>
-        <form id="addCouponForm" onsubmit="submitCoupon(event)">
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700"
-              >Coupon Name</label
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center mb-8">
+        <div class="flex items-center space-x-3">
+          <div class="bg-blue-100 p-2 rounded-lg">
+            <svg
+              class="w-6 h-6 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-            <input
-              type="text"
-              name="name"
-              id="couponName"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              onkeyup="validateCouponName()"
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
+              />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900">Add New Coupon</h3>
+        </div>
+        <button
+          onclick="closeAddCouponModal()"
+          class="text-gray-400 hover:text-gray-500"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
             />
-            <div id="nameError" class="text-red-500 text-xs mt-1 hidden"></div>
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700"
-              >Minimum Purchase Amount</label
-            >
-            <input
-              type="number"
-              name="minimumPrice"
-              id="minimumPrice"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              onkeyup="validateMinimumPrice()"
-            />
-            <div
-              id="minPriceError"
-              class="text-red-500 text-xs mt-1 hidden"
-            ></div>
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700"
-              >Discount Type</label
-            >
-            <select
-              name="discountType"
-              id="discountType"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              onchange="validateDiscountAmount()"
-            >
-              <option value="">Select Discount Type</option>
-              <option value="fixed">Fixed Amount</option>
-              <option value="percentage">Percentage</option>
-            </select>
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700"
-              >Discount Amount</label
-            >
-            <input
-              type="number"
-              name="offerPrice"
-              id="discountAmount"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              onkeyup="validateDiscountAmount()"
-            />
-            <div
-              id="discountError"
-              class="text-red-500 text-xs mt-1 hidden"
-            ></div>
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700"
-              >Maximum Discount</label
-            >
-            <input
-              type="number"
-              name="maxDiscount"
-              id="maxDiscount"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              onkeyup="validateMaxDiscount()"
-            />
-            <div
-              id="maxDiscountError"
-              class="text-red-500 text-xs mt-1 hidden"
-            ></div>
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700"
-              >Expiry Date</label
-            >
-            <input
-              type="date"
-              name="expireOn"
-              id="expiryDate"
-              required
-              min="<%= new Date().toISOString().split('T')[0] %>"
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              onchange="validateExpiryDate()"
-            />
-            <div
-              id="expiryError"
-              class="text-red-500 text-xs mt-1 hidden"
-            ></div>
-          </div>
-
-          <div class="flex justify-end gap-3">
-            <button
-              type="button"
-              onclick="closeAddCouponModal()"
-              class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              id="submitButton"
-              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Add Coupon
-            </button>
-          </div>
-        </form>
+          </svg>
+        </button>
       </div>
+
+
+
+
+      <!-- Modal Content -->
+      <form id="addCouponForm" onsubmit="submitCoupon(event)">
+        <div class="grid grid-cols-2 gap-x-12 gap-y-6">
+          <!-- Left Column -->
+          <div class="bg-gray-50 p-6 rounded-xl">
+            <h4 class="text-lg font-semibold text-gray-700 mb-6">
+              Basic Details
+            </h4>
+
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Coupon Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="couponName"
+                  required
+                  placeholder="Enter coupon name"
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  onkeyup="validateCouponName()"
+                />
+                <div
+                  id="nameError"
+                  class="text-red-500 text-xs mt-1 hidden"
+                ></div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Minimum Purchase Amount
+                </label>
+                <div class="relative">
+                  <span
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500"
+                    >₹</span
+                  >
+                  <input
+                    type="number"
+                    name="minimumPrice"
+                    id="minimumPrice"
+                    required
+                    placeholder="0.00"
+                    class="w-full pl-8 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    onkeyup="validateMinimumPrice()"
+                  />
+                </div>
+                <div
+                  id="minPriceError"
+                  class="text-red-500 text-xs mt-1 hidden"
+                ></div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Discount Type
+                </label>
+                <select
+                  name="discountType"
+                  id="discountType"
+                  required
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  onchange="updateDiscountSymbol(); validateDiscountAmount()"
+                >
+                  <option value="">Select type</option>
+                  <option value="fixed">Fixed Amount</option>
+                  <option value="percentage">Percentage</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Discount Amount
+                </label>
+                <div class="relative">
+                  <span
+                    id="discountSymbol"
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500"
+                    >₹</span
+                  >
+                  <input
+                    type="number"
+                    name="offerPrice"
+                    id="discountAmount"
+                    required
+                    placeholder="0.00"
+                    class="w-full pl-8 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    onkeyup="validateDiscountAmount()"
+                  />
+                </div>
+                <div
+                  id="discountError"
+                  class="text-red-500 text-xs mt-1 hidden"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="bg-gray-50 p-6 rounded-xl">
+            <h4 class="text-lg font-semibold text-gray-700 mb-6">
+              Additional Settings
+            </h4>
+
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Maximum Discount
+                </label>
+                <div class="relative">
+                  <span
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500"
+                    >₹</span
+                  >
+                  <input
+                    type="number"
+                    name="maxDiscount"
+                    id="maxDiscount"
+                    required
+                    placeholder="0.00"
+                    class="w-full pl-8 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    onkeyup="validateMaxDiscount()"
+                  />
+                </div>
+                <div
+                  id="maxDiscountError"
+                  class="text-red-500 text-xs mt-1 hidden"
+                ></div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Usage Per User
+                </label>
+                <input
+                  type="number"
+                  name="usagePerUser"
+                  id="usagePerUser"
+                  required
+                  placeholder="Enter usage limit"
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  onkeyup="validateUsagePerUser()"
+                />
+                <div
+                  id="usagePerUserError"
+                  class="text-red-500 text-xs mt-1 hidden"
+                ></div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Expiry Date
+                </label>
+                <input
+                  type="date"
+                  name="expireOn"
+                  id="expiryDate"
+                  required
+                  min="<%= new Date().toISOString().split('T')[0] %>"
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  onchange="validateExpiryDate()"
+                />
+                <div
+                  id="expiryError"
+                  class="text-red-500 text-xs mt-1 hidden"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Buttons -->
+        <div class="flex justify-end gap-4 mt-8 pt-6 border-t">
+          <button
+            type="button"
+            onclick="closeAddCouponModal()"
+            class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            id="submitButton"
+            class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Add Coupon
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
+
+
 
 <div
   id="successToast"
@@ -359,11 +372,14 @@
 
   function closeAddCouponModal() {
     document.getElementById('addCouponModal').classList.add('hidden');
-    // Reset form and error messages
     document.getElementById('addCouponForm').reset();
-    document
-      .querySelectorAll('.text-red-500')
-      .forEach((el) => el.classList.add('hidden'));
+    document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+    
+    document.querySelector('#addCouponModal h3').textContent = 'Add New Coupon';
+    document.querySelector('#submitButton').textContent = 'Add Coupon';
+    
+    isEditMode = false;
+    editCouponId = null;
   }
 
   function showError(elementId, message) {
@@ -376,6 +392,8 @@
     document.getElementById(elementId).classList.add('hidden');
   }
 
+
+  //validation function 
   function validateCouponName() {
     const nameInput = document.getElementById('couponName');
     const letterCount = (nameInput.value.match(/[a-zA-Z]/g) || []).length;
@@ -402,28 +420,43 @@
     return true;
   }
 
+  function updateDiscountSymbol() {
+    const discountType = document.getElementById('discountType').value;
+    const symbolSpan = document.getElementById('discountSymbol');
+    const input = document.getElementById('discountAmount');
+    
+    if (discountType === 'percentage') {
+        symbolSpan.textContent = '%';
+        symbolSpan.classList.remove('left-0', 'pl-3');
+        symbolSpan.classList.add('right-0', 'pr-3');
+        input.classList.remove('pl-8', 'pr-4');
+        input.classList.add('pl-4', 'pr-8');
+    } else {
+        symbolSpan.textContent = '₹';
+        symbolSpan.classList.remove('right-0', 'pr-3');
+        symbolSpan.classList.add('left-0', 'pl-3');
+        input.classList.remove('pl-4', 'pr-8');
+        input.classList.add('pl-8', 'pr-4');
+    }
+  }
+
   function validateDiscountAmount() {
     const discountType = document.getElementById('discountType').value;
-    const discountAmount = parseFloat(
-      document.getElementById('discountAmount').value
-    );
+    const discountAmount = parseFloat(document.getElementById('discountAmount').value);
     const minPrice = parseFloat(document.getElementById('minimumPrice').value);
 
     if (!discountAmount) return false;
 
     if (discountType === 'percentage') {
-      if (discountAmount > 80) {
-        showError('discountError', 'Percentage discount cannot exceed 80%');
-        return false;
-      }
+        if (discountAmount > 80) {
+            showError('discountError', 'Percentage discount cannot exceed 80%');
+            return false;
+        }
     } else if (discountType === 'fixed') {
-      if (discountAmount >= minPrice) {
-        showError(
-          'discountError',
-          'Fixed discount cannot be greater than or equal to minimum purchase amount'
-        );
-        return false;
-      }
+        if (discountAmount >= minPrice) {
+            showError('discountError', 'Fixed discount cannot be greater than or equal to minimum purchase amount');
+            return false;
+        }
     }
     hideError('discountError');
     return true;
@@ -455,77 +488,183 @@
     return true;
   }
 
+  function validateUsagePerUser() {
+    const usagePerUser = parseInt(
+      document.getElementById('usagePerUser').value
+    );
+
+    if (usagePerUser < 1) {
+      showError('usagePerUserError', 'Usage per user must be at least 1');
+      return false;
+    }
+    hideError('usagePerUserError');
+    return true;
+  }
+
   function showSuccessToast() {
     const toast = document.getElementById('successToast');
     toast.classList.remove('hidden');
     toast.classList.add('transform', 'translate-y-0', 'opacity-100');
 
-    // Hide toast after 3 seconds
+    // Hide toast after 2 seconds
     setTimeout(() => {
-      toast.classList.add('transform', 'translate-y-2', 'opacity-0');
-      setTimeout(() => {
-        toast.classList.add('hidden');
-      }, 500);
-    }, 3000);
+        toast.classList.add('transform', 'translate-y-2', 'opacity-0');
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 300);
+    }, 2000);
+  }
+
+  let isEditMode = false;
+  let editCouponId = null;
+
+  async function editCoupon(couponId) {
+    try {
+        // Fetch coupon data
+        const response = await fetch(`/admin/coupon/${couponId}`);
+        if (!response.ok) throw new Error('Failed to fetch coupon data');
+        
+        const data = await response.json();
+        if (!data.success) throw new Error(data.message);
+
+        const coupon = data.coupon;
+
+        // Populate form fields
+        document.getElementById('couponName').value = coupon.name;
+        document.getElementById('minimumPrice').value = coupon.minPurchase;
+        document.getElementById('discountType').value = coupon.couponType;
+        document.getElementById('discountAmount').value = coupon.discountPrice;
+        document.getElementById('maxDiscount').value = coupon.maximumPrice;
+        document.getElementById('usagePerUser').value = coupon.usagePerUser;
+        document.getElementById('expiryDate').value = new Date(coupon.expireOn).toISOString().split('T')[0];
+
+        // Update form for edit mode
+        const form = document.getElementById('addCouponForm');
+        form.setAttribute('data-coupon-id', couponId);
+        document.getElementById('submitButton').textContent = 'Update Coupon';
+
+        // Show modal
+        openAddCouponModal();
+
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Failed to load coupon data'
+        });
+    }
   }
 
   async function submitCoupon(event) {
     event.preventDefault();
+    
+    const form = event.target;
+    const couponId = form.getAttribute('data-coupon-id');
+    const isEdit = !!couponId;
 
-    // Run all validations
-    const isNameValid = validateCouponName();
-    const isMinPriceValid = validateMinimumPrice();
-    const isDiscountValid = validateDiscountAmount();
-    const isMaxDiscountValid = validateMaxDiscount();
-    const isExpiryValid = validateExpiryDate();
-
-    // Check if all validations pass
-    if (
-      !isNameValid ||
-      !isMinPriceValid ||
-      !isDiscountValid ||
-      !isMaxDiscountValid ||
-      !isExpiryValid
-    ) {
-      return;
-    }
-
-    const formData = new FormData(event.target);
-    const couponData = {
-      name: formData.get('name'),
-      minPurchase: Number(formData.get('minimumPrice')),
-      couponType: formData.get('discountType'),
-      discountPrice: Number(formData.get('offerPrice')),
-      maximumPrice: Number(formData.get('maxDiscount')),
-      expireOn: formData.get('expireOn'),
+    const formData = {
+        name: document.getElementById('couponName').value,
+        minPurchase: document.getElementById('minimumPrice').value,
+        couponType: document.getElementById('discountType').value,
+        discountPrice: document.getElementById('discountAmount').value,
+        maximumPrice: document.getElementById('maxDiscount').value,
+        usagePerUser: document.getElementById('usagePerUser').value,
+        expireOn: document.getElementById('expiryDate').value
     };
 
     try {
-      const response = await fetch('/admin/coupon/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(couponData),
-      });
+        const url = isEdit ? `/admin/coupon/edit/${couponId}` : '/admin/coupon/add';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
 
-      const data = await response.json();
+        const data = await response.json();
+        if (!data.success) throw new Error(data.message);
 
-      if (response.ok) {
-        // Close modal
-        closeAddCouponModal();
-        // Show success toast
-        showSuccessToast();
-        // Reload table data after short delay
-        setTimeout(() => {
-          location.reload();
-        }, 2000);
-      } else {
-        alert(data.message || 'Failed to add coupon');
-      }
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: data.message
+        }).then(() => {
+            window.location.reload();
+        });
+
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to add coupon');
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Failed to process coupon'
+        });
+    }
+  }
+
+  async function toggleCouponStatus(couponId, currentStatus) {
+    const action = currentStatus ? 'deactivate' : 'activate';
+    
+    // Show confirmation dialog
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you want to ${action} this coupon?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `Yes, ${action} it!`,
+        cancelButtonText: 'No, cancel'
+    });
+
+    // If user clicks cancel, do nothing
+    if (!result.isConfirmed) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/admin/coupon/toggle-status', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                couponId,
+                currentStatus
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to toggle status');
+        }
+
+        // Show success message
+        await Swal.fire({
+            title: 'Success!',
+            text: `Coupon ${action}d successfully!`,
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+        });
+
+        // Reload page after success message
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
+
+    } catch (error) {
+        console.error('Error:', error);
+        // Show error message
+        Swal.fire({
+            title: 'Error!',
+            text: error.message || 'Something went wrong',
+            icon: 'error',
+            confirmButtonColor: '#3085d6'
+        });
     }
   }
 </script>

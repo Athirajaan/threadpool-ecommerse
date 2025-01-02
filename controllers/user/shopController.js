@@ -2,124 +2,69 @@ const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
 const User = require('../../models/userSchema');
 const Wishlist = require('../../models/wishlistSchema');
+const { calculatePrice } = require('../../utils/priceCalculator');
 
 const loadWomenShopping = async (req, res) => {
   try {
-    const user = req.session.user;
-    if (!user) {
-      return res.redirect('/login');
-    }
-
-    const userData = await User.findById(user);
-    const categories = await Category.find({ isListed: true, gender: 'Women' });
-
-    // Fetch user's wishlist
-    const wishlist = await Wishlist.findOne({ userId: user });
-    const wishlistProductIds = wishlist
-      ? wishlist.products.map((item) => item.productId.toString())
-      : [];
-
-    // Get the sort option from query parameters
-    const sortOption = req.query.sort || 'newest';
-
-    // Base query for men's products
-    const query = {
-      isBlocked: false,
+    const products = await Product.find({
       gender: 'Women',
-    };
+      isBlocked: false,
+    }).populate('category');
+    const category = await Category.find({ gender: 'Women', isListed: true });
 
-    // Define sort criteria based on sortOption
-    let sortCriteria = {};
-    switch (sortOption) {
-      case 'priceAsc':
-        sortCriteria = { salePrice: 1 };
-        break;
-      case 'priceDesc':
-        sortCriteria = { salePrice: -1 };
-        break;
-      case 'nameAsc':
-        sortCriteria = { productName: 1 };
-        break;
-      case 'nameDesc':
-        sortCriteria = { productName: -1 };
-        break;
-      default: // 'newest'
-        sortCriteria = { createdOn: -1 };
-    }
+    // Calculate prices with offers for each product
+    const productsWithOffers = await Promise.all(
+      products.map(async (product) => {
+        const priceDetails = await calculatePrice(product, product.category);
+        return {
+          ...product.toObject(),
+          finalPrice: priceDetails.finalPrice,
+          totalDiscount: priceDetails.totalDiscount,
+          offer: priceDetails.offer,
+        };
+      })
+    );
 
-    // Fetch products with sorting
-    const products = await Product.find(query).sort(sortCriteria).exec();
-
-    res.render('WomenShop', {
-      user: userData,
-      products: products,
-      category: categories,
-      sortOption: sortOption,
-      wishlistProducts: wishlistProductIds, // Pass wishlist products to the view
+    res.render('womenShop', {
+      products: productsWithOffers,
+      category,
+      wishlistProducts: req.session.wishlist || [],
     });
   } catch (error) {
-    console.log(error);
-    res.redirect('/pageNotFound');
+    console.error('Error loading women shopping:', error);
+    res.status(500).redirect('/pageNotFound');
   }
 };
 
 const loadMenShopping = async (req, res) => {
   try {
-    const user = req.session.user;
-    if (!user) {
-      return res.redirect('/login');
-    }
-
-    const userData = await User.findById(user);
-    const categories = await Category.find({ isListed: true, gender: 'Men' });
-
-    // Fetch user's wishlist
-    const wishlist = await Wishlist.findOne({ userId: user });
-    const wishlistProductIds = wishlist
-      ? wishlist.products.map((item) => item.productId.toString())
-      : [];
-
-    // Get the sort option from query parameters
-    const sortOption = req.query.sort || 'newest';
-
-    // Base query for men's products
-    const query = {
-      isBlocked: false,
+    const products = await Product.find({
       gender: 'Men',
-    };
+      isBlocked: false,
+    }).populate('category');
+    const category = await Category.find({ gender: 'Men', isListed: true });
 
-    // Define sort criteria based on sortOption
-    let sortCriteria = {};
-    switch (sortOption) {
-      case 'priceAsc':
-        sortCriteria = { salePrice: 1 };
-        break;
-      case 'priceDesc':
-        sortCriteria = { salePrice: -1 };
-        break;
-      case 'nameAsc':
-        sortCriteria = { productName: 1 };
-        break;
-      case 'nameDesc':
-        sortCriteria = { productName: -1 };
-        break;
-      default: // 'newest'
-        sortCriteria = { createdOn: -1 };
-    }
-
-    // Fetch products with sorting
-    const products = await Product.find(query).sort(sortCriteria).exec();
+    // Calculate prices with offers for each product
+    const productsWithOffers = await Promise.all(
+      products.map(async (product) => {
+        const priceDetails = await calculatePrice(product, product.category);
+        return {
+          ...product.toObject(),
+          finalPrice: priceDetails.finalPrice,
+          totalDiscount: priceDetails.totalDiscount,
+          offer: priceDetails.offer,
+        };
+      })
+    );
 
     res.render('menShope', {
-      user: userData,
-      products: products,
-      category: categories,
-      sortOption: sortOption,
-      wishlistProducts: wishlistProductIds, // Pass wishlist products to the view
+      products: productsWithOffers,
+      category,
+      wishlistProducts: req.session.wishlist || [],
     });
   } catch (error) {
-    console.log(error);
-    res.redirect('/pageNotFound');
+    console.error('Error loading men shopping:', error);
+    res.status(500).redirect('/pageNotFound');
   }
 };
 

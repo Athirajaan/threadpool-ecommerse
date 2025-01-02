@@ -1,6 +1,7 @@
 const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const Wishlist = require('../../models/wishlistSchema');
+const { calculatePrice } = require('../../utils/priceCalculator');
 
 // Load Wishlist Page
 const loadWishlist = async (req, res) => {
@@ -8,24 +9,37 @@ const loadWishlist = async (req, res) => {
     const userId = req.session.user;
     const user = await User.findById(userId);
 
-    // Fetch wishlist with populated product details
+    // Fetch wishlist with populated product details including category for offer calculation
     const wishlist = await Wishlist.findOne({ userId }).populate({
       path: 'products.productId',
-      select: 'productName productImage salePrice regularPrice stock',
+      select: 'productName productImage salePrice regularPrice stock category',
+      populate: {
+        path: 'category', // Populate category for offer calculation
+      },
     });
 
-    // Format products for display
-    const wishlistProducts = wishlist
-      ? wishlist.products.map((item) => ({
-          _id: item.productId._id,
-          productName: item.productId.productName,
-          productImage: item.productId.productImage[0], // Assuming first image is main
-          salePrice: item.productId.salePrice,
-          regularPrice: item.productId.regularPrice,
-          stock: item.productId.stock,
-          addedAt: item.addedAt,
-        }))
-      : [];
+    // Format products for display with offer prices
+    const wishlistProducts = await Promise.all(
+      wishlist
+        ? wishlist.products.map(async (item) => {
+            // Calculate price with offers
+            const priceDetails = await calculatePrice(
+              item.productId,
+              item.productId.category
+            );
+
+            return {
+              _id: item.productId._id,
+              productName: item.productId.productName,
+              productImage: item.productId.productImage[0],
+              salePrice: priceDetails.finalPrice, // Use offer price
+              regularPrice: item.productId.regularPrice,
+              stock: item.productId.stock,
+              addedAt: item.addedAt,
+            };
+          })
+        : []
+    );
 
     res.render('wishlist', {
       user: user,
@@ -36,8 +50,6 @@ const loadWishlist = async (req, res) => {
     res.status(500).redirect('/pageNotFound');
   }
 };
-
-
 
 // Add this method to your wishlistController
 const toggleWishlist = async (req, res) => {
