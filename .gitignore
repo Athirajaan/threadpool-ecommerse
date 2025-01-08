@@ -1,2 +1,4 @@
 .env
 node_modules/
+public/invoices/*
+!public/invoices/.gitkeep

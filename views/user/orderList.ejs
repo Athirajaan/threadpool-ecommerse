@@ -2,7 +2,6 @@
 <%- include('../partials/user/userProfile') %>
 
 <div class="ml-64 flex-1">
-  <!-- Stylish Breadcrumbs -->
   <nav class="px-8 py-5">
     <ol class="flex items-center">
       <li class="flex items-center">
@@ -35,145 +34,118 @@
 
   <!-- Rest of the content -->
   <div class="px-8 mb-24">
-    <h1 class="text-2xl font-bold mb-4">Order Details</h1>
+    <h1 class="text-2xl font-bold mb-2">Order History</h1>
+    
     <div class="space-y-6">
       <% if (orders && orders.length > 0) { %>
         <% orders.forEach(order => { %>
-          <div class="bg-white shadow-sm border border-gray-100 rounded-xl overflow-hidden mb-6 
-                      transform transition-all duration-300 ease-in-out cursor-pointer
-                      hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] group">
-            <!-- Enhanced Order Header -->
-            <div class="px-6 py-4 border-b flex justify-between items-center bg-white">
+          <div class="bg-white shadow-sm border border-gray-100 rounded-xl overflow-hidden">
+            <!-- Order Header -->
+            <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
               <div class="flex items-center space-x-6">
                 <div class="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
-                  <span class="font-medium text-gray-700">Order ID: <%= order.orderId %></span>
+                 
+                  <span class="text-xs uppercase tracking-wider text-gray-500">Order ID&nbsp;</span>
+                  <span class="font-mono text-sm font-medium text-gray-900"><%= order.orderId %></span>
                 </div>
                 <div class="flex items-center text-sm text-gray-500">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <span>Ordered on: <%= new Date(order.orderDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+                  <!-- <span><%= new Date(order.orderDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) %></span> -->
+                  <time datetime="<%= order.orderDate %>" class="text-sm font-medium text-gray-900">
+                    <%= new Date(order.orderDate).toLocaleDateString('en-US', { 
+                      day: 'numeric', 
+                      month: 'long', 
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }) %>
+               </time>
                 </div>
               </div>
-              <button 
-                onclick="showModal('<%= order.orderId %>')" 
-                class="group inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 
-                       border border-gray-200 hover:border-blue-500 rounded-md 
-                       transition-all duration-200 ease-in-out 
-                       hover:shadow-sm 
-                       bg-white">
-                <svg xmlns="http://www.w3.org/2000/svg" 
-                     class="h-4 w-4 mr-1.5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" 
-                     fill="none" 
-                     viewBox="0 0 24 24" 
-                     stroke="currentColor">
-                  <path stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                View Order
-              </button>
+              <div class="flex items-center space-x-3">
+                <!-- View Details Button -->
+                <button 
+                    data-order='<%= JSON.stringify(order).replace(/'/g, "\\'") %>'
+                    onclick="showOrderDetails(this.dataset.order)" 
+                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 border border-gray-200 hover:border-blue-500 rounded-md transition-all duration-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  View Details
+                </button>
+
+                <!-- Retry Payment Button - Only show if payment status is Failed -->
+                <% if (order.paymentStatus === 'Failed') { %>
+                  <button 
+                    onclick="retryPayment('<%= order.orderId %>', <%= order.finalAmount %>)"
+                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 border border-transparent rounded-md transition-all duration-200 shadow-sm hover:shadow-md"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Retry Payment
+                  </button>
+                <% } %>
+              </div>
             </div>
 
-            <!-- Order Items Container -->
-            <div class="divide-y divide-blue-50">
+            <!-- Order Items -->
+            <div class="divide-y divide-gray-100">
               <% order.orderedItems.forEach(item => { %>
-                <div class="p-6 transition-all duration-300 ease-in-out">
+                <div class="p-6">
                   <div class="flex items-center justify-between">
-                    <!-- Enhanced Product Info -->
+                    <!-- Product Info -->
                     <div class="flex space-x-4">
-                      <div class="flex-shrink-0">
-                        <img src="<%= item.productImage %>" alt="<%= item.productName %>" 
-                          class="w-24 h-24 object-cover rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                      </div>
-                      <div class="flex flex-col justify-between py-1">
-                        <div>
-                          <h3 class="text-base font-medium text-gray-900 hover:text-blue-600 transition-colors duration-150">
-                            <%= item.productName %>
-                          </h3>
-                          <div class="mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                            <div class="flex items-center">
-                              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                              </svg>
-                              <span>Size: <%= item.size %></span>
-                            </div>
-                            <div class="flex items-center">
-                              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
-                              </svg>
-                              <span>Qty: <%= item.quantity %></span>
-                            </div>
-                            <div class="flex items-center font-medium text-gray-900">
-                              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                              </svg>
-                              <span>₹<%= item.price * item.quantity %></span>
-                            </div>
-                            <!-- Status Badge moved here -->
-                            <% let statusColor = ""; let textColor = ""; let bgColor = ""; %>
-                            <% if (item.status === "Shipped" || item.status === "out for delivery") { %>
-                              <% statusColor = "bg-yellow-100"; textColor = "text-yellow-800"; bgColor = "bg-yellow-400" %>
-                            <% } else if (item.status === "Delivered") { %>
-                              <% statusColor = "bg-green-100"; textColor = "text-green-800"; bgColor = "bg-green-400" %>
-                            <% } else if (item.status === "Pending") { %>
-                              <% statusColor = "bg-blue-100"; textColor = "text-blue-800"; bgColor = "bg-blue-400" %>
-                            <% } else if (item.status === "Cancelled" || item.status === "Returned") { %>
-                              <% statusColor = "bg-red-100"; textColor = "text-red-800"; bgColor = "bg-red-400" %>
-                            <% } %>
-                            <div class="flex items-center px-3 py-1 rounded-full <%= statusColor %> <%= textColor %>">
-                              <div class="w-2 h-2 <%= bgColor %> rounded-full mr-2"></div>
-                              <span class="text-sm font-medium"><%= item.status %></span>
-                            </div>
-                          </div>
+                      <img src="<%= item.product.productImage[0] %>" 
+                           alt="<%= item.product.productName %>" 
+                           class="w-24 h-24 object-cover rounded-lg shadow-sm">
+                      
+                      <div class="flex flex-col justify-center">
+                        <h3 class="font-medium text-gray-900 mb-1"><%= item.product.productName %></h3>
+                        <div class="flex items-center space-x-4 text-sm text-gray-500">
+                          <span>Qty: <%= item.quantity %></span>
+                          <span>Size: <%= item.size %></span>
+                          <span class="font-medium text-gray-900">₹<%= item.price %></span>
+                        </div>
+                        
+                        <!-- Status Badge -->
+                        <div class="mt-2">
+                          <% let statusColor = ""; let textColor = ""; %>
+                          <% if (item.status === "Shipped" || item.status === "out for delivery") { %>
+                            <% statusColor = "bg-blue-100"; textColor = "text-blue-800" %>
+                          <% } else if (item.status === "Delivered") { %>
+                            <% statusColor = "bg-green-100"; textColor = "text-green-800" %>
+                          <% } else if (item.status === "Pending") { %>
+                            <% statusColor = "bg-yellow-100"; textColor = "text-yellow-800" %>
+                          <% } else if (item.status === "Cancelled" || item.status === "Returned") { %>
+                            <% statusColor = "bg-red-100"; textColor = "text-red-800" %>
+                          <% } %>
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= statusColor %> <%= textColor %>">
+                            <%= item.status %>
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                    <!-- Right-aligned Action Buttons -->
-                    <div class="flex items-center space-x-2">
-                      <% if (["Pending", "Shipped", "out for delivery"].includes(item.status)) { %>
-                        <!-- Track Order Button -->
-                        <button 
-                          onclick="toggleTracking('<%= order.orderId %>', '<%= item.product._id %>')"
-                          class="inline-flex items-center px-4 py-2 text-green-600 rounded-md hover:bg-green-50 transition-all duration-150 text-sm hover:shadow-sm">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          </svg>
-                          Track
-                        </button>
-
-                        <!-- Cancel Button -->
-                        <button 
-                          onclick="confirmCancellation('<%= order.orderId %>', '<%= item.product && item.product._id %>','<%= item.quantity %>','<%= item.size %>')"
-                          class="inline-flex items-center px-4 py-2 text-red-600 rounded-md hover:bg-red-50 transition-all duration-150 text-sm hover:shadow-sm">
-                          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                          </svg>
-                          Cancel
-                        </button>
-                      <% } else if (item.status === "Delivered") { %>
-                        <!-- Rate and Return buttons for delivered items -->
-                        <button class="inline-flex items-center px-4 py-2 rounded-md hover:bg-gray-50 text-gray-700 transition-all duration-150 text-sm hover:shadow-sm">
-                          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                          </svg>
-                          Rate Product
-                        </button>
-                        <button 
-                          onclick="confirmReturn('<%= order.orderId %>', '<%= item.product && item.product._id %>', '<%= item.quantity %>', '<%= item.size %>')"
-                          class="inline-flex items-center px-4 py-2 text-red-600 rounded-md hover:bg-red-50 transition-all duration-150 text-sm hover:shadow-sm">
-                          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/>
-                          </svg>
+                    <!-- Action Buttons - Keeping original functionality -->
+                    <div class="flex items-center space-x-3">
+                      <% if (order.paymentStatus !== 'Failed') { %>
+                        <% if (["Pending", "Shipped", "out for delivery"].includes(item.status)) { %>
+                          <button onclick="toggleTracking('<%= order.orderId %>', '<%= item.product._id %>')"
+                                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 border border-gray-200 hover:border-blue-500 rounded-md transition-all duration-200">
+                            Track
+                          </button>
+                          <button onclick="confirmCancellation('<%= order.orderId %>', '<%= item.product._id %>','<%= item.quantity %>','<%= item.size %>')"
+                                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 border border-gray-200 hover:border-red-500 rounded-md transition-all duration-200">
+                            Cancel
+                          </button>
+                        <% } %>
+                      <% } %>
+                      <% if (item.status === "Delivered") { %>
+                        <button onclick="confirmReturn('<%= order.orderId %>', '<%= item.product._id %>', '<%= item.quantity %>', '<%= item.size %>')"
+                                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-yellow-600 hover:text-yellow-700 border border-gray-200 hover:border-yellow-500 rounded-md transition-all duration-200">
                           Return
                         </button>
                       <% } %>
@@ -181,7 +153,7 @@
                   </div>
                 </div>
 
-                <!-- Tracking Section with enhanced design -->
+                <!-- Tracking Section - Keeping original ID and structure -->
                 <div id="tracking-<%= order.orderId %>-<%= item.product._id %>" 
                      class="hidden w-full overflow-hidden transition-all duration-500 ease-in-out border-t border-blue-50">
                   <div class="p-6 bg-white animate-fadeIn">
@@ -251,35 +223,21 @@
           </div>
         <% }) %>
       <% } else { %>
-        <div class="min-h-[60vh] flex flex-col items-center justify-center p-8">
-          <div class="mb-6">
-            <svg class="w-40 h-40 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-            </svg>
-          </div>
-          
-          <h3 class="text-xl font-semibold text-gray-800 mb-2">No Orders Yet</h3>
-          <p class="text-gray-500 text-center mb-8 max-w-md">
-            Looks like you haven't placed any orders yet. Start shopping to find amazing products!
-          </p>
-          
-          <a href="/shop" 
-             class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg 
-                    hover:bg-blue-700 transition-colors duration-150 shadow-sm hover:shadow">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-            </svg>
-            Start Shopping
-          </a>
+        <!-- Empty state -->
+        <div class="text-center py-12">
+          <p class="text-gray-500">No orders found</p>
         </div>
       <% } %>
     </div>
   </div>
 
-  <!--view detail Modal -->
-  <div id="dynamicModalContainer"></div>
+  
+
+<!-- Order Details Modal -->
+
+
+
+ 
 
     <!-- cancel modal  -->
   <div id="cancelModal" class="hidden fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-50">
@@ -367,82 +325,254 @@
   </div>
   
 
-  <script>
-    function showModal(orderId) {
-        const modalContainer = document.getElementById('dynamicModalContainer');
-        
-        console.log('ShowModal called with orderId:', orderId);
 
-        if (!orderId) {
-            console.error('No orderId provided');
-            return;
-        }
 
-        // Show loading state
-        modalContainer.innerHTML = `
-            <div class="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-50">
-                <div class="bg-white rounded-lg p-6">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                    <p class="mt-2 text-gray-600">Loading order details...</p>
+  <!-- Order Details Modal -->
+<div id="orderDetailsModal" class="hidden fixed inset-y-0 right-0 w-1/3 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50">
+    <div class="h-full flex flex-col">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b border-gray-100">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 id="modalOrderId" class="text-xl font-semibold text-gray-800"></h3>
+                    <p id="modalOrderDate" class="text-sm text-gray-500 mt-1"></p>
+                </div>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-500">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Body - with scrolling -->
+        <div class="flex-1 overflow-y-auto">
+            <!-- Payment Failed Warning -->
+            <div id="paymentFailedWarning" class="hidden px-6 py-3 bg-red-50">
+                <div class="flex items-center text-red-800">
+                    <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <p class="text-sm font-medium">Payment Failed - Please complete the payment to process this order</p>
                 </div>
             </div>
-        `;
-        modalContainer.style.display = 'block';
 
-        // Construct URL with orderId
-        const url = `/order-details/${encodeURIComponent(orderId)}`;
-        console.log('Fetching from URL:', url);
-
-        // Fetch order details
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'same-origin'
-        })
-        .then(async response => {
-            console.log('Response received:', response.status);
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Error response:', errorText);
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Order details received:', data);
-            // ... rest of the modal content generation ...
-        })
-        .catch(error => {
-            console.error('Error in showModal:', error);
-            modalContainer.innerHTML = `
-                <div class="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-50">
-                    <div class="bg-white rounded-lg p-6">
-                        <div class="flex items-center text-red-500 mb-4">
-                            <svg class="w-6 h-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <p class="font-medium">Error loading order details</p>
-                        </div>
-                        <p class="text-sm text-gray-500 mb-4">Error: ${error.message}</p>
-                        <button onclick="closeModal()" 
-                                class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
-                            Close
-                        </button>
+            <div class="px-6 py-4 space-y-6">
+                <!-- Order Items Section -->
+                <div>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Products</h4>
+                    <div id="modalItems" class="space-y-4">
+                        <!-- Items will be populated here -->
                     </div>
                 </div>
-            `;
-        });
+
+                <!-- Contact Information Section -->
+                <div>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Contact Information</h4>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="space-y-4">
+                            <!-- Phone Number -->
+                            <div class="flex items-center text-sm">
+                                <span class="text-gray-600 w-24">Phone:</span>
+                                <span id="modalPhone" class="text-gray-900 font-medium"></span>
+                            </div>
+                            
+                            <!-- Delivery Address -->
+                            <div class="border-t border-gray-200 pt-4">
+                                <p class="text-gray-600 text-sm mb-2">Delivery Address:</p>
+                                <p id="modalAddress" class="text-sm text-gray-900"></p>
+                                <p id="modalAddressType" class="text-xs text-gray-500 mt-1"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Information Section -->
+                <div>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Payment Information</h4>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Payment Method</span>
+                                <span id="modalPaymentMethod" class="text-gray-900 font-medium"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Coupon Applied</span>
+                                <span id="modalCoupon" class="text-gray-900"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Discount</span>
+                                <span class="text-gray-900"><span id="modalDiscount"></span></span>
+                            </div>
+                            <div class="flex justify-between pt-3 border-t border-gray-200">
+                                <span class="text-gray-900 font-medium">Total Amount</span>
+                                <span class="text-gray-900 font-bold">₹<span id="modalAmount"></span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-gray-100">
+          <form id="invoiceForm" action="/download-invoice" method="POST" class="w-full">
+              <input type="hidden" name="orderId" id="modalInvoiceOrderId">
+              <button 
+                  type="submit"
+                  id="downloadInvoiceBtn"
+                  class="w-full inline-flex items-center justify-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download Invoice
+              </button>
+          </form>
+      </div>
+    </div>
+</div>
+
+<!-- Overlay -->
+<div id="modalOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+
+  <script>
+
+  
+    function showOrderDetails(orderData) {
+        try {
+            const order = JSON.parse(orderData);
+            console.log('Order data:', order);
+
+            // Set the order ID for the invoice
+            const modalInvoiceOrderId = document.getElementById('modalInvoiceOrderId');
+            if (modalInvoiceOrderId) {
+                modalInvoiceOrderId.value = order.orderId;
+                console.log('Set invoice orderId:', order.orderId);
+            }
+
+            // Show/hide payment failed warning
+            const paymentFailedWarning = document.getElementById('paymentFailedWarning');
+            if (paymentFailedWarning) {
+                if (order.paymentStatus === 'Failed') {
+                    paymentFailedWarning.classList.remove('hidden');
+                } else {
+                    paymentFailedWarning.classList.add('hidden');
+                }
+            }
+
+            // Basic Order Details
+            const orderIdElement = document.getElementById('modalOrderId');
+            const orderDateElement = document.getElementById('modalOrderDate');
+            if (orderIdElement) orderIdElement.textContent = `Order ${order.orderId}`;
+            if (orderDateElement) orderDateElement.textContent = new Date(order.orderDate).toLocaleString();
+
+            // Order Items
+            const itemsContainer = document.getElementById('modalItems');
+            if (itemsContainer) {
+                itemsContainer.innerHTML = order.orderedItems.map(item => `
+                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded mb-2">
+                        <div class="flex items-center gap-4">
+                            <img src="${item.productImage}" 
+                                 alt="${item.productName}" 
+                                 class="w-16 h-16 object-cover rounded">
+                            <div>
+                                <p class="font-medium">${item.productName}</p>
+                                <p class="text-sm text-gray-600">Size: ${item.size} | Quantity: ${item.quantity}</p>
+                                <p class="text-sm ${item.status === 'Delivered' ? 'text-green-600' : 'text-blue-600'}">${item.status}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium">₹${item.price}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Contact Information
+            const phoneElement = document.getElementById('modalPhone');
+            if (phoneElement) phoneElement.textContent = order.phoneNumber || 'N/A';
+
+            // Address Details
+            const addressElement = document.getElementById('modalAddress');
+            const addressTypeElement = document.getElementById('modalAddressType');
+            if (order.address) {
+                if (addressElement) {
+                    const addr = order.address;
+                    const addressParts = [];
+                    if (addr.name) addressParts.push(addr.name);
+                    if (addr.landMark) addressParts.push(addr.landMark);
+                    if (addr.city) addressParts.push(addr.city);
+                    if (addr.state) addressParts.push(addr.state);
+                    if (addr.pincode) addressParts.push(addr.pincode.toString());
+                    addressElement.textContent = addressParts.join(', ') || 'No address details available';
+                }
+                if (addressTypeElement && order.address.addressType) {
+                    addressTypeElement.textContent = order.address.addressType;
+                }
+            } else {
+                if (addressElement) addressElement.textContent = 'No address available';
+                if (addressTypeElement) addressTypeElement.textContent = '';
+            }
+
+            // Payment Details
+            const elements = {
+                paymentMethod: document.getElementById('modalPaymentMethod'),
+                coupon: document.getElementById('modalCoupon'),
+                discount: document.getElementById('modalDiscount'),
+                amount: document.getElementById('modalAmount')
+            };
+
+            if (elements.paymentMethod) elements.paymentMethod.textContent = order.paymentMethod || 'N/A';
+            if (elements.coupon) elements.coupon.textContent = order.couponApplied ? order.appliedCoupon?.code : 'No coupon applied';
+            if (elements.discount) elements.discount.textContent = order.couponDiscount || '0';
+            if (elements.amount) elements.amount.textContent = order.finalAmount || '0';
+
+            // Set the order ID on the download button
+            const downloadButton = document.querySelector('[data-order-id]');
+            if (downloadButton) {
+                downloadButton.setAttribute('data-order-id', order.orderId);
+                console.log('Set order ID for download:', order.orderId); // Debug log
+            }
+
+            // Set up download button
+            const invoiceOrderIdInput = document.getElementById('invoiceOrderId');
+        if (invoiceOrderIdInput) {
+            invoiceOrderIdInput.value = order.orderId;
+        }
+            // Show modal and overlay
+            const modal = document.getElementById('orderDetailsModal');
+            const overlay = document.getElementById('modalOverlay');
+            if (modal) modal.classList.remove('hidden');
+            if (overlay) overlay.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+
+        } catch (error) {
+            console.error('Error in showOrderDetails:', error);
+            console.log('Raw order data:', orderData);
+        }
     }
 
     function closeModal() {
-        const modalContainer = document.getElementById('dynamicModalContainer');
-        modalContainer.style.display = 'none';
-        modalContainer.innerHTML = '';
+        const modal = document.getElementById('orderDetailsModal');
+        const overlay = document.getElementById('modalOverlay');
+        
+        if (modal) {
+            modal.classList.add('translate-x-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('translate-x-full');
+            }, 300);
+        }
+        
+        if (overlay) {
+            overlay.classList.add('hidden');
+        }
+        
+        document.body.classList.remove('overflow-hidden');
     }
+
+
+    
 // Function to confirm the cancellation and update the UI
 function confirmCancellation(orderId, productId, quantity, size) {
     // First show confirmation dialog
@@ -932,6 +1062,147 @@ function closeReturnModal() {
     returnModal.classList.add('hidden');
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    const orderPlaced = localStorage.getItem('orderPlaced');
+    const paymentStatus = localStorage.getItem('paymentStatus');
+
+    if (orderPlaced === 'true') {
+        // Show appropriate toast based on payment status
+        Toastify({
+            text: paymentStatus === 'Failed' ? 
+                  "Order placed but payment failed. You can try payment again later." : 
+                  "Order placed successfully!",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: paymentStatus === 'Failed' ? "#dc3545" : "#000000",
+                color: "#ffffff",
+                borderRadius: "8px",
+                padding: "12px 24px",
+                marginTop: "60px"
+            }
+        }).showToast();
+        
+        // Clear the flags
+        localStorage.removeItem('orderPlaced');
+        localStorage.removeItem('paymentStatus');
+    }
+});
+
+function retryPayment(orderId, amount) {
+    console.log('Starting retry payment for:', orderId, amount); // Debug log
+
+    fetch('/create-razorpay-order', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            amount: amount,
+            orderId: orderId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Razorpay order created:', data); // Debug log
+        if (data.success) {
+            let options = {
+                key: '<%= process.env.RAZORPAY_KEY_ID %>',
+                amount: amount * 100,
+                currency: "INR",
+                name: "Your Store Name",
+                description: "Payment retry for order: " + orderId,
+                order_id: data.orderId,
+                handler: function (response) {
+                    console.log('Payment successful, response:', response); // Debug log
+
+                    // After successful payment, update the order status
+                    fetch('/update-payment-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            orderId: orderId,
+                            paymentId: response.razorpay_payment_id,
+                            signature: response.razorpay_signature
+                        })
+                    })
+                    .then(res => {
+                        console.log('Update status response:', res); // Debug log
+                        return res.json();
+                    })
+                    .then(data => {
+                        console.log('Update status data:', data); // Debug log
+                        if (data.success) {
+                            Toastify({
+                                text: "Payment completed successfully!",
+                                duration: 3000,
+                                gravity: "top",
+                                position: "right",
+                                style: {
+                                    background: "#22c55e",
+                                    color: "#ffffff",
+                                    borderRadius: "8px",
+                                    padding: "12px 24px",
+                                    marginTop: "60px"
+                                }
+                            }).showToast();
+
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating payment status:', error);
+                        Toastify({
+                            text: "Payment completed but status update failed",
+                            duration: 3000,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "#dc3545",
+                                color: "#ffffff",
+                                borderRadius: "8px",
+                                padding: "12px 24px",
+                                marginTop: "60px"
+                            }
+                        }).showToast();
+                    });
+                },
+                prefill: {
+                    name: "<%= user.name %>",
+                    email: "<%= user.email %>"
+                },
+                theme: {
+                    color: "#3399cc"
+                }
+            };
+
+            let rzp1 = new Razorpay(options);
+            rzp1.open();
+        }
+    })
+    .catch(error => {
+        console.error('Error creating Razorpay order:', error);
+        Toastify({
+            text: "Failed to initiate payment",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: "#dc3545",
+                color: "#ffffff",
+                borderRadius: "8px",
+                padding: "12px 24px",
+                marginTop: "60px"
+            }
+        }).showToast();
+    });
+}
+
     </script>
 
 
@@ -1090,6 +1361,8 @@ function closeReturnModal() {
     animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
   }
 </style>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 </body>
 </html>

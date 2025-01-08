@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const categorySchema = new Schema({
@@ -13,7 +13,7 @@ const categorySchema = new Schema({
   },
   gender: {
     type: String,
-    enum: ["Men", "Women"],
+    enum: ['Men', 'Women'],
     required: true,
   },
   isListed: {
@@ -24,10 +24,14 @@ const categorySchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  salesCount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 categorySchema.index({ name: 1, gender: 1 }, { unique: true });
 
-const Category = mongoose.model("Category", categorySchema);
+const Category = mongoose.model('Category', categorySchema);
 
 module.exports = Category;

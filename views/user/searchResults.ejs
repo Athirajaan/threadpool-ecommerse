@@ -11,37 +11,94 @@
 </div>
 
 <!-- Main Content -->
-<div class="container mx-auto px-4 py-8">
-  <!-- Products Section -->
-  <div class="flex-1">
-    <!-- Sort Options -->
-    <div class="flex justify-end mb-6">
-      <div class="relative">
-        <select id="sortSelect" class="bg-white px-4 py-2 rounded-lg shadow-sm border appearance-none pr-8">
-          <option value="newest" <%= sortOption === 'newest' ? 'selected' : '' %>>Newest First</option>
-          <option value="priceAsc" <%= sortOption === 'priceAsc' ? 'selected' : '' %>>Price: Low to High</option>
-          <option value="priceDesc" <%= sortOption === 'priceDesc' ? 'selected' : '' %>>Price: High to Low</option>
-        </select>
-      </div>
-    </div>
+<div class="flex-1 container mx-auto px-4 py-8">
+  <div class="flex gap-8">
+    <!-- Sticky Filter Sidebar -->
+    <aside class="w-72 flex-shrink-0">
+      <div class="bg-white rounded-xl shadow-md sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div class="p-6">
+          <!-- Header with Reset -->
+          <div class="flex justify-between items-center mb-8 sticky top-0 bg-white z-10 py-2">
+            <h2 class="text-xl font-bold text-gray-800">Filters</h2>
+            <button id="resetFilters" 
+                    class="hidden text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200">
+              Clear All
+            </button>
+          </div>
+          <!-- Sort Options -->
+          <div class="mb-8 border-b border-gray-100 pb-6">
+            <h3 class="text-md font-semibold text-gray-700 mb-4">Sort By</h3>
+            <div class="space-y-3">
+              <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                <input type="radio" name="sort" value="newest" checked class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                <span class="ml-3 text-gray-700 group-hover:text-gray-900">Newest First</span>
+              </label>
+              <!-- ... other sort options ... -->
+            </div>
+          </div>
 
-    <!-- Products Grid -->
-    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <% if (products.length === 0) { %>
-        <div class="col-span-full text-center py-12">
-          <h3 class="text-xl text-gray-600">No products found matching your search.</h3>
-          <p class="mt-2 text-gray-500">Try adjusting your search terms.</p>
+          <!-- Categories -->
+          <div class="mb-8 border-b border-gray-100 pb-6">
+            <h3 class="text-md font-semibold text-gray-700 mb-4">Categories</h3>
+            <div class="space-y-3">
+              <% category.forEach(cat => { %>
+                <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                  <input type="checkbox" 
+                         class="category-checkbox form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                         value="<%= cat._id %>">
+                  <span class="ml-3 text-gray-700 group-hover:text-gray-900"><%= cat.name %></span>
+                </label>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Sizes -->
+          <div class="mb-8 border-b border-gray-100 pb-6">
+            <h3 class="text-md font-semibold text-gray-700 mb-4">Sizes</h3>
+            <div class="flex flex-wrap gap-3">
+              <% ['S', 'M', 'L', 'XL'].forEach(size => { %>
+                <button 
+                  class="size-option w-12 h-12 rounded-lg border-2 border-gray-200 text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  data-size="<%= size %>">
+                  <%= size %>
+                </button>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Price Range -->
+          <div class="mb-6">
+            <!-- ... price range options ... -->
+          </div>
         </div>
-      <% } else { %>
-        <% products.forEach(product => { %>
-          <%- include('../partials/productCard', { product: product }) %>
-        <% }) %>
-      <% } %>
-    </div>
+      </div>
+    </aside>
 
-    <!-- Loading Indicator -->
-    <div id="loadingIndicator" class="hidden text-center py-8">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-blue-600"></div>
+    <!-- Products Grid Container -->
+    <div class="flex-1">
+      <!-- Products Section -->
+      <div class="flex-1">
+        <!-- Sort Options -->
+
+        <!-- Products Grid -->
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <% if (products.length === 0) { %>
+            <div class="col-span-full text-center py-12">
+              <h3 class="text-xl text-gray-600">No products found matching your search.</h3>
+              <p class="mt-2 text-gray-500">Try adjusting your search terms.</p>
+            </div>
+          <% } else { %>
+            <% products.forEach(product => { %>
+              <%- include('../partials/productCard', { product: product }) %>
+            <% }) %>
+          <% } %>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="hidden text-center py-8">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-blue-600"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

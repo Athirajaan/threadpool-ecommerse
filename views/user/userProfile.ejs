@@ -1,122 +1,130 @@
 <%- include('../partials/user/userheader') %> 
 <%- include('../partials/user/userProfile') %>
-<div class="ml-64 flex-1">
-  <!-- Stylish Breadcrumbs -->
-  <nav class="px-8 py-5">
-    <ol class="flex items-center">
-      <li class="flex items-center">
-        <a href="/" class="text-xs uppercase tracking-wider text-gray-500 hover:text-gray-700 transition-colors duration-200">
-          Home
-        </a>
-      </li>
-      <li class="flex items-center">
-        <span class="mx-3 inline-block">
-          <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5l7 7-7 7"/>
-          </svg>
-        </span>
-        <span class="text-xs uppercase tracking-wider text-gray-900 font-medium">
-          Profile
-        </span>
-      </li>
-    </ol>
-  </nav>
-</div>
 
-
-
-    <!-- Main Content -->
-    <main class="flex-grow p-1">
-     
-  <div class="w-full max-w-4xl mx-auto px-1 sm:px-1 lg:px-1 py-3">
-    <!-- Profile Section with Edit Button -->
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-lg font-medium text-gray-800">Personal Information</h2>
-      <button id="editProfileBtn" class="text-yellow-600 hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md border border-yellow-600 hover:border-yellow-800 transition duration-200 ease-in-out">
-        <i class="fas fa-user-edit mr-2"></i> Edit Profile
-      </button>
-    </div>
-
-    <!-- Profile Information -->
-    <div class="mb-12 bg-white rounded-lg shadow-sm p-6">
-      <div class="divide-y divide-gray-300">
-        <div id="notification" class="hidden fixed top-20 right-4 px-6 py-3 rounded-lg text-white shadow-lg transition-opacity duration-500 z-50"></div>
-        
-        <!-- Name Field -->
-        <div class="flex items-start justify-between py-4">
-          <div>
-            <span class="block text-gray-600 text-sm">Your Name</span>
-            <span class="block text-gray-900 font-medium text-base mt-1"><%= user.name %></span>
-          </div>
-        </div>
-
-        <!-- Phone Field -->
-        <div class="flex items-start justify-between py-4">
-          <div>
-            <span class="block text-gray-600 text-sm">Phone Number</span>
-            <span class="block text-gray-900 font-medium text-base mt-1"><%= user.phone || "Not provided" %></span>
-          </div>
-        </div>
-
-        <!-- Email Field (Read-only) -->
-        <div class="flex items-start justify-between py-4">
-          <div>
-            <span class="block text-gray-600 text-sm">Email Address</span>
-            <span class="block text-gray-900 font-medium text-base mt-1"><%= user.email%></span>
-          </div>
-        </div>
-
-        <!-- Password Field -->
-        <div class="flex items-start justify-between py-4">
-          <div>
-            <span class="block text-gray-600 text-sm">Password</span>
-            <span class="block text-gray-900 font-medium text-base mt-1">********</span>
-          </div>
-          <button id="changePasswordBtn" class="text-black hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md transition duration-200 ease-in-out">
-            <i class="fas fa-key mr-2"></i> Change Password
+<!-- Main Content -->
+<main class="flex-grow p-6 bg-gradient-to-br from-slate-50 via-white to-slate-50 ml-64">
+  <div class="max-w-5xl mx-auto px-4 flex justify-center">
+    <div class="w-full max-w-4xl">
+      <!-- Profile Overview Section -->
+      <div class="mb-10">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">Profile Overview</h2>
+          <!-- Keeping original edit button with same ID -->
+          <button id="editProfileBtn" class="flex items-center px-6 py-2.5  rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+            <i class="fas fa-user-edit mr-2"></i>
+            Edit Profile
           </button>
         </div>
-      </div>
-    </div>
 
-    <!-- Address Section -->
-    <div class="mb-8">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-lg font-medium text-gray-700">Address</h2>
-        <button  id="openModalBtn" class="text-yellow-600 hover:bg-yellow-100 hover:text-yellow-800 text-sm py-2 px-4 rounded-md border border-yellow-600  hover:border-yellow-800 transition duration-200 ease-in-out self-center inline-block flex items-center">
-          <i class="fas fa-plus mr-2"></i>  add new
-        </button>
-        
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Address Card -->
-        <% if (addresses && addresses.length > 0) { %>
-          <% addresses.forEach(addressItem => { %>
-            <% const address = addressItem.address[0]; %> <!-- Access the first object in the address array -->
-            <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-              <h3 class="text-gray-900 font-semibold mb-2"><%= address.name || 'N/A' %></h3>
-              <p class="text-gray-700 text-sm mb-1"><%= address.city || 'N/A' %></p>
-              <p class="text-gray-600 text-sm mb-4">
-                <%= address.landMark || 'N/A' %>, <%= address.state || 'N/A' %> - <%= address.pincode || 'N/A' %>
-              </p>
-              <div class="flex items-center justify-between text-sm">
-                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg"><%= address.addressType || 'N/A' %></span>
-                <div class="space-x-2">
-                  <% if (address.isDefault) { %>
-                    <button class="text-blue-600 hover:underline">Default Address</button>
-                  <% } %>
+        <!-- Profile Info Card -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+          <div class="grid md:grid-cols-2 gap-8 p-8">
+            <!-- Personal Details -->
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Personal Details</h3>
+              <div class="space-y-6">
+                <div class="relative group p-4 bg-gray-50 rounded-xl">
+                  <label class="text-sm text-gray-500 mb-1 block">Full Name</label>
+                  <p class="text-lg font-semibold text-gray-800"><%= user.name %></p>
+                </div>
+                
+                <div class="relative group p-4 bg-gray-50 rounded-xl">
+                  <label class="text-sm text-gray-500 mb-1 block">Email Address</label>
+                  <p class="text-lg font-semibold text-gray-800"><%= user.email %></p>
+                </div>
+
+                <div class="relative group p-4 bg-gray-50 rounded-xl">
+                  <label class="text-sm text-gray-500 mb-1 block">Phone Number</label>
+                  <p class="text-lg font-semibold text-gray-800"><%= user.phone || "Not provided" %></p>
                 </div>
               </div>
-              <div class="flex justify-between mt-4 text-sm text-gray-600">
-                <button class="hover:text-red-600">Remove</button>
-                <button class="hover:text-blue-600">Edit</button>
+            </div>
+
+            <!-- Security Section -->
+            <div class="bg-gray-50 rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Security Settings</h3>
+                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">Protected</span>
+              </div>
+              
+              <div class="space-y-4">
+                <div class="bg-white rounded-xl p-4 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <label class="text-sm text-gray-500 mb-1 block">Password</label>
+                      <p class="text-lg font-semibold text-gray-800">••••••••</p>
+                    </div>
+                    <!-- Keeping original change password button with same ID -->
+                    <button id="changePasswordBtn" class="flex items-center px-4 py-2 text-sm bg-gray-800 hover:bg-gray-900 text-white rounded-lg transition-all duration-300">
+                      <i class="fas fa-key mr-2"></i>
+                      Change
+                    </button>
+                  </div>
+                 
+                </div>
+
+                <div class="bg-white rounded-xl p-4 shadow-sm">
+                  <div class="flex items-center space-x-3">
+                    <i class="fas fa-shield-alt text-gray-400"></i>
+                    <p class="text-sm text-gray-600">Your account is protected with two-factor authentication</p>
+                  </div>
+                </div>
               </div>
             </div>
-          <% }) %>
-        <% } else { %>
-          <p>No addresses available.</p>
-        <% } %>
-        
+          </div>
+        </div>
+      </div>
+
+      <!-- Address Section -->
+      <div class="mb-10">
+        <div class="flex justify-between items-center mb-8">
+          <h2 class="text-2xl font-bold text-gray-900">My Addresses</h2>
+          <!-- Keeping original add address button with same ID -->
+          <button id="openModalBtn" class="flex items-center px-6 py-2.5 bg-gray-800 hover:bg-gray-900 text-white rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+            <i class="fas fa-plus mr-2"></i>
+            Add New Address
+          </button>
+        </div>
+
+        <!-- Address Grid -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <% if (addresses && addresses.length > 0) { %>
+            <% addresses.forEach(addressItem => { %>
+              <% const address = addressItem.address[0]; %>
+              <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+                <div class="p-6">
+                  <div class="flex justify-between items-start mb-4">
+                    <span class="px-4 py-1.5 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+                      <%= address.addressType %>
+                    </span>
+                    <% if (address.isDefault) { %>
+                      <span class="px-4 py-1.5 bg-green-100 text-green-800 rounded-full text-sm font-medium">Default</span>
+                    <% } %>
+                  </div>
+
+                  <h3 class="text-xl font-bold text-gray-900 mb-3"><%= address.name %></h3>
+                  <p class="text-gray-600 leading-relaxed mb-4">
+                    <%= address.landMark %><br>
+                    <%= address.city %>, <%= address.state %> - <%= address.pincode %>
+                  </p>
+
+                  <div class="flex justify-end items-center space-x-4 pt-4 border-t border-gray-100">
+                    <button class="text-red-500 hover:text-red-600 font-medium text-sm transition-colors duration-300">
+                      <i class="fas fa-trash-alt mr-1"></i> Remove
+                    </button>
+                    <button class="text-blue-500 hover:text-blue-600 font-medium text-sm transition-colors duration-300">
+                      <i class="fas fa-edit mr-1"></i> Edit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div class="col-span-2 bg-white rounded-2xl shadow-lg p-8 text-center">
+              <p class="text-gray-500">No addresses available yet</p>
+            </div>
+          <% } %>
+        </div>
       </div>
     </div>
   </div>
@@ -191,19 +199,23 @@
   id="addAddressModal"
   class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden"
 >
-  <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
-    <div class="flex justify-between items-center">
-      <h2 class="text-xl font-bold">Add Address</h2>
-      <button id="closeModalBtn" class="text-gray-500 hover:text-black text-xl">&times;</button>
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg p-8">
+    <div class="flex justify-between items-center border-b pb-4">
+      <h2 class="text-2xl font-bold text-gray-800">Add Address</h2>
+      <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
-    <form id="addressForm" class="mt-4">
+    <form id="addressForm" class="mt-6 space-y-6">
       <!-- Address Type -->
-      <div class="mb-4">
-        <label for="addressType" class="block text-sm font-medium">Address Type*</label>
+      <div>
+        <label for="addressType" class="block text-sm font-semibold text-gray-700">Address Type*</label>
         <select
           id="addressType"
           name="addressType"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+          class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
           required
         >
           <option value="" disabled selected>Select type</option>
@@ -215,104 +227,107 @@
       </div>
 
       <!-- Name -->
-      <div class="mb-4">
-        <label for="name" class="block text-sm font-medium">Name*</label>
+      <div>
+        <label for="name" class="block text-sm font-semibold text-gray-700">Name*</label>
         <input
           type="text"
           id="name"
           name="name"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-          placeholder="Full Name"
+          class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+          placeholder="Enter your full name"
           minlength="3"
           maxlength="50"
           required
         />
       </div>
 
-      <!-- City -->
-      <div class="mb-4">
-        <label for="city" class="block text-sm font-medium">City*</label>
-        <input
-          type="text"
-          id="city"
-          name="city"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-          placeholder="City"
-          minlength="2"
-          maxlength="100"
-          required
-        />
+      <div class="grid grid-cols-2 gap-4">
+        <!-- City -->
+        <div>
+          <label for="city" class="block text-sm font-semibold text-gray-700">City*</label>
+          <input
+            type="text"
+            id="city"
+            name="city"
+            class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+            placeholder="Enter city"
+            minlength="2"
+            maxlength="100"
+            required
+          />
+        </div>
+
+        <!-- State -->
+        <div>
+          <label for="state" class="block text-sm font-semibold text-gray-700">State*</label>
+          <input
+            type="text"
+            id="state"
+            name="state"
+            class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+            placeholder="Enter state"
+            required
+          />
+        </div>
       </div>
 
       <!-- Landmark -->
-      <div class="mb-4">
-        <label for="landMark" class="block text-sm font-medium">Landmark*</label>
+      <div>
+        <label for="landMark" class="block text-sm font-semibold text-gray-700">Landmark*</label>
         <input
           type="text"
           id="landMark"
           name="landMark"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-          placeholder="Landmark"
+          class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+          placeholder="Enter a nearby landmark"
           maxlength="100"
-          required
-        />
-      </div>
-
-      <!-- State -->
-      <div class="mb-4">
-        <label for="state" class="block text-sm font-medium">State*</label>
-        <input
-          type="text"
-          id="state"
-          name="state"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-          placeholder="State"
           required
         />
       </div>
 
       <!-- Pincode -->
-      <div class="mb-4">
-        <label for="pincode" class="block text-sm font-medium">Pincode*</label>
+      <div>
+        <label for="pincode" class="block text-sm font-semibold text-gray-700">Pincode*</label>
         <input
           type="number"
           id="pincode"
           name="pincode"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-          placeholder="6-digit Pincode"
+          class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+          placeholder="Enter 6-digit pincode"
           min="100000"
           max="999999"
           required
         />
       </div>
-      <div>
-        <label class="flex items-center space-x-2">
+
+      <div class="flex items-center">
+        <label class="flex items-center space-x-3 cursor-pointer">
           <input
             type="checkbox"
             id="isDefault"
-            class="form-checkbox h-4 w-4 text-blue-600"
+            class="w-5 h-5 rounded border-gray-300 text-yellow-500 focus:ring-yellow-400"
             onchange="handleDefaultAddressCheckbox()"
           />
-          <span>Set as Default Address</span>
+          <span class="text-sm font-medium text-gray-700">Set as Default Address</span>
         </label>
       </div>
+
       <div id="error-message" class="text-red-500"></div>
 
-
       <!-- Buttons -->
-      <div class="flex justify-end">
-        <button
-          type="submit"
-          class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mr-2"
-        >
-          Save
-        </button>
+      <div class="flex justify-end space-x-3 pt-4 border-t">
         <button
           type="button"
           id="cancelModalBtn"
-          class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded"
+          class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
         >
           Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-6 py-2.5 rounded-lg bg-yellow-500 text-white font-medium hover:bg-yellow-600 transition-colors"
+        >
+          Save Address
         </button>
       </div>
     </form>

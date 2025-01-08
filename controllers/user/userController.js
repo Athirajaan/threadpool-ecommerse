@@ -403,6 +403,30 @@ const handleGoogleLogin = async (req, res) => {
   }
 };
 
+const updatePhone = async (req, res) => {
+  try {
+    const { phoneNumber } = req.body;
+    const userId = req.session.user;
+
+    // Validate phone number
+    if (!/^\d{10}$/.test(phoneNumber)) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Invalid phone number' });
+    }
+
+    // Update user's phone number
+    await User.findByIdAndUpdate(userId, { phone: phoneNumber });
+
+    res.json({ success: true, message: 'Phone number updated successfully' });
+  } catch (error) {
+    console.error('Error updating phone number:', error);
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to update phone number' });
+  }
+};
+
 module.exports = {
   loadHomepage,
   loadSignup,
@@ -419,4 +443,5 @@ module.exports = {
   updateProfile,
   changePassword,
   handleGoogleLogin,
+  updatePhone,
 };

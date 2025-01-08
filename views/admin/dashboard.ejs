@@ -1,131 +1,212 @@
 <%- include('../partials/admin/header') %>
 
-<div class="dashboard-wrapper">
-    <div class="main-content p-0">
-        <!-- Top Stats Strip -->
-        <div class="stats-strip mb-4">
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="fas fa-shopping-bag"></i>
-                </div>
-                <div class="stat-details">
-                    <h3 class="stat-value"><%= totalSales %></h3>
-                    <p class="stat-label">Total Orders</p>
-                    <span class="trend positive">↑ 12%</span>
-                </div>
-            </div>
-
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="fas fa-rupee-sign"></i>
-                </div>
-                <div class="stat-details">
-                    <h3 class="stat-value">₹<%= totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 }) %></h3>
-                    <p class="stat-label">Revenue</p>
-                    <span class="trend positive">↑ 8%</span>
+<!-- Main content area that fills the space next to sidebar -->
+<div class="container mx-auto px-4 py-8">
+    <!-- Your existing sidebar here -->
+    
+    <!-- Main content wrapper - will fill remaining space -->
+    <div class="flex-1">
+        <!-- Stats Strip -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <!-- Total Orders -->
+            <div class="bg-white rounded-xl shadow-sm p-6 transition-transform hover:-translate-y-1 duration-300">
+                <div class="flex items-center">
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <i class="fas fa-shopping-bag text-blue-500 text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-500 text-sm">Total Orders</p>
+                        <h3 class="text-2xl font-semibold text-gray-800"><%= totalSales %></h3>
+                        <span class="text-green-500 text-sm">↑ 12% increase</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="fas fa-tags"></i>
-                </div>
-                <div class="stat-details">
-                    <h3 class="stat-value">₹<%= totalDiscount.toLocaleString('en-IN', { maximumFractionDigits: 2 }) %></h3>
-                    <p class="stat-label">Discounts</p>
-                    <span class="trend negative">↓ 5%</span>
+            <!-- Revenue -->
+            <div class="bg-white rounded-xl shadow-sm p-6 transition-transform hover:-translate-y-1 duration-300">
+                <div class="flex items-center">
+                    <div class="bg-green-50 p-3 rounded-lg">
+                        <i class="fas fa-rupee-sign text-green-500 text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-500 text-sm">Revenue</p>
+                        <h3 class="text-2xl font-semibold text-gray-800">₹<%= totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 }) %></h3>
+                        <span class="text-green-500 text-sm">↑ 8% increase</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="fas fa-chart-line"></i>
+            <!-- Discounts -->
+            <div class="bg-white rounded-xl shadow-sm p-6 transition-transform hover:-translate-y-1 duration-300">
+                <div class="flex items-center">
+                    <div class="bg-yellow-50 p-3 rounded-lg">
+                        <i class="fas fa-tags text-yellow-500 text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-500 text-sm">Discounts</p>
+                        <h3 class="text-2xl font-semibold text-gray-800">₹<%= totalDiscount.toLocaleString('en-IN', { maximumFractionDigits: 2 }) %></h3>
+                        <span class="text-red-500 text-sm">↓ 5% decrease</span>
+                    </div>
                 </div>
-                <div class="stat-details">
-                    <h3 class="stat-value">₹<%= (totalAmount/totalSales).toLocaleString('en-IN', { maximumFractionDigits: 2 }) %></h3>
-                    <p class="stat-label">Avg. Order</p>
-                    <span class="trend positive">↑ 3%</span>
+            </div>
+
+            <!-- Average Order -->
+            <div class="bg-white rounded-xl shadow-sm p-6 transition-transform hover:-translate-y-1 duration-300">
+                <div class="flex items-center">
+                    <div class="bg-purple-50 p-3 rounded-lg">
+                        <i class="fas fa-chart-line text-purple-500 text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-500 text-sm">Avg. Order Value</p>
+                        <h3 class="text-2xl font-semibold text-gray-800">₹<%= (totalAmount/totalSales).toLocaleString('en-IN', { maximumFractionDigits: 2 }) %></h3>
+                        <span class="text-green-500 text-sm">↑ 3% increase</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Orders Table Section -->
-        <div class="orders-section">
-            <div class="orders-header">
-                <div class="header-left">
-                    <h2>Recent Orders</h2>
-                    <div class="time-filters flex gap-3 mt-2">
-                        <button onclick="filterOrders('today')" class="filter-btn">
-                            Today
-                        </button>
-                        <button onclick="filterOrders('week')" class="filter-btn">
-                            This Week
-                        </button>
-                        <button onclick="filterOrders('month')" class="filter-btn">
-                            This Month
-                        </button>
-                        <button onclick="filterOrders('all')" class="filter-btn active">
-                            All Orders
-                        </button>
-                    </div>
+    
+        <!-- Sales Analytics Section -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Sales Analytics</h2>
+                    <p class="text-gray-500 mt-1">Track your sales performance</p>
                 </div>
-                <div class="header-right">
-                    <a href="/admin/export-pdf" class="btn-export pdf">
-                        <i class="fas fa-file-pdf"></i> Export PDF
-                    </a>
-                    <a href="/admin/export-excel" class="btn-export excel">
-                        <i class="fas fa-file-excel"></i> Export Excel
-                    </a>
+                <div class="flex items-center gap-4">
+                    <button onclick="openTopSellers()" 
+                            class="group relative px-6 py-2.5 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 flex items-center space-x-2">
+                        <div>
+                            <i class="fas fa-crown text-yellow-500 mr-2"></i>
+                            <span class="font-medium text-gray-700">Explore Top Sellers</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <span class="hidden group-hover:inline-block ml-1">View Details</span>
+                            <i class="fas fa-chevron-right ml-1 text-xs transition-transform group-hover:translate-x-1"></i>
+                        </div>
+                        
+                        <!-- Hover tooltip -->
+                        <div class="absolute hidden group-hover:block w-48 bg-gray-800 text-white text-xs py-1 px-2 rounded-md -bottom-8 left-1/2 transform -translate-x-1/2">
+                            View top products and categories
+                        </div>
+                    </button>
                 </div>
             </div>
 
-            <div class="orders-table">
-                <table>
-                    <thead>
+            <!-- Period selection buttons -->
+            <div class="flex gap-3 mb-6">
+                <button onclick="updateChart('weekly')" 
+                        class="px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm 
+                        bg-blue-500 text-white hover:bg-blue-600 hover:shadow-md active:transform active:scale-95">
+                        <i class="fas fa-calendar-week mr-2"></i>Weekly
+                </button>
+                <button onclick="updateChart('monthly')" 
+                        class="px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm 
+                        bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md active:transform active:scale-95">
+                        <i class="fas fa-calendar-alt mr-2"></i>Monthly
+                </button>
+                <button onclick="updateChart('yearly')" 
+                        class="px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm 
+                        bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md active:transform active:scale-95">
+                        <i class="fas fa-calendar mr-2"></i>Yearly
+                </button>
+            </div>
+
+            <!-- Chart Container with subtle gradient background -->
+            <div class="relative h-[400px] p-4 rounded-lg bg-gradient-to-br from-gray-50 via-white to-gray-50">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="bg-white rounded-xl shadow-sm">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Recent Orders</h2>
+                        <div class="flex gap-3 mt-3">
+                            <button onclick="filterOrders('today')" class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'today' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                                Today
+                            </button>
+                            <button onclick="filterOrders('week')" class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'week' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                                This Week
+                            </button>
+                            <button onclick="filterOrders('month')" class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'month' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                                This Month
+                            </button>
+                            <button onclick="filterOrders('all')" class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                                All Orders
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-4 md:mt-0">
+                        <a href="/admin/export-pdf" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                            <i class="fas fa-file-pdf mr-2"></i> Export PDF
+                        </a>
+                        <a href="/admin/export-excel" class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                            <i class="fas fa-file-excel mr-2"></i> Export Excel
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Products</th>
-                            <th>Amount</th>
-                            <th>Discount</th>
-                            <th>Date</th>
-                            <th>Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="bg-white divide-y divide-gray-200">
                         <% orders.forEach(order => { %>
-                            <tr>
-                                <td class="order-id">#<%= order.orderId %></td>
-                                <td>
-                                    <div class="customer-info">
-                                        <div class="avatar"><%= order.user.name.charAt(0) %></div>
-                                        <div class="details">
-                                            <div class="name"><%= order.user.name %></div>
-                                            <div class="phone"><%= order.phoneNumber %></div>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#<%= order.orderId %></td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                            <%= order.user.name.charAt(0) %>
+                                        </div>
+                                        <div class="ml-3">
+                                            <div class="text-sm font-medium text-gray-900"><%= order.user.name %></div>
+                                            <div class="text-sm text-gray-500"><%= order.phoneNumber %></div>
                                         </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <div class="products-list">
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">
                                         <% order.orderedItems.forEach(item => { %>
-                                            <div class="product">
-                                                <%= item.product.productName %> 
-                                                <span class="meta">(<%= item.size %> | <%= item.quantity %>)</span>
+                                            <div class="mb-1">
+                                                <%= item.product.productName %>
+                                                <span class="text-gray-500">(<%= item.size %> | <%= item.quantity %>)</span>
                                             </div>
                                         <% }) %>
                                     </div>
                                 </td>
-                                <td class="amount">₹<%= order.finalAmount.toFixed(2) %></td>
-                                <td class="discount">-₹<%= ((order.discount || 0) + (order.couponDiscount || 0)).toFixed(2) %></td>
-                                <td>
-                                    <div class="date">
-                                        <div><%= new Date(order.createdOn).toLocaleDateString() %></div>
-                                        <div class="time"><%= new Date(order.createdOn).toLocaleTimeString() %></div>
-                                    </div>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
+                                    ₹<%= order.finalAmount.toFixed(2) %>
                                 </td>
-                                <td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
+                                    -₹<%= ((order.discount || 0) + (order.couponDiscount || 0)).toFixed(2) %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900"><%= new Date(order.createdOn).toLocaleDateString() %></div>
+                                    <div class="text-sm text-gray-500"><%= new Date(order.createdOn).toLocaleTimeString() %></div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
                                     <% const itemStatus = order.orderedItems[0]?.status || 'Pending' %>
-                                    <span class="status <%= itemStatus.toLowerCase() %>"><%= itemStatus %></span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        <%= itemStatus.toLowerCase() === 'delivered' ? 'bg-green-100 text-green-800' : 
+                                           itemStatus.toLowerCase() === 'cancelled' ? 'bg-red-100 text-red-800' : 
+                                           'bg-yellow-100 text-yellow-800' %>">
+                                        <%= itemStatus %>
+                                    </span>
                                 </td>
                             </tr>
                         <% }) %>
@@ -136,321 +217,299 @@
     </div>
 </div>
 
-<style>
-/* Modern Dashboard Styles */
-.dashboard-wrapper {
-    min-height: 100vh;
-    background: #f0f2f5;
-    margin: 0;
-    padding: 0;
-}
+<%- include('../partials/admin/footer') %>
 
-.main-content {
-    width: 100%;
-    max-width: 100%;
-}
-
-/* Stats Strip */
-.stats-strip {
-    display: flex;
-    background: linear-gradient(135deg, #2193b0, #6dd5ed);
-    padding: 2rem;
-    gap: 2rem;
-    color: white;
-}
-
-.stat-item {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 1.5rem;
-    border-radius: 1rem;
-    backdrop-filter: blur(10px);
-    transition: transform 0.3s ease;
-}
-
-.stat-item:hover {
-    transform: translateY(-5px);
-}
-
-.stat-icon {
-    font-size: 2.5rem;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-}
-
-.stat-details {
-    flex: 1;
-}
-
-.stat-value {
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.stat-label {
-    margin: 0.25rem 0;
-    opacity: 0.9;
-}
-
-.trend {
-    font-size: 0.875rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.trend.positive { color: #4ade80; }
-.trend.negative { color: #f87171; }
-
-/* Orders Section */
-.orders-section {
-    background: white;
-    margin: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.orders-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-}
-
-.header-left h2 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: #1f2937;
-}
-
-.search-container {
-    position: relative;
-    width: 300px;
-}
-
-.search-container input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-}
-
-.search-container i {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9ca3af;
-}
-
-.btn-export {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.btn-export.pdf {
-    background: #ef4444;
-    color: white;
-    margin-right: 1rem;
-}
-
-.btn-export.excel {
-    background: #22c55e;
-    color: white;
-}
-
-/* Table Styles */
-.orders-table {
-    padding: 1.5rem 2rem;
-}
-
-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 0.5rem;
-}
-
-th {
-    text-align: left;
-    padding: 1rem;
-    color: #6b7280;
-    font-weight: 500;
-    background: #f9fafb;
-}
-
-td {
-    padding: 1rem;
-    background: white;
-    border-top: 1px solid #e5e7eb;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-td:first-child { border-left: 1px solid #e5e7eb; border-radius: 0.5rem 0 0 0.5rem; }
-td:last-child { border-right: 1px solid #e5e7eb; border-radius: 0 0.5rem 0.5rem 0; }
-
-.customer-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.avatar {
-    width: 40px;
-    height: 40px;
-    background: #3b82f6;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-}
-
-.status {
-    padding: 0.5rem 1rem;
-    border-radius: 2rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.status.pending { background: #fff7ed; color: #f97316; }
-.status.delivered { background: #f0fdf4; color: #22c55e; }
-.status.cancelled { background: #fef2f2; color: #ef4444; }
-
-.products-list .product {
-    margin-bottom: 0.25rem;
-}
-
-.products-list .meta {
-    color: #6b7280;
-    font-size: 0.875rem;
-}
-
-.amount { color: #059669; font-weight: 600; }
-.discount { color: #dc2626; font-weight: 600; }
-
-.date .time {
-    color: #6b7280;
-    font-size: 0.875rem;
-}
-
-@media (max-width: 1200px) {
-    .stats-strip {
-        flex-wrap: wrap;
-    }
-    
-    .stat-item {
-        flex: 1 1 calc(50% - 1rem);
-    }
-}
-
-@media (max-width: 768px) {
-    .stats-strip {
-        padding: 1rem;
-    }
-    
-    .stat-item {
-        flex: 1 1 100%;
-    }
-    
-    .orders-header {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .header-left {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .search-container {
-        width: 100%;
-    }
-}
-
-.time-filters {
-    margin-top: 1rem;
-}
-
-.filter-btn {
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    background: #f3f4f6;
-    color: #374151;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
-}
-
-.filter-btn:hover {
-    background: #e5e7eb;
-}
-
-.filter-btn.active {
-    background: #2193b0;
-    color: white;
-}
-</style>
-
+<!-- Add this before closing body tag -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-function exportToPDF() {
-    alert('PDF export functionality will be implemented');
-}
+let salesChart;
 
-function exportToExcel() {
-    alert('Excel export functionality will be implemented');
-}
-
-async function filterOrders(period) {
+async function updateChart(period) {
     try {
-        // Update active button state
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
+        // Update button styles
+        document.querySelectorAll('[onclick^="updateChart"]').forEach(btn => {
+            if (btn) {
+                btn.className = 'px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md active:transform active:scale-95';
+            }
         });
-        event.target.classList.add('active');
+        if (event && event.target) {
+            event.target.className = 'px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm bg-blue-500 text-white hover:bg-blue-600 hover:shadow-md active:transform active:scale-95';
+        }
 
-        // Redirect to the filtered view
-        window.location.href = `/admin/filter-orders?period=${period}`;
+        // Fetch data
+        const response = await fetch(`/admin/sales-data?period=${period}`);
+        const data = await response.json();
+
+        // Destroy existing chart if it exists
+        if (salesChart) {
+            salesChart.destroy();
+        }
+
+        // Create new chart with enhanced styling
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        label: 'Revenue',
+                        data: data.datasets[0].data,
+                        borderColor: '#4F46E5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.05)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#4F46E5',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Orders',
+                        data: data.datasets[1].data,
+                        borderColor: '#0EA5E9',
+                        backgroundColor: 'rgba(14, 165, 233, 0.05)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#0EA5E9',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            font: {
+                                family: "'Inter', sans-serif",
+                                size: 13,
+                                weight: '500'
+                            },
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            boxWidth: 10
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#1f2937',
+                        bodyColor: '#1f2937',
+                        borderColor: '#e5e7eb',
+                        borderWidth: 1,
+                        padding: 12,
+                        bodyFont: {
+                            family: "'Inter', sans-serif"
+                        },
+                        titleFont: {
+                            family: "'Inter', sans-serif",
+                            weight: '600'
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.dataset.label === 'Revenue') {
+                                    label += '₹' + context.parsed.y.toLocaleString('en-IN');
+                                } else {
+                                    label += context.parsed.y;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.03)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                family: "'Inter', sans-serif",
+                                size: 12
+                            },
+                            color: '#6B7280',
+                            stepSize: 100,
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString('en-IN');
+                            }
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 500
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                family: "'Inter', sans-serif",
+                                size: 12
+                            },
+                            color: '#6B7280'
+                        }
+                    }
+                }
+            }
+        });
     } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to filter orders');
+        console.error('Error updating chart:', error);
     }
 }
 
-// Add this to highlight the current active filter on page load
+// Initialize with weekly data only after DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const currentPeriod = urlParams.get('period') || 'all';
-    
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        if (btn.textContent.toLowerCase().includes(currentPeriod)) {
-            btn.classList.add('active');
-        }
-    });
+    updateChart('weekly');
 });
+
+async function openTopSellers() {
+    try {
+        const response = await fetch('/admin/top-sellers');
+        const data = await response.json();
+        
+        // Populate Women's Products
+        const womenHTML = data.topWomenProducts.map(product => `
+            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <img src="${product.productImage && product.productImage.length > 0 ? product.productImage[0] : '/images/default-product.jpg'}" 
+                     alt="${product.productName}" 
+                     class="w-12 h-12 object-cover rounded">
+                <div class="ml-3 flex-1">
+                    <h4 class="font-medium text-gray-800">${product.productName}</h4>
+                    <p class="text-sm text-gray-500">Sales: ${product.salesCount || 0}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-medium text-gray-800">₹${product.salePrice}</p>
+                </div>
+            </div>
+        `).join('');
+        
+        const womenContainer = document.getElementById('topWomenProducts');
+        if (womenContainer) {
+            womenContainer.innerHTML = womenHTML;
+        }
+
+        // Populate Men's Products
+        const menHTML = data.topMenProducts.map(product => `
+            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <img src="${product.productImage && product.productImage.length > 0 ? product.productImage[0] : '/images/default-product.jpg'}" 
+                     alt="${product.productName}" 
+                     class="w-12 h-12 object-cover rounded">
+                <div class="ml-3 flex-1">
+                    <h4 class="font-medium text-gray-800">${product.productName}</h4>
+                    <p class="text-sm text-gray-500">Sales: ${product.salesCount || 0}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-medium text-gray-800">₹${product.salePrice}</p>
+                </div>
+            </div>
+        `).join('');
+        
+        const menContainer = document.getElementById('topMenProducts');
+        if (menContainer) {
+            menContainer.innerHTML = menHTML;
+        }
+
+        // Populate Categories
+        const categoriesHTML = data.topCategories.map(category => `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <h4 class="font-medium text-gray-800">${category.name}</h4>
+                <p class="text-sm text-gray-500">Total Sales: ${category.totalSales || 0}</p>
+            </div>
+        `).join('');
+        
+        const categoriesContainer = document.getElementById('topCategories');
+        if (categoriesContainer) {
+            categoriesContainer.innerHTML = categoriesHTML;
+        }
+
+        // Show overlay and modal
+        const overlay = document.getElementById('modalOverlay');
+        const modal = document.getElementById('topSellersModal');
+        
+        if (overlay && modal) {
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            overlay.classList.add('opacity-50');
+            modal.classList.remove('translate-x-full');
+        }
+    } catch (error) {
+        console.error('Error fetching top sellers:', error);
+    }
+}
+
+function closeTopSellers() {
+    const overlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById('topSellersModal');
+    
+    if (overlay && modal) {
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        overlay.classList.remove('opacity-50');
+        modal.classList.add('translate-x-full');
+    }
+}
+
+// Add click handler to close modal when clicking overlay
+document.getElementById('modalOverlay')?.addEventListener('click', closeTopSellers);
 </script>
 
-<%- include('../partials/admin/footer') %>
+<!-- Add this right after your main content and before the modal -->
+<div id="modalOverlay" 
+     class="fixed inset-0 bg-black opacity-0 pointer-events-none transition-opacity duration-300 ease-in-out"
+     style="z-index: 40;">
+</div>
+
+<!-- Update the modal's z-index to be above the overlay -->
+<div id="topSellersModal" 
+     class="fixed top-0 right-0 h-full w-1/3 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto"
+     style="z-index: 50;">
+    <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Top Sellers</h2>
+            <button onclick="closeTopSellers()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Women's Products -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Top Women's Products</h3>
+            <div id="topWomenProducts" class="space-y-4">
+                <!-- Products will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Men's Products -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Top Men's Products</h3>
+            <div id="topMenProducts" class="space-y-4">
+                <!-- Products will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Top Categories</h3>
+            <div id="topCategories" class="space-y-4">
+                <!-- Categories will be inserted here -->
+            </div>
+        </div>
+    </div>
+</div>

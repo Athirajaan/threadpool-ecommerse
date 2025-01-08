@@ -80,4 +80,8 @@ router.get('/export-pdf', adminController.exportToPDF);
 // Add this new route
 router.get('/filter-orders', adminAuth, adminController.filterOrders);
 
+router.get('/sales-data', adminAuth, adminController.getSalesData);
+
+router.get('/top-sellers', adminAuth, adminController.getTopSellers);
+
 module.exports = router;

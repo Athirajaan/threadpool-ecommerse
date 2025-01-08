@@ -11,6 +11,7 @@ const passport = require('passport');
 const { userAuth } = require('../middlewares/auth');
 const razorpay = require('../config/razorpay');
 const crypto = require('crypto');
+const Wishlist = require('../models/wishlistSchema');
 
 router.get('/pageNotFound', userController.pageNotFound);
 router.get('/', userController.loadHomepage);
@@ -53,7 +54,6 @@ router.get('/profile', userAuth, userController.loadProfile);
 router.post('/update-profile', userAuth, userController.updateProfile);
 router.post('/change-password', userAuth, userController.changePassword);
 router.post('/add-address', userAuth, userController.addAddress);
-
 
 //cart management
 router.get('/cart', userAuth, cartController.getCart);
@@ -107,10 +107,17 @@ router.post(
 // Verify Razorpay payment
 router.post('/verify-payment', userAuth, cartController.verifyRazorpayPayment);
 
+router.post('/retry-razorpay-order', orderController.createRazorpayOrder);
+router.post('/update-payment-status', orderController.updatePaymentStatus);
+
 router.post('/remove-coupon', userAuth, cartController.removeCoupon);
 
 router.get('/wallet', userAuth, walletController.getWallet);
 router.post('/wallet/add-money', userAuth, walletController.initiateAddMoney);
 router.post('/wallet/verify-payment', userAuth, walletController.verifyPayment);
+
+router.post('/update-phone', userController.updatePhone);
+
+router.post('/download-invoice', userAuth, orderController.downloadInvoice);
 
 module.exports = router;

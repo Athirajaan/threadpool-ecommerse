@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const Order = require('../../models/orderSchema');
 const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
+const Product = require('../../models/productSchema');
+const Category = require('../../models/categorySchema');
 
 //load login
 const loadLogin = (req, res) => {
@@ -294,11 +296,9 @@ const exportToPDF = async (req, res) => {
     });
 
     // Footer
-    doc
-      .fontSize(8)
-      .text('Threadpool - Your Fashion Destination', 30, 780, {
-        align: 'center',
-      });
+    doc.fontSize(8).text('Threadpool - Your Fashion Destination', 30, 780, {
+      align: 'center',
+    });
 
     doc.end();
   } catch (error) {
@@ -393,6 +393,209 @@ const filterOrders = async (req, res) => {
   }
 };
 
+const getSalesData = async (req, res) => {
+  try {
+    const { period } = req.query;
+    const currentDate = new Date();
+    let startDate;
+    let labels;
+    let groupByFormat;
+
+    switch (period) {
+      case 'weekly':
+        // Get current day of week (0 = Sunday, 1 = Monday, etc.)
+        const currentDay = currentDate.getDay();
+        // Calculate days to subtract to get to last Monday
+        const daysToMonday = currentDay === 0 ? 6 : currentDay - 1;
+
+        startDate = new Date(currentDate);
+        startDate.setDate(currentDate.getDate() - daysToMonday);
+        startDate.setHours(0, 0, 0, 0);
+
+        // Create labels for Monday to Sunday
+        labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        groupByFormat = '%Y-%m-%d';
+        break;
+
+      case 'monthly':
+        startDate = new Date(currentDate);
+        startDate.setMonth(currentDate.getMonth() - 1);
+        labels = Array.from({ length: 30 }, (_, i) => {
+          const date = new Date(startDate);
+          date.setDate(startDate.getDate() + i);
+          return date.getDate().toString();
+        });
+        groupByFormat = '%Y-%m-%d';
+        break;
+
+      case 'yearly':
+        startDate = new Date(currentDate);
+        startDate.setFullYear(currentDate.getFullYear() - 1);
+        labels = [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
+        ];
+        groupByFormat = '%Y-%m';
+        break;
+
+      default:
+        return res.status(400).json({ error: 'Invalid period' });
+    }
+
+    // Aggregate sales data
+    const salesData = await Order.aggregate([
+      {
+        $match: {
+          createdOn: { $gte: startDate },
+          'orderedItems.status': { $ne: 'Cancelled' },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: groupByFormat,
+              date: '$createdOn',
+            },
+          },
+          totalSales: { $sum: '$finalAmount' },
+          orderCount: { $sum: 1 },
+          totalItems: { $sum: { $size: '$orderedItems' } },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+
+    // Format data for Chart.js
+    const datasets = [
+      {
+        label: 'Sales Amount (₹)',
+        data: new Array(labels.length).fill(0),
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1,
+      },
+      {
+        label: 'Number of Orders',
+        data: new Array(labels.length).fill(0),
+        borderColor: 'rgb(255, 99, 132)',
+        tension: 0.1,
+      },
+    ];
+
+    // Fill in the actual data
+    salesData.forEach((data) => {
+      let index;
+      if (period === 'weekly') {
+        const date = new Date(data._id);
+        index = labels.indexOf(
+          date.toLocaleDateString('en-US', { weekday: 'short' })
+        );
+      } else if (period === 'monthly') {
+        const date = new Date(data._id);
+        index = date.getDate() - 1;
+      } else {
+        const date = new Date(data._id + '-01'); // Add day for proper parsing
+        index = date.getMonth();
+      }
+
+      if (index !== -1) {
+        datasets[0].data[index] = data.totalSales;
+        datasets[1].data[index] = data.orderCount;
+      }
+    });
+
+    // For weekly view, ensure data aligns with Monday-Sunday
+    if (period === 'weekly') {
+      const filledData = new Array(7).fill(0);
+      salesData.forEach((data) => {
+        const date = new Date(data._id);
+        const dayIndex = (date.getDay() + 6) % 7; // Convert Sunday(0) to 6, Monday(1) to 0, etc.
+        filledData[dayIndex] = data.totalSales;
+      });
+      datasets[0].data = filledData;
+
+      const orderData = new Array(7).fill(0);
+      salesData.forEach((data) => {
+        const date = new Date(data._id);
+        const dayIndex = (date.getDay() + 6) % 7;
+        orderData[dayIndex] = data.orderCount;
+      });
+      datasets[1].data = orderData;
+    }
+
+    res.json({
+      labels,
+      datasets,
+      summary: {
+        totalSales: datasets[0].data.reduce((a, b) => a + b, 0),
+        totalOrders: datasets[1].data.reduce((a, b) => a + b, 0),
+        averageOrderValue:
+          datasets[0].data.reduce((a, b) => a + b, 0) /
+          datasets[1].data.reduce((a, b) => a + b, 1),
+      },
+    });
+  } catch (error) {
+    console.error('Sales data error:', error);
+    res.status(500).json({ error: 'Error fetching sales data' });
+  }
+};
+
+const getTopSellers = async (req, res) => {
+  try {
+    // Get top 5 products for each gender
+    const topWomenProducts = await Product.find({ gender: 'Women' })
+      .sort({ salesCount: -1 })
+      .limit(5)
+      .select('productName salesCount salePrice productImage');
+
+    const topMenProducts = await Product.find({ gender: 'Men' })
+      .sort({ salesCount: -1 })
+      .limit(5)
+      .select('productName salesCount salePrice productImage');
+
+    // Get top 5 categories
+    const topCategories = await Category.aggregate([
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: 'category',
+          as: 'products',
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          totalSales: { $sum: '$products.salesCount' },
+        },
+      },
+      { $sort: { totalSales: -1 } },
+      { $limit: 5 },
+    ]);
+
+    res.json({
+      topWomenProducts,
+      topMenProducts,
+      topCategories,
+    });
+  } catch (error) {
+    console.error('Error fetching top sellers:', error);
+    res.status(500).json({ error: 'Error fetching top sellers' });
+  }
+};
+
 module.exports = {
   loadLogin,
   login,
@@ -402,4 +605,6 @@ module.exports = {
   exportToExcel,
   exportToPDF,
   filterOrders,
+  getSalesData,
+  getTopSellers,
 };

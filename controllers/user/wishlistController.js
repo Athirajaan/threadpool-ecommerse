@@ -54,51 +54,51 @@ const loadWishlist = async (req, res) => {
 // Add this method to your wishlistController
 const toggleWishlist = async (req, res) => {
   try {
-    const userId = req.session.user;
     const { productId } = req.body;
+    const userId = req.session.user;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Please login first',
+      });
+    }
 
     // Find user's wishlist
     let wishlist = await Wishlist.findOne({ userId });
 
     // If no wishlist exists, create one
     if (!wishlist) {
-      wishlist = new Wishlist({
-        userId,
-        products: [],
-      });
+      wishlist = new Wishlist({ userId, products: [] });
     }
 
     // Check if product is already in wishlist
-    const productIndex = wishlist.products.findIndex(
+    const existingProduct = wishlist.products.find(
       (item) => item.productId.toString() === productId
     );
 
-    if (productIndex > -1) {
+    if (existingProduct) {
       // Remove product if it exists
-      wishlist.products.splice(productIndex, 1);
-      await Product.findByIdAndUpdate(productId, {
-        $inc: { wishlistCount: -1 },
-      });
+      wishlist.products = wishlist.products.filter(
+        (item) => item.productId.toString() !== productId
+      );
     } else {
       // Add product if it doesn't exist
       wishlist.products.push({ productId });
-      await Product.findByIdAndUpdate(productId, {
-        $inc: { wishlistCount: 1 },
-      });
     }
 
     await wishlist.save();
 
     res.json({
       success: true,
-      message:
-        productIndex > -1 ? 'Removed from wishlist' : 'Added to wishlist',
+      action: existingProduct ? 'removed' : 'added',
+      message: `Product ${existingProduct ? 'removed from' : 'added to'} wishlist`,
     });
   } catch (error) {
-    console.error('Error in toggleWishlist:', error);
+    console.error('Wishlist toggle error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update wishlist',
+      message: 'Error updating wishlist',
     });
   }
 };

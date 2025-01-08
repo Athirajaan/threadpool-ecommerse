@@ -5,11 +5,13 @@ const orderInfo = async (req, res) => {
   try {
     const { page = 1, limit = 4 } = req.query;
 
-    // First, get total count
-    const totalOrders = await Order.countDocuments();
+    // First, get total count (excluding failed payments)
+    const totalOrders = await Order.countDocuments({
+      paymentStatus: { $ne: 'Failed' },
+    });
 
-    // Then get orders with proper sorting
-    const orders = await Order.find()
+    // Then get orders with proper sorting (excluding failed payments)
+    const orders = await Order.find({ paymentStatus: { $ne: 'Failed' } })
       .populate({
         path: 'orderedItems.product',
         select: 'productName productImage',

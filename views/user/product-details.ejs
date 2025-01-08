@@ -410,15 +410,20 @@ sizeButtons.forEach(button => {
 });
 document.getElementById('addToCartButton').addEventListener('click', async function() {
     if (!selectedSize) {
-        Swal.fire({
-            title: "Please select a size",
-            icon: "warning",
-            toast: true,
-            position: 'top-right',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true
-        });
+        // Size selection warning at the top
+        Toastify({
+            text: "Please select a size",
+            duration: 3000,
+            gravity: "top",     // Changed from "bottom" to "top"
+            position: "right", 
+            style: {
+                background: "#dc3545", // Changed to red
+                color: "#ffffff",
+                borderRadius: "8px",
+                padding: "12px 24px",
+                marginTop: "60px"  // Added margin to prevent header overlap
+            }
+        }).showToast();
         return;
     }
 
@@ -437,16 +442,20 @@ document.getElementById('addToCartButton').addEventListener('click', async funct
         const data = await response.json();
 
         if (response.ok) {
-            Swal.fire({
-                title: data.message, 
-                toast: true,
-                position: 'top-right',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                background: '#28a745',
-                color: '#ffffff'
-            });
+            // Success message at the top
+            Toastify({
+                text: data.message,
+                duration: 3000,
+                gravity: "top",     // Changed from "bottom" to "top"
+                position: "right",
+                style: {
+                    background: "#000000",
+                    color: "#ffffff",
+                    borderRadius: "8px",
+                    padding: "12px 24px",
+                    marginTop: "60px"  // Added margin to prevent header overlap
+                }
+            }).showToast();
 
             // Update cart count if needed
             const cartCountElement = document.querySelector('.cart-count');
@@ -454,31 +463,37 @@ document.getElementById('addToCartButton').addEventListener('click', async funct
                 cartCountElement.textContent = data.cartCount;
             }
         } else {
-            Swal.fire({
-                title: data.message,  // Show error message
-                icon: "error",
-                toast: true,
-                position: 'top-right',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                background: '#dc3545',
-                color: '#ffffff'
-            });
+            // Error message at the top
+            Toastify({
+                text: data.message,
+                duration: 3000,
+                gravity: "top",     // Changed from "bottom" to "top"
+                position: "right",
+                style: {
+                    background:  "#dc3545",
+                    color: "#ffffff",
+                    borderRadius: "8px",
+                    padding: "12px 24px",
+                    marginTop: "60px"  // Added margin to prevent header overlap
+                }
+            }).showToast();
         }
     } catch (error) {
         console.error("Error adding to cart:", error);
-        Swal.fire({
-            title: 'Failed to add the product to cart',
-            icon: "error",
-            toast: true,
-            position: 'top-right',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            background: '#dc3545',
-            color: '#ffffff'
-        });
+        // Error message at the top
+        Toastify({
+            text: "Failed to add the product to cart",
+            duration: 3000,
+            gravity: "top",     // Changed from "bottom" to "top"
+            position: "right",
+            style: {
+                background: "#dc3545",
+                color: "#ffffff",
+                borderRadius: "8px",
+                padding: "12px 24px",
+                marginTop: "60px"  // Added margin to prevent header overlap
+            }
+        }).showToast();
     }
 });
 

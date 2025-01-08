@@ -2,341 +2,545 @@
 
 <!-- Hero Video Section -->
 <section class="relative w-full h-[400px]">
-  <video 
-    class="w-full h-full object-cover brightness-75" 
-    autoplay 
-    loop 
-    muted 
-    playsinline>
-    <source src="/videos/maleShop.mp4" type="video/mp4" />
-  </video>
-  <div class="absolute inset-0 flex items-center justify-center">
-    <h1 class="text-4xl md:text-5xl font-bold text-white tracking-wide">Men’s Gymwear: Built for Strength</h1>
+  <div class="absolute w-full h-full">
+    <video 
+      class="w-full h-full object-cover brightness-80" 
+      autoplay 
+      loop 
+      muted 
+      playsinline>
+      <source src="/videos/womenShop.mp4" type="video/mp4" />
+    </video>
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/30">
+      <div class="absolute inset-0 flex flex-col items-center justify-center">
+        <h1 class="text-4xl md:text-6xl font-bold text-white tracking-wider mb-4 animate-fade-in-down">
+          Women's Collection
+        </h1>
+        <p class="text-xl md:text-2xl text-white/90 tracking-wide animate-fade-in-up">
+          Elevate Your Fitness Journey
+        </p>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- Main Shopping Section -->
-<div class="container mx-auto px-4 py-8">
-  <div class="flex gap-8">
-    <!-- Sticky Filter Sidebar -->
-    <aside class="w-64 flex-shrink-0">
-      <div class="bg-white rounded-lg shadow-lg p-6 sticky top-24">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-lg font-semibold text-gray-800">Filters</h2>
-          <button id="resetFilters" class="text-sm text-blue-600 hover:text-blue-800 hidden">
-            Clear All
-          </button>
-        </div>
-
-        <!-- Categories -->
-        <div class="mb-6">
-          <h3 class="text-md font-medium text-gray-700 mb-3">Categories</h3>
-          <div class="space-y-2">
-            <% category.forEach(cat => { %>
-              <label class="flex items-center group cursor-pointer">
-                <input type="checkbox" 
-                       class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out" 
-                       value="<%= cat._id %>">
-                <span class="ml-2 text-gray-600 group-hover:text-gray-900"><%= cat.name %></span>
-              </label>
-            <% }) %>
-          </div>
-        </div>
-
-        <!-- Sizes -->
-        <div class="mb-6">
-          <h3 class="text-md font-medium text-gray-700 mb-3">Sizes</h3>
-          <div class="flex flex-wrap gap-2">
-            <% ['S', 'M', 'L', 'XL'].forEach(size => { %>
-              <button 
-                class="size-option px-3 py-1 rounded-full border-2 border-gray-200 text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-colors"
-                data-size="<%= size %>">
-                <%= size %>
+<!-- Main Content Section -->
+<div class="relative z-10 bg-white min-h-[calc(100vh-500px)] pb-0 flex flex-col">
+  <!-- Filter and Products Container -->
+  <div class="flex-1 container mx-auto px-4 py-8">
+    <div class="flex gap-8">
+      <!-- Sticky Filter Sidebar -->
+      <aside class="w-72 flex-shrink-0">
+        <div class="bg-white rounded-xl shadow-md sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <div class="p-6">
+            <!-- Header with Reset -->
+            <div class="flex justify-between items-center mb-8 sticky top-0 bg-white z-10 py-2">
+              <h2 class="text-xl font-bold text-gray-800">Filters</h2>
+              <button id="resetFilters" 
+                      class="hidden text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200">
+                Clear All
               </button>
-            <% }) %>
-          </div>
-        </div>
-
-        <!-- Price Range -->
-        <div class="mb-6">
-          <h3 class="text-md font-medium text-gray-700 mb-3">Price Range</h3>
-          <div class="space-y-2">
-            <% const priceRanges = [
-              { value: 'under500', label: 'Under ₹500' },
-              { value: '500to799', label: '₹500 - ₹799' },
-              { value: '800to999', label: '₹800 - ₹999' },
-              { value: '1000to1999', label: '₹1000 - ₹1999' },
-              { value: '2000plus', label: '₹2000+' }
-            ] %>
-            <% priceRanges.forEach(range => { %>
-              <label class="flex items-center group cursor-pointer">
-                <input type="checkbox" 
-                       class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out" 
-                       value="<%= range.value %>">
-                <span class="ml-2 text-gray-600 group-hover:text-gray-900"><%= range.label %></span>
-              </label>
-            <% }) %>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Products Section -->
-    <div class="flex-1">
-      <!-- Sort Options -->
-      <div class="flex justify-end mb-6">
-        <form action="/menShop" method="GET" class="w-64">
-          <select 
-            name="sort" 
-            onchange="this.form.submit()"
-            class="w-full bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          >
-            <option value="newest" <%= locals.sortOption === 'newest' ? 'selected' : '' %>>Newest First</option>
-            <option value="priceAsc" <%= locals.sortOption === 'priceAsc' ? 'selected' : '' %>>Price: Low to High</option>
-            <option value="priceDesc" <%= locals.sortOption === 'priceDesc' ? 'selected' : '' %>>Price: High to Low</option>
-            <option value="nameAsc" <%= locals.sortOption === 'nameAsc' ? 'selected' : '' %>>Name: A to Z</option>
-            <option value="nameDesc" <%= locals.sortOption === 'nameDesc' ? 'selected' : '' %>>Name: Z to A</option>
-          </select>
-        </form>
-      </div>
-
-      <!-- Products Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <% products.forEach(product => { %>
-          <div class="group">
-            <div class="relative bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-              <!-- Product Image with Hover Effect -->
-              <a href="/productDetails?id=<%= product._id %>" class="block">
-              <div class="aspect-w-1 aspect-h-1 w-full relative overflow-hidden">
-                <img 
-                  src="<%= product.productImage[0] %>" 
-                  alt="<%= product.productName %>" 
-                  class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0">
-                <img 
-                  src="<%= product.productImage[1] || product.productImage[0] %>" 
-                  alt="<%= product.productName %>" 
-                  class="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            </div>
+            <!-- Sort Options -->
+            <div class="mb-8 border-b border-gray-100 pb-6">
+              <h3 class="text-md font-semibold text-gray-700 mb-4">Sort By</h3>
+              <div class="space-y-3">
+                <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                  <input type="radio" name="sort" value="newest" checked class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                  <span class="ml-3 text-gray-700 group-hover:text-gray-900">Newest First</span>
+                </label>
+                
+                <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                  <input type="radio" name="sort" value="priceAsc" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                  <span class="ml-3 text-gray-700 group-hover:text-gray-900">Price: Low to High</span>
+                </label>
+                
+                <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                  <input type="radio" name="sort" value="priceDesc" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                  <span class="ml-3 text-gray-700 group-hover:text-gray-900">Price: High to Low</span>
+                </label>
+                
+                <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                  <input type="radio" name="sort" value="nameAsc" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                  <span class="ml-3 text-gray-700 group-hover:text-gray-900">Name: A to Z</span>
+                </label>
+                
+                <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                  <input type="radio" name="sort" value="nameDesc" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                  <span class="ml-3 text-gray-700 group-hover:text-gray-900">Name: Z to A</span>
+                </label>
               </div>
-              </a>
-              
-              <!-- Quick Actions -->
-              <div class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  class="wishlist-btn p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
-                  data-product-id="<%= product._id %>"
-                  data-in-wishlist="<%= wishlistProducts.includes(product._id.toString()) ? 'true' : 'false' %>"
-                >
-                  <svg class="w-5 h-5 wishlist-icon <%= wishlistProducts.includes(product._id.toString()) ? 'text-red-500' : 'text-gray-400' %>" 
-                       fill="currentColor" 
-                       viewBox="0 0 24 24">
-                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                  </svg>
-                </button>
-              </div>
+            </div>
 
-              <!-- Product Info -->
-              <div class="p-4">
-                <h3 class="text-lg font-medium text-gray-900 mb-2"><%= product.productName %></h3>
-                <div class="flex flex-col">
-                    <div class="flex items-baseline justify-between">
-                        <div class="flex items-baseline space-x-2">
-                            <span class="text-lg font-bold text-gray-900">₹<%= product.finalPrice %></span>
-                            <span class="text-sm text-gray-500 line-through">₹<%= product.regularPrice %></span>
-                        </div>
-                        <span class="text-sm font-medium text-green-600">
-                            <%= Math.round((product.regularPrice - product.finalPrice) / product.regularPrice * 100) %>% OFF
-                        </span>
-                    </div>
-                    
-                    <% if (product.offer) { %>
-                        <div class="mt-2">
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                <%= product.offer.name %>: <%= product.offer.percentage %>% OFF
-                            </span>
-                        </div>
-                    <% } %>
-                </div>
+            <!-- Categories -->
+            <div class="mb-8 border-b border-gray-100 pb-6">
+              <h3 class="text-md font-semibold text-gray-700 mb-4">Categories</h3>
+              <div class="space-y-3">
+                <% category.forEach(cat => { %>
+                  <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                    <input type="checkbox" 
+                           class="category-checkbox form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                           value="<%= cat._id %>">
+                    <span class="ml-3 text-gray-700 group-hover:text-gray-900"><%= cat.name %></span>
+                  </label>
+                <% }) %>
+              </div>
+            </div>
+
+            <!-- Sizes -->
+            <div class="mb-8 border-b border-gray-100 pb-6">
+              <h3 class="text-md font-semibold text-gray-700 mb-4">Sizes</h3>
+              <div class="flex flex-wrap gap-3">
+                <% ['S', 'M', 'L', 'XL'].forEach(size => { %>
+                  <button 
+                    class="size-option w-12 h-12 rounded-lg border-2 border-gray-200 text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    data-size="<%= size %>">
+                    <%= size %>
+                  </button>
+                <% }) %>
+              </div>
+            </div>
+
+            <!-- Price Range -->
+            <div class="mb-6">
+              <h3 class="text-md font-semibold text-gray-700 mb-4">Price Range</h3>
+              <div class="space-y-3">
+                <% const priceRanges = [
+                  { value: 'under500', label: 'Under ₹500' },
+                  { value: '500to799', label: '₹500 - ₹799' },
+                  { value: '800to999', label: '₹800 - ₹999' },
+                  { value: '1000to1999', label: '₹1000 - ₹1999' },
+                  { value: '2000plus', label: '₹2000+' }
+                ] %>
+                <% priceRanges.forEach(range => { %>
+                  <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                    <input type="checkbox" 
+                           class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                           value="<%= range.value %>">
+                    <span class="ml-3 text-gray-700 group-hover:text-gray-900"><%= range.label %></span>
+                  </label>
+                <% }) %>
               </div>
             </div>
           </div>
-        <% }) %>
+        </div>
+      </aside>
+
+      <!-- Products Section -->
+      <div class="flex-1">
+        <!-- Products Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <% products.forEach(product => { %>
+            <div class="group">
+              <div class="relative bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <!-- Product Image with Hover Effect and Offer Sticker -->
+                <a href="/productDetails?id=<%= product._id %>" class="block">
+                  <div class="aspect-w-1 aspect-h-1 w-full relative overflow-hidden">
+                    <!-- Offer Sticker -->
+                    <% if (product.offer) { %>
+                      <div class="absolute top-2 left-2 z-10">
+                        <div class="relative bg-green-500 text-white px-2 py-1 rounded-sm shadow-md">
+                          <div class="text-[10px] font-medium leading-tight">
+                            <%= product.offer.name %>
+                          </div>
+                          <div class="text-xs font-bold">
+                            <%= product.offer.percentage %>% OFF
+                          </div>
+                          <!-- Price tag triangle -->
+                          <div class="absolute -right-2 top-0 h-full w-2 overflow-hidden">
+                            <div class="absolute top-0 left-0 h-full w-2 bg-green-600 transform rotate-45 origin-top-left"></div>
+                          </div>
+                          <!-- Bottom triangle -->
+                          <div class="absolute -bottom-1 left-0 w-0 h-0 
+                                      border-t-[4px] border-t-green-700
+                                      border-l-[4px] border-l-transparent">
+                          </div>
+                        </div>
+                      </div>
+                    <% } %>
+                    
+                    <!-- Images -->
+                    <img 
+                      src="<%= product.productImage[0] %>" 
+                      alt="<%= product.productName %>" 
+                      class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0">
+                    <img 
+                      src="<%= product.productImage[1] || product.productImage[0] %>" 
+                      alt="<%= product.productName %>" 
+                      class="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  </div>
+                </a>
+                
+                <!-- Quick Actions -->
+                <div class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button 
+                    class="wishlist-btn p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
+                    data-product-id="<%= product._id %>"
+                    data-in-wishlist="<%= product.inWishlist ? 'true' : 'false' %>">
+                    <svg class="w-5 h-5 wishlist-icon <%= product.inWishlist ? 'text-red-500' : 'text-gray-400' %>" 
+                         fill="currentColor" 
+                         viewBox="0 0 24 24">
+                      <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Product Info -->
+                <div class="p-3">
+                  <h3 class="text-sm font-medium text-gray-900 mb-1"><%= product.productName %></h3>
+                  <div class="flex items-baseline justify-between">
+                    <div class="flex items-baseline space-x-1">
+                      <span class="text-sm font-bold text-gray-900">₹<%= product.finalPrice %></span>
+                      <span class="text-xs text-gray-500 line-through">₹<%= product.regularPrice %></span>
+                    </div>
+                    <span class="text-xs font-medium text-green-600">
+                      <%= Math.round((product.regularPrice - product.finalPrice) / product.regularPrice * 100) %>% OFF
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+        <!-- Add this after your products grid -->
+        <div class="flex items-center justify-center mt-8 space-x-2">
+          <!-- Previous Button -->
+          <a 
+            href="?page=<%= currentPage > 1 ? currentPage - 1 : 1 %>" 
+            class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= currentPage === 1 ? 'cursor-not-allowed opacity-50' : '' %>">
+            &laquo;
+          </a>
+
+          <!-- Page Numbers -->
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <a 
+              href="?page=<%= i %>" 
+              class="px-4 py-2 rounded <%= currentPage === i ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+              <%= i %>
+            </a>
+          <% } %>
+
+          <!-- Next Button -->
+          <a 
+            href="?page=<%= currentPage < totalPages ? currentPage + 1 : totalPages %>" 
+            class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= currentPage === totalPages ? 'cursor-not-allowed opacity-50' : '' %>">
+            &raquo;
+          </a>
+        </div>
       </div>
     </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex items-center justify-center py-8 space-x-2 bg-white">
+    <!-- Your existing pagination -->
   </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const filterInputs = document.querySelectorAll('input[type="checkbox"]');
-  const sizeButtons = document.querySelectorAll('.size-option');
-  const productsGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3.gap-6');
-  const resetButton = document.getElementById('resetFilters');
+// Initialize filter tracking
+let activeFilters = {
+    categories: [],
+    sizes: [],
+    priceRanges: [],
+    sort: 'newest'
+};
 
-  // Load saved filters from localStorage
-  function loadSavedFilters() {
-    const savedFilters = JSON.parse(localStorage.getItem('shopFilters') || '{}');
-    
-    // Restore category filters
-    if (savedFilters.categories) {
-      savedFilters.categories.forEach(categoryId => {
-        const input = document.querySelector(`input[value="${categoryId}"]`);
-        if (input) input.checked = true;
-      });
-    }
-
-    // Restore size filters
-    if (savedFilters.sizes) {
-      savedFilters.sizes.forEach(size => {
-        const button = document.querySelector(`.size-option[data-size="${size}"]`);
-        if (button) {
-          button.classList.add('border-blue-500', 'text-blue-500');
+// Category filter
+document.querySelectorAll('.category-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        if (this.checked) {
+            activeFilters.categories.push(this.value);
+        } else {
+            activeFilters.categories = activeFilters.categories.filter(id => id !== this.value);
         }
-      });
+        applyFilters();
+    });
+});
+
+// Size filter
+document.querySelectorAll('.size-option').forEach(button => {
+    button.addEventListener('click', function() {
+        const size = this.dataset.size;
+        this.classList.toggle('border-blue-500');
+        this.classList.toggle('text-blue-500');
+        
+        if (this.classList.contains('border-blue-500')) {
+            activeFilters.sizes.push(size);
+        } else {
+            activeFilters.sizes = activeFilters.sizes.filter(s => s !== size);
+        }
+        applyFilters();
+    });
+});
+
+// Price range filter
+document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    if (checkbox.value.includes('under') || checkbox.value.includes('to') || checkbox.value.includes('plus')) {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                activeFilters.priceRanges.push(this.value);
+            } else {
+                activeFilters.priceRanges = activeFilters.priceRanges.filter(range => range !== this.value);
+            }
+            applyFilters();
+        });
     }
+});
 
-    // Restore price range filters
-    if (savedFilters.priceRanges) {
-      savedFilters.priceRanges.forEach(range => {
-        const input = document.querySelector(`input[value="${range}"]`);
-        if (input) input.checked = true;
-      });
-    }
+// Sort handler
+document.querySelectorAll('input[name="sort"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        console.log('Sort changed to:', this.value); // Debug log
+        activeFilters.sort = this.value;
+        applyFilters();
+    });
+});
 
-    // Show reset button if there are any filters
-    const hasFilters = (savedFilters.categories?.length || savedFilters.sizes?.length || savedFilters.priceRanges?.length);
-    resetButton.classList.toggle('hidden', !hasFilters);
-
-    // Update products if there are any filters
-    if (hasFilters) {
-      updateProducts();
-    }
-  }
-
-  // Function to save filters to localStorage
-  function saveFilters(filters) {
-    localStorage.setItem('shopFilters', JSON.stringify(filters));
-  }
-
-  // Function to get selected filters
-  function getSelectedFilters() {
-    const categories = Array.from(document.querySelectorAll('input[value]:checked'))
-      .filter(input => !input.value.includes('to') && !input.value.startsWith('under') && !input.value.endsWith('plus'))
-      .map(input => input.value);
-    
-    const sizes = Array.from(document.querySelectorAll('.size-option.border-blue-500'))
-      .map(button => button.dataset.size);
-    
-    const priceRanges = Array.from(document.querySelectorAll('input[value]:checked'))
-      .filter(input => input.value.includes('to') || input.value.startsWith('under') || input.value.endsWith('plus'))
-      .map(input => input.value);
-
-    return { categories, sizes, priceRanges };
-  }
-
-  // Function to update products
-  async function updateProducts() {
-    const filters = getSelectedFilters();
-    const currentSort = document.querySelector('select[name="sort"]').value;
-
-    // Save filters to localStorage
-    saveFilters(filters);
-
+// Apply filters function
+async function applyFilters() {
     try {
-      const response = await fetch(`/filter-products?sort=${currentSort}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(filters)
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        productsGrid.innerHTML = data.html;
-        
-        // Reinitialize wishlist buttons for new products
-        initializeWishlistButtons();
-        
-        // Show/hide reset button based on if any filters are selected
-        resetButton.classList.toggle('hidden', 
-          !filters.categories.length && !filters.sizes.length && !filters.priceRanges.length);
-      } else {
-        console.error('Error:', data.message);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
-
-  // Add event listeners to all filter inputs
-  filterInputs.forEach(input => {
-    input.addEventListener('change', updateProducts);
-  });
-
-  // Add event listeners to size buttons
-  sizeButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      button.classList.toggle('border-blue-500');
-      button.classList.toggle('text-blue-500');
-      updateProducts();
-    });
-  });
-
-  // Reset filters
-  resetButton.addEventListener('click', () => {
-    // Clear localStorage
-    localStorage.removeItem('shopFilters');
-    
-    // Reset UI
-    filterInputs.forEach(input => input.checked = false);
-    sizeButtons.forEach(button => {
-      button.classList.remove('border-blue-500', 'text-blue-500');
-    });
-    updateProducts();
-  });
-
-  // Initialize wishlist buttons function
-  function initializeWishlistButtons() {
-    document.querySelectorAll('.wishlist-btn').forEach(button => {
-      button.addEventListener('click', async function(e) {
-        e.preventDefault();
-        const productId = this.dataset.productId;
-        const icon = this.querySelector('.wishlist-icon');
-        
-        try {
-          const response = await fetch('/wishlist/toggle', {
+        const response = await fetch('/filter-products?sort=' + activeFilters.sort, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ productId })
-          });
+            body: JSON.stringify({
+                categories: activeFilters.categories,
+                sizes: activeFilters.sizes,
+                priceRanges: activeFilters.priceRanges
+            })
+        });
 
-          const data = await response.json();
-
-          if (data.success) {
-            const isInWishlist = this.dataset.inWishlist === 'true';
-            this.dataset.inWishlist = (!isInWishlist).toString();
-            icon.classList.toggle('text-red-500');
-            icon.classList.toggle('text-gray-400');
-          }
-        } catch (error) {
-          console.error('Error:', error);
+        if (!response.ok) throw new Error('Filter request failed');
+        const data = await response.json();
+        
+        const productsContainer = document.querySelector('.grid.grid-cols-1');
+        
+        if (!data.products || data.products.length === 0) {
+            renderEmptyState(productsContainer);
+        } else {
+            renderProducts(productsContainer, data.products);
         }
-      });
+        
+        updateResetButtonVisibility();
+    } catch (error) {
+        console.error('Error applying filters:', error);
+    }
+}
+function renderEmptyState(container) {
+    container.innerHTML = `
+        <div class="col-span-full flex items-center justify-center w-full" style="height: 60vh;">
+            <div class="w-full max-w-md px-4">
+                <div class="flex flex-col items-center">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-2">No Products Found</h2>
+                    <p class="text-gray-500 mb-6">We couldn't find any products matching your filters</p>
+                    <button onclick="resetAllFilters()" 
+                            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
+                        Clear All Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderProducts(container, products) {
+    container.innerHTML = products.map(product => `
+        <div class="group">
+            <div class="relative bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <a href="/productDetails?id=${product._id}" class="block">
+                    <div class="aspect-w-1 aspect-h-1 w-full relative overflow-hidden">
+                        ${product.offer ? `
+                            <div class="absolute top-2 left-2 z-10">
+                                <div class="relative inline-flex items-center">
+                                    <div class="absolute -top-1.5 left-2 h-2 w-[1px] bg-gray-300"></div>
+                                    <div class="bg-white border border-gray-200 rounded-sm px-1.5 py-0.5 shadow-sm">
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-[10px] text-gray-600 font-medium">${product.offer.name}</span>
+                                            <span class="text-[10px] text-green-600 font-bold">${product.offer.percentage}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        <img src="${product.productImage[0]}" alt="${product.productName}" 
+                             class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0">
+                        <img src="${product.productImage[1] || product.productImage[0]}" alt="${product.productName}" 
+                             class="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    </div>
+                </a>
+                <!-- Quick Actions -->
+                <div class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                        class="wishlist-btn p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
+                        data-product-id="${product._id}"
+                        data-in-wishlist="${product.inWishlist ? 'true' : 'false'}">
+                        <svg class="w-5 h-5 wishlist-icon ${product.inWishlist ? 'text-red-500' : 'text-gray-400'}" 
+                             fill="currentColor" 
+                             viewBox="0 0 24 24">
+                            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                    </button>
+                </div>
+                <!-- Product Info -->
+                <div class="p-3">
+                    <h3 class="text-sm font-medium text-gray-900 mb-1">${product.productName}</h3>
+                    <div class="flex items-baseline justify-between">
+                        <div class="flex items-baseline space-x-1">
+                            <span class="text-sm font-bold text-gray-900">₹${product.salePrice}</span>
+                            <span class="text-xs text-gray-500 line-through">₹${product.regularPrice}</span>
+                        </div>
+                        <span class="text-xs font-medium text-green-600">
+                            ${Math.round((product.regularPrice - product.salePrice) / product.regularPrice * 100)}% OFF
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    initializeWishlistButtons();
+}
+
+// Reset filters
+document.getElementById('resetFilters').addEventListener('click', function() {
+    // Reset checkboxes
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    
+    // Reset size buttons
+    document.querySelectorAll('.size-option').forEach(btn => {
+        btn.classList.remove('border-blue-500', 'text-blue-500');
     });
-  }
-
-  // Initialize wishlist buttons on page load
-  initializeWishlistButtons();
-
-  // Load saved filters on page load
-  loadSavedFilters();
+    
+    // Reset sort
+    document.querySelector('input[name="sort"][value="newest"]').checked = true;
+    
+    // Clear active filters
+    activeFilters = {
+        categories: [],
+        sizes: [],
+        priceRanges: [],
+        sort: 'newest'
+    };
+    
+    applyFilters();
 });
+
+// Update reset button visibility
+function updateResetButtonVisibility() {
+    const hasActiveFilters = 
+        activeFilters.categories.length > 0 || 
+        activeFilters.sizes.length > 0 || 
+        activeFilters.priceRanges.length > 0 || 
+        activeFilters.sort !== 'newest';
+    
+    document.getElementById('resetFilters').classList.toggle('hidden', !hasActiveFilters);
+}
+
+// Initialize wishlist buttons
+function initializeWishlistButtons() {
+    document.querySelectorAll('.wishlist-btn').forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            const icon = this.querySelector('.wishlist-icon');
+            
+            try {
+                const response = await fetch('/wishlist/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ productId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const isInWishlist = this.dataset.inWishlist === 'true';
+                    this.dataset.inWishlist = (!isInWishlist).toString();
+                    icon.classList.toggle('text-red-500');
+                    icon.classList.toggle('text-gray-400');
+
+                    // Show toast notification
+                    Toastify({
+                        text: data.action === 'added' 
+                            ? "Product added to wishlist" 
+                            : "Product removed from wishlist",
+                        duration: 3000,
+                        gravity: "bottom",
+                        position: "right",
+                        style: {
+                            background: "#000000",
+                            color: "#ffffff",
+                            borderRadius: "8px",
+                            padding: "12px 24px",
+                            marginBottom: "60px" 
+                        }
+                    }).showToast();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Show error toast
+                Toastify({
+                    text: "Something went wrong",
+                    duration: 3000,
+                    gravity: "bottom",
+                    position: "right",
+                    style: {
+                        background: "#000000",
+                        color: "#ffffff",
+                        borderRadius: "8px",
+                        padding: "12px 24px",
+                    }
+                }).showToast();
+            }
+        });
+    });
+}
+
+// Initial setup
+document.addEventListener('DOMContentLoaded', function() {
+    initializeWishlistButtons();
+    updateResetButtonVisibility();
+    
+    // Debug log
+    console.log('Page loaded, activeFilters:', activeFilters);
+});
+
+// Add this function with your other JavaScript
+function resetAllFilters() {
+    // Reset checkboxes
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    
+    // Reset sort radio buttons
+    document.querySelector('input[name="sort"][value="newest"]').checked = true;
+    
+    // Reset size buttons
+    document.querySelectorAll('.size-option').forEach(btn => {
+        btn.classList.remove('border-blue-500', 'text-blue-500');
+    });
+    
+    // Reset filter state
+    activeFilters = {
+        categories: [],
+        sizes: [],
+        priceRanges: [],
+        sort: 'newest'
+    };
+    
+    // Apply the reset
+    applyFilters();
+}
+
+// Make sure your existing resetFilters button also uses this function
+document.getElementById('resetFilters')?.addEventListener('click', resetAllFilters);
 </script>
 
 <%- include('../partials/user/userfooter') %>
+
 
 
 
