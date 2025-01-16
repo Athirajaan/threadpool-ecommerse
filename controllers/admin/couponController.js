@@ -2,7 +2,15 @@ const Coupon = require('../../models/couponSchema');
 
 const loadCoupons = async (req, res) => {
   try {
-    // Fetch all coupons with complete details
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5; // Items per page
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination
+    const totalCoupons = await Coupon.countDocuments();
+    const totalPages = Math.ceil(totalCoupons / limit);
+
+    // Fetch coupons with pagination
     const coupons = await Coupon.find()
       .sort({ createdOn: -1 })
       .select({
@@ -17,13 +25,19 @@ const loadCoupons = async (req, res) => {
         createdOn: 1,
         userId: 1,
       })
-      .populate('userId', 'name email'); // If you need user details who used the coupon
-
-    console.log('Fetched coupons:', coupons); // For debugging
+      .populate('userId', 'name email')
+      .skip(skip)
+      .limit(limit);
 
     res.render('coupon', {
       coupons,
-      title: 'Coupon Management', // Optional: for page title
+      title: 'Coupon Management',
+      pagination: {
+        currentPage: page,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
     });
   } catch (error) {
     console.error('Error in loadCoupons:', error);

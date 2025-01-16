@@ -14,6 +14,15 @@ const path = require('path');
 const getOrder = async (req, res) => {
   try {
     const user = req.session.user;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5; // Orders per page
+    const skip = (page - 1) * limit;
+
+    // Get total count of orders
+    const totalOrders = await Order.countDocuments({ user: user._id });
+    const totalPages = Math.ceil(totalOrders / limit);
+
+    // Fetch orders with pagination
     const orders = await Order.find({ user: user._id })
       .populate({
         path: 'orderedItems.product',
@@ -26,10 +35,9 @@ const getOrder = async (req, res) => {
       })
       .populate('appliedCoupon')
       .populate('user', 'name email')
-      .sort({ createdOn: -1 });
-
-    // Debug logs
-    console.log('Raw order:', JSON.stringify(orders[0], null, 2));
+      .sort({ createdOn: -1 })
+      .skip(skip)
+      .limit(limit);
 
     const orderDetails = orders
       ? orders.map((order) => {
@@ -40,8 +48,6 @@ const getOrder = async (req, res) => {
           const deliveryAddress =
             order.address?.address?.find((addr) => addr.isDefault) ||
             order.address?.address?.[0];
-
-          console.log('Found delivery address:', deliveryAddress);
 
           return {
             orderId: order.orderId,
@@ -82,15 +88,16 @@ const getOrder = async (req, res) => {
         })
       : [];
 
-    // Final debug log
-    console.log(
-      'Processed order details:',
-      JSON.stringify(orderDetails[0], null, 2)
-    );
-
     res.render('orderList', {
       orders: orderDetails,
       user,
+      currentPage: page,
+      totalPages: totalPages,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+      nextPage: page + 1,
+      prevPage: page - 1,
+      lastPage: totalPages,
     });
   } catch (error) {
     console.error('Error fetching order details:', error);
@@ -98,6 +105,10 @@ const getOrder = async (req, res) => {
       orders: [],
       user: req.session.user,
       error: 'Failed to fetch order details',
+      currentPage: 1,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPrevPage: false,
     });
   }
 };
@@ -209,14 +220,11 @@ const trackOrder = async (req, res) => {
     const orderId = decodeURIComponent(req.params.orderId);
     const productId = decodeURIComponent(req.params.productId);
 
-    console.log('Track Order Request:', { orderId, productId });
-
     const order = await Order.findOne({ orderId }).populate(
       'orderedItems.product'
     );
 
     if (!order) {
-      console.log('Order not found:', orderId);
       return res.status(404).json({
         success: false,
         message: 'Order not found',
@@ -228,7 +236,6 @@ const trackOrder = async (req, res) => {
     );
 
     if (!orderedItem) {
-      console.log('Product not found in order:', productId);
       return res.status(404).json({
         success: false,
         message: 'Product not found in order',
@@ -242,7 +249,6 @@ const trackOrder = async (req, res) => {
       status: orderedItem.status,
     };
 
-    console.log('Sending response:', response);
     return res.json(response);
   } catch (error) {
     console.error('Error tracking order:', error);
@@ -257,9 +263,6 @@ const getOrderDetails = async (req, res) => {
   try {
     const orderId = req.params.orderId;
 
-    // Add logging to debug
-    console.log('Fetching order details for:', orderId);
-
     // Find order and populate necessary fields
     const order = await Order.findOne({ orderId })
       .populate({
@@ -270,7 +273,6 @@ const getOrderDetails = async (req, res) => {
       .lean(); // Convert to plain JavaScript object
 
     if (!order) {
-      console.log('Order not found:', orderId);
       return res.status(404).json({
         success: false,
         message: 'Order not found',
@@ -419,7 +421,6 @@ const returnOrder = async (req, res) => {
 const createRazorpayOrder = async (req, res) => {
   try {
     const { amount, orderId } = req.body;
-    console.log('Creating Razorpay order for:', { amount, orderId }); // Debug log
 
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID,
@@ -433,11 +434,11 @@ const createRazorpayOrder = async (req, res) => {
     };
 
     const order = await razorpay.orders.create(options);
-    console.log('Razorpay order created:', order.id); // Debug log
 
     res.json({
       success: true,
       orderId: order.id,
+      amount: options.amount,
     });
   } catch (error) {
     console.error('Error creating Razorpay order:', error);
@@ -456,7 +457,14 @@ const updatePaymentStatus = async (req, res) => {
       razorpay_signature,
       orderId,
     } = req.body;
-    console.log('Payment verification request received:', { orderId });
+
+    // Only proceed if we have all required fields for verification
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing payment verification details',
+      });
+    }
 
     // Create the verification data string
     const body = razorpay_order_id + '|' + razorpay_payment_id;
@@ -471,12 +479,8 @@ const updatePaymentStatus = async (req, res) => {
     const isAuthentic = expectedSignature === razorpay_signature;
 
     if (isAuthentic) {
-      // Payment is verified
+      // Payment is verified, update order status
       const order = await Order.findOne({ orderId: orderId });
-      const update = await Order.updateOne(
-        { orderId: orderId },
-        { $set: { paymentStatus: 'Completed' } }
-      );
       if (order) {
         order.paymentStatus = 'Completed';
         await order.save();

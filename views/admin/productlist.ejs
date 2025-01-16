@@ -41,7 +41,7 @@
                 <tr class="border-b hover:bg-gray-100">
                   <td class="p-4"><%= data[i].productName %></td>
                   <td class="p-4"><%= data[i].gender %></td>
-                  <td class="p-4"><%= data[i].category %></td>
+                  <td class="p-4"><%= data[i].category ? data[i].category.name : 'N/A' %></td>
                   <td class="p-4 text-orange-500"> <%= data[i].totalQuantity <= 10 ? 'Low Stock' : 'In Stock' %></td>
                   <td class="p-4"><%= data[i].salePrice %></td>
                   <td class="p-4">

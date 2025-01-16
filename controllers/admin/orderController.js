@@ -32,24 +32,7 @@ const orderInfo = async (req, res) => {
       .skip((parseInt(page) - 1) * parseInt(limit))
       .limit(parseInt(limit));
 
-    // Debug log to check order IDs and dates
-    console.log(
-      'Orders:',
-      orders.map((order) => ({
-        _id: order._id,
-        orderId: order.orderId,
-        createdAt: order.createdAt,
-      }))
-    );
-
     const formattedOrders = orders.map((order) => {
-      // Debug log to check coupon data
-      console.log('Order coupon data:', {
-        orderId: order.orderId,
-        couponApplied: order.couponApplied,
-        appliedCoupon: order.appliedCoupon,
-        couponDiscount: order.couponDiscount,
-      });
 
       let formattedAddress = 'N/A';
       if (
@@ -108,7 +91,6 @@ const orderInfo = async (req, res) => {
 };
 
 const updateStatus = async (req, res) => {
-  console.log('Request Body:', req.body);
   const { orderId, productId, size, status } = req.body;
 
   try {

@@ -2,7 +2,7 @@
 
 
 <!-- Hero Section -->
-<section class="relative flex flex-col items-center justify-center bg-gray-100 rounded-lg mx-auto w-full shadow-md h-[500px]">
+<section class="relative flex flex-col items-center justify-center bg-gray-100 rounded-lg mx-auto w-full shadow-md h-[800px]">
   <video autoplay muted loop class="absolute top-0 left-0 w-full h-full object-cover rounded-lg">
       <source src="/videos/homeBanner.mp4" type="video/mp4">
       Your browser does not support the video tag.
@@ -22,7 +22,7 @@
   </div>
   
   <!-- Optional Overlay -->
-  <div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 rounded-lg"></div>
+  <!-- <div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 rounded-lg"></div> -->
 </section>
 
 
@@ -31,7 +31,7 @@
 <div class="container mx-auto px-4 py-12">
   <div class="flex items-center justify-between mb-8">
     <div class="relative">
-      <h2 class="text-3xl font-bold text-gray-900">Our Top Sellers</h2>
+      <h2 class="text-3xl font-bold text-gray-900">New Arrivals</h2>
       <div class="absolute -bottom-2 left-0 w-24 h-1 bg-yellow-500"></div>
     </div>
     <a href="/womenShop" class="inline-flex items-center text-yellow-600 hover:text-yellow-700 font-medium">
@@ -44,24 +44,24 @@
 
   <!-- Products Grid -->
   <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-    <% for (let i = 0; i < products.length; i++) { %>
+    <% for (let i = 0; i < newArrivals.length; i++) { %>
       <div class="group">
         <div class="relative bg-white rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden">
           <!-- Product Images with Hover Effect -->
           <div class="aspect-w-3 aspect-h-4 relative overflow-hidden">
             <img 
-              src="<%= products[i].productImage[0] %>" 
-              alt="<%= products[i].productName %>" 
+              src="<%= newArrivals[i].productImage[0] %>" 
+              alt="<%= newArrivals[i].productName %>" 
               class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0">
             <img 
-              src="<%= products[i].productImage[1] || products[i].productImage[0] %>" 
-              alt="<%= products[i].productName %>" 
+              src="<%= newArrivals[i].productImage[1] || newArrivals[i].productImage[0] %>" 
+              alt="<%= newArrivals[i].productName %>" 
               class="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           </div>
 
           <!-- Quick Shop Button -->
           <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-0 group-hover:bg-opacity-70 backdrop-blur-sm transition-all duration-300 h-0 group-hover:h-14 flex items-center justify-center">
-            <a href="/productDetails?id=<%= products[i]._id %>" 
+            <a href="/productDetails?id=<%= newArrivals[i]._id %>" 
                class="text-white font-medium tracking-wider uppercase text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:text-yellow-400">
               Quick View
             </a>
@@ -70,16 +70,16 @@
           <!-- Product Info -->
           <div class="p-4">
             <h3 class="font-medium text-gray-900 group-hover:text-yellow-600 transition-colors duration-200 mb-2">
-              <%= products[i].productName %>
+              <%= newArrivals[i].productName %>
             </h3>
             <div class="flex items-center justify-between">
               <div class="flex flex-col">
-                <span class="text-lg font-bold text-gray-900">₹<%= products[i].salePrice %></span>
-                <% if (products[i].regularPrice > products[i].salePrice) { %>
-                  <span class="text-sm text-gray-500 line-through">₹<%= products[i].regularPrice %></span>
+                <span class="text-lg font-bold text-gray-900">₹<%= newArrivals[i].salePrice %></span>
+                <% if (newArrivals[i].regularPrice > newArrivals[i].salePrice) { %>
+                  <span class="text-sm text-gray-500 line-through">₹<%= newArrivals[i].regularPrice %></span>
                 <% } %>
               </div>
-              <% const discount = Math.round((products[i].regularPrice - products[i].salePrice) / products[i].regularPrice * 100) %>
+              <% const discount = Math.round((newArrivals[i].regularPrice - newArrivals[i].salePrice) / newArrivals[i].regularPrice * 100) %>
               <% if (discount > 0) { %>
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                   -<%= discount %>%
@@ -129,62 +129,66 @@
   </div>
 </div>
 
-  <!-- Featured Products Section -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="relative mb-8">
-      <h2 class="text-3xl font-bold text-gray-900">Featured Products</h2>
+
+
+<!-- Best Sellers Section -->
+<div class="container mx-auto px-4 py-12">
+  <div class="flex items-center justify-between mb-8">
+    <div class="relative">
+      <h2 class="text-3xl font-bold text-gray-900">Best Sellers</h2>
       <div class="absolute -bottom-2 left-0 w-24 h-1 bg-yellow-500"></div>
     </div>
+    <a href="/womenShop" class="inline-flex items-center text-yellow-600 hover:text-yellow-700 font-medium">
+      View All
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <% for(let i = 4; i < Math.min(products.length, 8); i++) { %>
-        <div class="group">
-          <div class="relative bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-            <!-- Product Images with Hover Effect -->
-            <div class="aspect-w-1 aspect-h-1 w-full relative overflow-hidden">
+  <!-- Products Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <% if (featuredProducts && featuredProducts.length > 0) { %>
+      <% for(let i = 0; i < featuredProducts.length; i++) { %>
+        <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+          <!-- Product Image (Single) -->
+          <a href="/productDetails?id=<%= featuredProducts[i]._id %>">
+            <div class="aspect-w-3 aspect-h-4 relative">
               <img 
-                src="<%= products[i].productImage[0] %>" 
-                alt="<%= products[i].productName %>" 
-                class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0">
-              <img 
-                src="<%= products[i].productImage[1] || products[i].productImage[0] %>" 
-                alt="<%= products[i].productName %>" 
-                class="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                src="<%= featuredProducts[i].productImage[0] %>" 
+                alt="<%= featuredProducts[i].productName %>" 
+                class="w-full h-full object-cover rounded-t-lg">
             </div>
+          </a>
 
-            <!-- Quick Shop Button -->
-            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-0 group-hover:bg-opacity-70 backdrop-blur-sm transition-all duration-300 h-0 group-hover:h-14 flex items-center justify-center">
-              <a href="/productDetails?id=<%= products[i]._id %>" 
-                 class="text-white font-medium tracking-wider uppercase text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:text-yellow-400">
-                Quick View
-              </a>
-            </div>
-
-            <!-- Product Info -->
-            <div class="p-4">
-              <h3 class="font-medium text-gray-900 group-hover:text-yellow-600 transition-colors duration-200 mb-2">
-                <%= products[i].productName %>
-              </h3>
-              <div class="flex items-center justify-between">
-                <div class="flex flex-col">
-                  <span class="text-lg font-bold text-gray-900">₹<%= products[i].salePrice %></span>
-                  <% if (products[i].regularPrice > products[i].salePrice) { %>
-                    <span class="text-sm text-gray-500 line-through">₹<%= products[i].regularPrice %></span>
-                  <% } %>
-                </div>
-                <% const discount = Math.round((products[i].regularPrice - products[i].salePrice) / products[i].regularPrice * 100) %>
-                <% if (discount > 0) { %>
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    -<%= discount %>%
-                  </span>
+          <!-- Product Info -->
+          <div class="p-4">
+            <a href="/productDetails?id=<%= featuredProducts[i]._id %>" 
+               class="block font-medium text-gray-900 hover:text-yellow-600 transition-colors duration-200 mb-2">
+              <%= featuredProducts[i].productName %>
+            </a>
+            <div class="flex items-center justify-between">
+              <div class="flex flex-col">
+                <span class="text-lg font-bold text-gray-900">₹<%= featuredProducts[i].salePrice %></span>
+                <% if (featuredProducts[i].regularPrice > featuredProducts[i].salePrice) { %>
+                  <span class="text-sm text-gray-500 line-through">₹<%= featuredProducts[i].regularPrice %></span>
                 <% } %>
               </div>
+              <% const discount = Math.round((featuredProducts[i].regularPrice - featuredProducts[i].salePrice) / featuredProducts[i].regularPrice * 100) %>
+              <% if (discount > 0) { %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  -<%= discount %>%
+                </span>
+              <% } %>
             </div>
           </div>
         </div>
       <% } %>
-    </div>
+    <% } else { %>
+      <p class="col-span-4 text-center text-gray-500">No best sellers available at the moment.</p>
+    <% } %>
   </div>
+</div>
 
 <%- include('../partials/user/userfooter') %> 
 

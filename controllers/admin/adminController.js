@@ -43,28 +43,40 @@ const login = async (req, res) => {
 const loadDashboard = async (req, res) => {
   if (req.session.admin) {
     try {
-      const { period } = req.query;
+      const { period, startDate, endDate } = req.query;
+      const page = parseInt(req.query.page) || 1;
+      const limit = 10;
+      const skip = (page - 1) * limit;
+
       let dateFilter = {};
 
-      // Set date filter based on period
-      if (period) {
+      // Handle date range filter
+      if (startDate && endDate) {
+        dateFilter = {
+          createdOn: {
+            $gte: new Date(startDate),
+            $lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
+          },
+        };
+      }
+      // Handle period filter
+      else if (period) {
         const now = new Date();
         switch (period) {
           case 'today':
             dateFilter = {
-              createdAt: {
+              createdOn: {
                 $gte: new Date(now.setHours(0, 0, 0, 0)),
                 $lt: new Date(now.setHours(23, 59, 59, 999)),
               },
             };
             break;
           case 'week':
-            const weekStart = new Date(
-              now.setDate(now.getDate() - now.getDay())
-            );
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - 7);
             dateFilter = {
-              createdAt: {
-                $gte: new Date(weekStart.setHours(0, 0, 0, 0)),
+              createdOn: {
+                $gte: weekStart,
                 $lt: new Date(),
               },
             };
@@ -72,7 +84,7 @@ const loadDashboard = async (req, res) => {
           case 'month':
             const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
             dateFilter = {
-              createdAt: {
+              createdOn: {
                 $gte: monthStart,
                 $lt: new Date(),
               },
@@ -81,24 +93,59 @@ const loadDashboard = async (req, res) => {
         }
       }
 
-      // Fetch orders with date filter
-      const orders = await Order.find(dateFilter)
-        .populate('orderedItems.product')
-        .populate('user')
-        .sort({ createdAt: -1 });
+      // Get filtered orders count for pagination
+      const totalOrders = await Order.countDocuments(dateFilter);
 
       // Calculate totals based on filtered orders
-      const totalSales = orders.length;
-      const totalAmount = orders.reduce(
+      const allFilteredOrders = await Order.find(dateFilter);
+      const totalSales = allFilteredOrders.length;
+      const totalAmount = allFilteredOrders.reduce(
         (sum, order) => sum + (order.finalAmount || 0),
         0
       );
-      const totalDiscount = orders.reduce(
+      const totalDiscount = allFilteredOrders.reduce(
         (sum, order) =>
           sum + (order.discount || 0) + (order.couponDiscount || 0),
         0
       );
-      const averageOrderValue = totalSales > 0 ? totalAmount / totalSales : 0;
+
+      // Calculate average order value
+      const averageOrderValue =
+        totalSales > 0 ? (totalAmount / totalSales).toFixed(2) : '0.00'; // Return '0.00' as string when there are no orders
+
+      // If no orders found, render with empty data
+      if (totalOrders === 0) {
+        return res.render('dashboard', {
+          orders: [],
+          totalSales: 0,
+          totalAmount: 0,
+          totalDiscount: 0,
+          averageOrderValue: '0.00', // Consistent string format
+          currentPeriod: period || 'all',
+          dateRange: {
+            startDate: startDate || '',
+            endDate: endDate || '',
+          },
+          pagination: {
+            currentPage: 1,
+            totalPages: 0,
+            hasNextPage: false,
+            hasPrevPage: false,
+            nextPage: 1,
+            prevPage: 1,
+          },
+        });
+      }
+
+      const totalPages = Math.ceil(totalOrders / limit);
+
+      // Fetch filtered orders with pagination
+      const orders = await Order.find(dateFilter)
+        .populate('orderedItems.product')
+        .populate('user')
+        .sort({ createdOn: -1 })
+        .skip(skip)
+        .limit(limit);
 
       res.render('dashboard', {
         orders,
@@ -107,6 +154,18 @@ const loadDashboard = async (req, res) => {
         totalDiscount,
         averageOrderValue,
         currentPeriod: period || 'all',
+        dateRange: {
+          startDate: startDate || '',
+          endDate: endDate || '',
+        },
+        pagination: {
+          currentPage: page,
+          totalPages,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+          nextPage: page + 1,
+          prevPage: page - 1,
+        },
       });
     } catch (error) {
       console.log('Dashboard error:', error);
@@ -351,17 +410,11 @@ const filterOrders = async (req, res) => {
         dateFilter = {};
     }
 
-    // Add debug logging
-    console.log('Date Filter:', dateFilter);
-
     // Fetch filtered orders for the table only
     const filteredOrders = await Order.find(dateFilter)
       .populate('orderedItems.product')
       .populate('user')
       .sort({ createdOn: -1 });
-
-    // Debug log the results
-    console.log('Filtered Orders Count:', filteredOrders.length);
 
     // Fetch total stats (unfiltered) for the stats strip
     const totalSales = await Order.countDocuments();
@@ -596,6 +649,35 @@ const getTopSellers = async (req, res) => {
   }
 };
 
+const loadProductList = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination
+    const totalProducts = await Product.countDocuments();
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    // Populate the category field to get category name
+    const data = await Product.find()
+      .populate('category', 'name')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.render('productlist', {
+      data,
+      currentPage: page,
+      totalPages,
+      title: 'Product Management',
+    });
+  } catch (error) {
+    console.error('Error loading product list:', error);
+    res.status(500).redirect('/admin/error');
+  }
+};
+
 module.exports = {
   loadLogin,
   login,
@@ -607,4 +689,5 @@ module.exports = {
   filterOrders,
   getSalesData,
   getTopSellers,
+  loadProductList,
 };

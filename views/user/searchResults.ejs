@@ -5,7 +5,7 @@
   <div class="container mx-auto px-4">
     <h1 class="text-3xl font-bold text-gray-900 mb-2">Search Results</h1>
     <p class="text-gray-600">
-      Showing results for "<span class="font-medium"><%= searchQuery %></span>"
+      Showing results for "<span class="font-medium text-blue-600"><%= searchQuery %></span>"
     </p>
   </div>
 </div>
@@ -25,6 +25,7 @@
               Clear All
             </button>
           </div>
+
           <!-- Sort Options -->
           <div class="mb-8 border-b border-gray-100 pb-6">
             <h3 class="text-md font-semibold text-gray-700 mb-4">Sort By</h3>
@@ -33,7 +34,26 @@
                 <input type="radio" name="sort" value="newest" checked class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
                 <span class="ml-3 text-gray-700 group-hover:text-gray-900">Newest First</span>
               </label>
-              <!-- ... other sort options ... -->
+              
+              <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                <input type="radio" name="sort" value="priceAsc" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                <span class="ml-3 text-gray-700 group-hover:text-gray-900">Price: Low to High</span>
+              </label>
+              
+              <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                <input type="radio" name="sort" value="priceDesc" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                <span class="ml-3 text-gray-700 group-hover:text-gray-900">Price: High to Low</span>
+              </label>
+              
+              <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                <input type="radio" name="sort" value="nameAsc" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                <span class="ml-3 text-gray-700 group-hover:text-gray-900">Name: A to Z</span>
+              </label>
+              
+              <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                <input type="radio" name="sort" value="nameDesc" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                <span class="ml-3 text-gray-700 group-hover:text-gray-900">Name: Z to A</span>
+              </label>
             </div>
           </div>
 
@@ -68,7 +88,24 @@
 
           <!-- Price Range -->
           <div class="mb-6">
-            <!-- ... price range options ... -->
+            <h3 class="text-md font-semibold text-gray-700 mb-4">Price Range</h3>
+            <div class="space-y-3">
+              <% const priceRanges = [
+                { value: 'under500', label: 'Under ₹500' },
+                { value: '500to799', label: '₹500 - ₹799' },
+                { value: '800to999', label: '₹800 - ₹999' },
+                { value: '1000to1999', label: '₹1000 - ₹1999' },
+                { value: '2000plus', label: '₹2000+' }
+              ] %>
+              <% priceRanges.forEach(range => { %>
+                <label class="flex items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                  <input type="checkbox" 
+                         class="price-range-checkbox form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                         value="<%= range.value %>">
+                  <span class="ml-3 text-gray-700 group-hover:text-gray-900"><%= range.label %></span>
+                </label>
+              <% }) %>
+            </div>
           </div>
         </div>
       </div>
@@ -76,125 +113,270 @@
 
     <!-- Products Grid Container -->
     <div class="flex-1">
-      <!-- Products Section -->
-      <div class="flex-1">
-        <!-- Sort Options -->
-
-        <!-- Products Grid -->
-        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <% if (products.length === 0) { %>
-            <div class="col-span-full text-center py-12">
-              <h3 class="text-xl text-gray-600">No products found matching your search.</h3>
-              <p class="mt-2 text-gray-500">Try adjusting your search terms.</p>
-            </div>
-          <% } else { %>
-            <% products.forEach(product => { %>
-              <%- include('../partials/productCard', { product: product }) %>
-            <% }) %>
-          <% } %>
-        </div>
-
-        <!-- Loading Indicator -->
-        <div id="loadingIndicator" class="hidden text-center py-8">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-blue-600"></div>
-        </div>
+      <!-- Products Grid -->
+      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <% if (products.length === 0) { %>
+          <div class="col-span-full text-center py-12">
+            <h3 class="text-xl text-gray-600">No products found matching your search.</h3>
+            <p class="mt-2 text-gray-500">Try adjusting your search terms or filters.</p>
+          </div>
+        <% } else { %>
+          <% products.forEach(product => { %>
+            <%- include('../partials/productCard', { product: product }) %>
+          <% }) %>
+        <% } %>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-let currentPage = 1;
-let loading = false;
-let hasMore = <%= hasMore %>;
-const searchQuery = '<%= searchQuery %>';
+let activeFilters = {
+    categories: [],
+    sizes: [],
+    priceRanges: [],
+    sort: 'newest'
+};
 
-// Infinite scroll function
-function loadMoreProducts() {
-  if (loading || !hasMore) return;
-  
-  loading = true;
-  const loadingIndicator = document.getElementById('loadingIndicator');
-  loadingIndicator.classList.remove('hidden');
-  
-  const sortSelect = document.getElementById('sortSelect');
-  const sortValue = sortSelect.value;
-  
-  fetch(`/search?q=${searchQuery}&page=${currentPage + 1}&sort=${sortValue}`, {
-    headers: {
-      'X-Requested-With': 'XMLHttpRequest'
+// Category filter
+document.querySelectorAll('.category-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        if (this.checked) {
+            activeFilters.categories.push(this.value);
+        } else {
+            activeFilters.categories = activeFilters.categories.filter(id => id !== this.value);
+        }
+        applyFilters();
+    });
+});
+
+// Size filter
+document.querySelectorAll('.size-option').forEach(button => {
+    button.addEventListener('click', function() {
+        const size = this.dataset.size;
+        this.classList.toggle('border-blue-500');
+        this.classList.toggle('text-blue-500');
+        
+        if (this.classList.contains('border-blue-500')) {
+            activeFilters.sizes.push(size);
+        } else {
+            activeFilters.sizes = activeFilters.sizes.filter(s => s !== size);
+        }
+        applyFilters();
+    });
+});
+
+// Price range filter
+document.querySelectorAll('.price-range-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        if (this.checked) {
+            activeFilters.priceRanges.push(this.value);
+        } else {
+            activeFilters.priceRanges = activeFilters.priceRanges.filter(range => range !== this.value);
+        }
+        applyFilters();
+    });
+});
+
+// Sort handler
+document.querySelectorAll('input[name="sort"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        activeFilters.sort = this.value;
+        applyFilters();
+    });
+});
+
+async function applyFilters() {
+    try {
+        const searchQuery = new URLSearchParams(window.location.search).get('q');
+        const response = await fetch(`/filter-Search`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                categories: activeFilters.categories,
+                sizes: activeFilters.sizes,
+                priceRanges: activeFilters.priceRanges,
+                sort: activeFilters.sort,
+                searchQuery: searchQuery,
+                searchMode: true
+            })
+        });
+
+        if (!response.ok) throw new Error('Filter request failed');
+        const data = await response.json();
+        
+        const productsGrid = document.getElementById('productsGrid');
+        
+        if (!data.success || !data.products || data.products.length === 0) {
+            renderEmptyState(productsGrid);
+        } else {
+            const formattedProducts = data.products.map(product => ({
+                _id: product._id,
+                productName: product.productName,
+                productImage: product.productImage,
+                regularPrice: product.regularPrice,
+                salePrice: product.salePrice,
+                finalPrice: product.salePrice,
+                inWishlist: product.inWishlist,
+                offer: product.offer
+            }));
+            
+            renderProducts(productsGrid, formattedProducts);
+        }
+        
+        updateResetButtonVisibility();
+    } catch (error) {
+        console.error('Error applying filters:', error);
+        showToast('Error filtering products', 'error');
     }
-  })
-    .then(response => response.json())
-    .then(data => {
-      const productsGrid = document.getElementById('productsGrid');
-      
-      data.products.forEach(product => {
-        const productCard = createProductCard(product);
-        productsGrid.insertAdjacentHTML('beforeend', productCard);
-      });
-      
-      currentPage++;
-      hasMore = data.hasMore;
-      loading = false;
-      loadingIndicator.classList.add('hidden');
-    })
-    .catch(error => {
-      console.error('Error loading more products:', error);
-      loading = false;
-      loadingIndicator.classList.add('hidden');
+}
+
+function renderEmptyState(container) {
+    container.innerHTML = `
+        <div class="col-span-full text-center py-12">
+            <h3 class="text-xl text-gray-600">No products found matching your criteria.</h3>
+            <p class="mt-2 text-gray-500">Try adjusting your filters or search terms.</p>
+            <button onclick="resetAllFilters()" 
+                    class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                Clear All Filters
+            </button>
+        </div>
+    `;
+}
+
+function renderProducts(container, products) {
+    container.innerHTML = products.map(product => `
+        <div class="group">
+            <div class="relative bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <a href="/productDetails?id=${product._id}" class="block">
+                    <div class="aspect-w-1 aspect-h-1 w-full relative overflow-hidden">
+                        <img src="${product.productImage[0]}" 
+                             alt="${product.productName}" 
+                             class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0">
+                        <img src="${product.productImage[1] || product.productImage[0]}" 
+                             alt="${product.productName}" 
+                             class="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    </div>
+                </a>
+                
+                <div class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                        class="wishlist-btn p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
+                        data-product-id="${product._id}"
+                        data-in-wishlist="${product.inWishlist}">
+                        <svg class="w-5 h-5 wishlist-icon ${product.inWishlist ? 'text-red-500' : 'text-gray-400'}" 
+                             fill="currentColor" 
+                             viewBox="0 0 24 24">
+                            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="p-4">
+                    <h3 class="text-sm font-medium text-gray-900 mb-1">${product.productName}</h3>
+                    <div class="flex items-baseline justify-between">
+                        <div class="flex items-baseline space-x-1">
+                            <span class="text-sm font-bold text-gray-900">₹${product.finalPrice}</span>
+                            <span class="text-xs text-gray-500 line-through">₹${product.regularPrice}</span>
+                        </div>
+                        <span class="text-xs font-medium text-green-600">
+                            ${Math.round((product.regularPrice - product.finalPrice) / product.regularPrice * 100)}% OFF
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    initializeWishlistButtons();
+}
+
+function updateResetButtonVisibility() {
+    const hasActiveFilters = 
+        activeFilters.categories.length > 0 || 
+        activeFilters.sizes.length > 0 || 
+        activeFilters.priceRanges.length > 0 || 
+        activeFilters.sort !== 'newest';
+    
+    const resetButton = document.getElementById('resetFilters');
+    if (resetButton) {
+        resetButton.classList.toggle('hidden', !hasActiveFilters);
+    }
+}
+
+function resetAllFilters() {
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelector('input[name="sort"][value="newest"]').checked = true;
+    document.querySelectorAll('.size-option').forEach(btn => {
+        btn.classList.remove('border-blue-500', 'text-blue-500');
+    });
+    
+    activeFilters = {
+        categories: [],
+        sizes: [],
+        priceRanges: [],
+        sort: 'newest'
+    };
+    
+    applyFilters();
+}
+
+document.getElementById('resetFilters')?.addEventListener('click', resetAllFilters);
+
+// Initialize wishlist functionality
+function initializeWishlistButtons() {
+    document.querySelectorAll('.wishlist-btn').forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            const icon = this.querySelector('.wishlist-icon');
+            
+            try {
+                const response = await fetch('/wishlist/toggle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    const isInWishlist = this.dataset.inWishlist === 'true';
+                    this.dataset.inWishlist = (!isInWishlist).toString();
+                    icon.classList.toggle('text-red-500');
+                    icon.classList.toggle('text-gray-400');
+                    
+                    showToast(data.action === 'added' ? 'Added to wishlist' : 'Removed from wishlist', 'success');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Failed to update wishlist', 'error');
+            }
+        });
     });
 }
 
-// Create product card HTML
-function createProductCard(product) {
-  return `
-    <div class="group">
-      <div class="relative bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-        <a href="/productDetails?id=${product._id}" class="block">
-          <div class="aspect-w-1 aspect-h-1 w-full relative overflow-hidden">
-            <img src="${product.productImage[0]}" 
-                 alt="${product.productName}" 
-                 class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0">
-            <img src="${product.productImage[1] || product.productImage[0]}" 
-                 alt="${product.productName}" 
-                 class="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          </div>
-        </a>
-        <div class="p-4">
-          <h3 class="text-lg font-medium text-gray-900 mb-2">${product.productName}</h3>
-          <div class="flex items-center justify-between">
-            <div class="flex items-baseline">
-              <span class="text-lg font-bold text-gray-900">₹${product.salePrice}</span>
-              <span class="ml-2 text-sm text-gray-500 line-through">₹${product.regularPrice}</span>
-            </div>
-            <span class="text-sm font-medium text-green-600">
-              ${Math.round((product.regularPrice - product.salePrice) / product.regularPrice * 100)}% OFF
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
+function showToast(message, type = 'success') {
+    Toastify({
+        text: message,
+        duration: 3000,
+        gravity: "bottom",
+        position: "right",
+        style: {
+            background: type === 'success' ? "#000000" : "#EF4444",
+            color: "#ffffff",
+            borderRadius: "8px",
+            padding: "12px 24px",
+            marginBottom: "60px"
+        }
+    }).showToast();
 }
 
-// Intersection Observer for infinite scroll
-const observer = new IntersectionObserver((entries) => {
-  if (entries[0].isIntersecting && !loading) {
-    loadMoreProducts();
-  }
-});
-
-// Observe the loading indicator
-observer.observe(document.getElementById('loadingIndicator'));
-
-// Sort change handler
-document.getElementById('sortSelect').addEventListener('change', (e) => {
-  currentPage = 1;
-  hasMore = true;
-  const productsGrid = document.getElementById('productsGrid');
-  productsGrid.innerHTML = '';
-  loadMoreProducts();
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initializeWishlistButtons();
+    updateResetButtonVisibility();
 });
 </script>
 

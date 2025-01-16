@@ -96,7 +96,7 @@ router.get(
 );
 
 router.post('/filter-products', userAuth, shopController.getFilteredProducts);
-
+router.post('/filter-Search', userAuth, shopController.filterSearchResults);
 // Create Razorpay order
 router.post(
   '/create-razorpay-order',
@@ -119,5 +119,8 @@ router.post('/wallet/verify-payment', userAuth, walletController.verifyPayment);
 router.post('/update-phone', userController.updatePhone);
 
 router.post('/download-invoice', userAuth, orderController.downloadInvoice);
+
+router.post('/delete-address', userAuth, userController.deleteAddress);
+router.post('/edit-address', userAuth, userController.editAddress);
 
 module.exports = router;

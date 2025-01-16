@@ -14,8 +14,6 @@ const userSchema = new Schema(
     },
     phone: {
       type: String,
-      unique: true,
-      sparse: true,
       default: undefined,
     },
     password: {

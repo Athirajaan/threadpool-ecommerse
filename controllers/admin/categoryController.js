@@ -1,4 +1,5 @@
 const Category = require('../../models/categorySchema');
+const Produtc = require('../../models/productSchema');
 
 // Display category
 const categoryInfo = async (req, res) => {

@@ -1,11 +1,11 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const addressSchema = new Schema(
   {
     UserId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     address: [
@@ -13,7 +13,7 @@ const addressSchema = new Schema(
         addressType: {
           type: String,
           required: true,
-          enum: ["Home", "Work", "Office", "Other"],
+          enum: ['Home', 'Work', 'Office', 'Other'],
         },
         name: {
           type: String,
@@ -46,17 +46,16 @@ const addressSchema = new Schema(
           type: Boolean,
           default: false,
         },
-        isDelete:{
-          type:Boolean,
-          default:false,
-        }
-       
+        isDelete: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-const Address = mongoose.model("Address", addressSchema);
+const Address = mongoose.model('Address', addressSchema);
 
 module.exports = Address;

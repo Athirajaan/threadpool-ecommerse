@@ -231,7 +231,32 @@
     </div>
   </div>
 
-  
+  <% if (totalPages > 1) { %>
+    <div class="flex items-center justify-center mt-8 space-x-2">
+      <!-- Previous Button -->
+      <a 
+        href="?page=<%= currentPage > 1 ? currentPage - 1 : 1 %>" 
+        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= currentPage === 1 ? 'cursor-not-allowed opacity-50' : '' %>">
+        &laquo;
+      </a>
+
+      <!-- Page Numbers -->
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <a 
+          href="?page=<%= i %>" 
+          class="px-4 py-2 rounded <%= currentPage === i ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+          <%= i %>
+        </a>
+      <% } %>
+
+      <!-- Next Button -->
+      <a 
+        href="?page=<%= currentPage < totalPages ? currentPage + 1 : totalPages %>" 
+        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= currentPage === totalPages ? 'cursor-not-allowed opacity-50' : '' %>">
+        &raquo;
+      </a>
+    </div>
+  <% } %>
 
 <!-- Order Details Modal -->
 
@@ -1091,115 +1116,70 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function retryPayment(orderId, amount) {
-    console.log('Starting retry payment for:', orderId, amount); // Debug log
-
-    fetch('/create-razorpay-order', {
+    fetch('/retry-razorpay-order', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            amount: amount,
-            orderId: orderId
-        })
+        body: JSON.stringify({ orderId, amount })
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
-        console.log('Razorpay order created:', data); // Debug log
         if (data.success) {
-            let options = {
+            const options = {
                 key: '<%= process.env.RAZORPAY_KEY_ID %>',
-                amount: amount * 100,
+                amount: data.amount,
                 currency: "INR",
                 name: "Your Store Name",
-                description: "Payment retry for order: " + orderId,
+                description: "Retry Payment",
                 order_id: data.orderId,
-                handler: function (response) {
-                    console.log('Payment successful, response:', response); // Debug log
+                handler: async function (response) {
+                    try {
+                        const verifyResponse = await fetch('/update-payment-status', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                                orderId: orderId
+                            })
+                        });
 
-                    // After successful payment, update the order status
-                    fetch('/update-payment-status', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            orderId: orderId,
-                            paymentId: response.razorpay_payment_id,
-                            signature: response.razorpay_signature
-                        })
-                    })
-                    .then(res => {
-                        console.log('Update status response:', res); // Debug log
-                        return res.json();
-                    })
-                    .then(data => {
-                        console.log('Update status data:', data); // Debug log
-                        if (data.success) {
-                            Toastify({
-                                text: "Payment completed successfully!",
-                                duration: 3000,
-                                gravity: "top",
-                                position: "right",
-                                style: {
-                                    background: "#22c55e",
-                                    color: "#ffffff",
-                                    borderRadius: "8px",
-                                    padding: "12px 24px",
-                                    marginTop: "60px"
-                                }
-                            }).showToast();
-
-                            setTimeout(() => {
+                        const result = await verifyResponse.json();
+                        if (result.success) {
+                            Swal.fire({
+                                title: 'Payment Successful',
+                                text: 'Your payment has been completed successfully',
+                                icon: 'success',
+                                confirmButtonColor: '#3B82F6'
+                            }).then(() => {
                                 window.location.reload();
-                            }, 2000);
+                            });
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error updating payment status:', error);
-                        Toastify({
-                            text: "Payment completed but status update failed",
-                            duration: 3000,
-                            gravity: "top",
-                            position: "right",
-                            style: {
-                                background: "#dc3545",
-                                color: "#ffffff",
-                                borderRadius: "8px",
-                                padding: "12px 24px",
-                                marginTop: "60px"
-                            }
-                        }).showToast();
-                    });
+                    } catch (error) {
+                        console.error('Payment verification error:', error);
+                        showToast('Payment verification failed', 'error');
+                    }
                 },
-                prefill: {
-                    name: "<%= user.name %>",
-                    email: "<%= user.email %>"
-                },
-                theme: {
-                    color: "#3399cc"
+                modal: {
+                    ondismiss: function() {
+                        showToast('Payment cancelled', 'warning');
+                    }
                 }
             };
 
-            let rzp1 = new Razorpay(options);
-            rzp1.open();
+            const razorpayInstance = new Razorpay(options);
+            razorpayInstance.on('payment.failed', function(response) {
+                showToast('Payment failed', 'error');
+            });
+
+            razorpayInstance.open();
         }
     })
     .catch(error => {
-        console.error('Error creating Razorpay order:', error);
-        Toastify({
-            text: "Failed to initiate payment",
-            duration: 3000,
-            gravity: "top",
-            position: "right",
-            style: {
-                background: "#dc3545",
-                color: "#ffffff",
-                borderRadius: "8px",
-                padding: "12px 24px",
-                marginTop: "60px"
-            }
-        }).showToast();
+        console.error('Error:', error);
+        showToast('Failed to initialize payment', 'error');
     });
 }
 

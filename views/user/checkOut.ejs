@@ -943,26 +943,91 @@
                 color: "#F59E0B"
               },
               modal: {
-                ondismiss: function() {
-                  console.log('Checkout form closed');
-                  showToast('Payment cancelled', 'error');
+                ondismiss: async function() {
+                  try {
+                    const response = await fetch('/verify-payment', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        payment_failed: true,
+                        orderDetails: {
+                          phoneNumber,
+                          finalAmount,
+                          address,
+                          paymentMethod: 'Razorpay'
+                        }
+                      })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                      Swal.fire({
+                        title: 'Payment Cancelled',
+                        text: 'Your order is in pending state. Please try to make the payment later.',
+                        icon: 'warning',
+                        confirmButtonColor: '#EAB308',
+                        confirmButtonText: 'OK'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          window.location.href = '/order';
+                        }
+                      });
+                    }
+                  } catch (error) {
+                    console.error('Error creating failed order:', error);
+                    showToast('Payment cancelled', 'error');
+                  }
                 }
               }
             };
 
-            // Create and open Razorpay instance
-            const razorpay = new Razorpay(options);
+            // Create Razorpay instance and store it
+            const razorpayInstance = new Razorpay(options);
             
-            razorpay.on('payment.failed', function (response) {
-              console.error('Payment failed:', response.error);
-              showToast('Payment failed: ' + response.error.description,'error');
+            // Add payment failed handler
+            razorpayInstance.on('payment.failed', async function(response) {
+              try {
+                const failureResponse = await fetch('/verify-payment', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    payment_failed: true,
+                    orderDetails: {
+                      phoneNumber,
+                      finalAmount,
+                      address,
+                      paymentMethod: 'Razorpay',
+                      error: response.error ? response.error.description : 'Payment Failed'
+                    }
+                  })
+                });
+
+                const result = await failureResponse.json();
+                if (result.success) {
+                  // Show SweetAlert before redirecting
+                  Swal.fire({
+                    title: 'Payment Failed',
+                    text: 'Your order is in pending state. Please try to make the payment later.',
+                    icon: 'warning',
+                    confirmButtonColor: '#EAB308',
+                    confirmButtonText: 'OK'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      window.location.href = '/order';
+                    }
+                  });
+                }
+              } catch (error) {
+                console.error('Error creating failed order:', error);
+                showToast('Payment failed', 'error');
+              }
             });
 
-            razorpay.open();
+            razorpayInstance.open();
 
           } catch (error) {
             console.error('Razorpay initialization error:', error);
-            showToast(error.message || 'Failed to initialize payment','error');
+            showToast(error.message || 'Failed to initialize payment', 'error');
           }
         } else if (paymentMethod === 'Cash on Delivery') {
           if (finalAmount > 1000) {
@@ -1226,6 +1291,33 @@
             this.checked = false;
           });
         }
+      }
+    });
+
+    // Add payment failed handler
+    razorpay.on('payment.failed', async function(response) {
+      try {
+        const response = await fetch('/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            payment_failed: true,
+            orderDetails: {
+              phoneNumber,
+              address,
+              finalAmount
+            }
+          })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          showToast('Payment failed. Order created with failed status', 'error');
+          window.location.href = '/order';
+        }
+      } catch (error) {
+        console.error('Error creating failed order:', error);
+        showToast('Payment failed', 'error');
       }
     });
   </script>

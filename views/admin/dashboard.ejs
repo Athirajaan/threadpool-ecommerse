@@ -58,7 +58,11 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-gray-500 text-sm">Avg. Order Value</p>
-                        <h3 class="text-2xl font-semibold text-gray-800">₹<%= (totalAmount/totalSales).toLocaleString('en-IN', { maximumFractionDigits: 2 }) %></h3>
+                        <h3 class="text-2xl font-semibold text-gray-800">
+                            ₹<%= typeof averageOrderValue === 'number' ? 
+                                averageOrderValue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 
+                                parseFloat(averageOrderValue).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
+                        </h3>
                         <span class="text-green-500 text-sm">↑ 3% increase</span>
                     </div>
                 </div>
@@ -125,18 +129,35 @@
                     <div>
                         <h2 class="text-xl font-semibold text-gray-800">Recent Orders</h2>
                         <div class="flex gap-3 mt-3">
-                            <button onclick="filterOrders('today')" class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'today' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                            <button onclick="filterOrders('today')" 
+                                    class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'today' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
                                 Today
                             </button>
-                            <button onclick="filterOrders('week')" class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'week' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                            <button onclick="filterOrders('week')" 
+                                    class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'week' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
                                 This Week
                             </button>
-                            <button onclick="filterOrders('month')" class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'month' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                            <button onclick="filterOrders('month')" 
+                                    class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'month' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
                                 This Month
                             </button>
-                            <button onclick="filterOrders('all')" class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                            <button onclick="filterOrders('all')" 
+                                    class="px-4 py-2 text-sm rounded-lg <%= currentPeriod === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
                                 All Orders
                             </button>
+                        </div>
+                        <div class="flex gap-3 mt-3">
+                            <div class="flex items-center gap-2">
+                                <input type="date" id="startDate" 
+                                       class="px-3 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-blue-500">
+                                <span class="text-gray-500">to</span>
+                                <input type="date" id="endDate" 
+                                       class="px-3 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-blue-500">
+                                <button onclick="filterByDateRange()" 
+                                        class="px-4 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+                                    Apply
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="flex gap-3 mt-4 md:mt-0">
@@ -165,54 +186,130 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <% orders.forEach(order => { %>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#<%= order.orderId %></td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                                            <%= order.user.name.charAt(0) %>
-                                        </div>
-                                        <div class="ml-3">
-                                            <div class="text-sm font-medium text-gray-900"><%= order.user.name %></div>
-                                            <div class="text-sm text-gray-500"><%= order.phoneNumber %></div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">
-                                        <% order.orderedItems.forEach(item => { %>
-                                            <div class="mb-1">
-                                                <%= item.product.productName %>
-                                                <span class="text-gray-500">(<%= item.size %> | <%= item.quantity %>)</span>
+                        <% if (orders && orders.length > 0) { %>
+                            <% orders.forEach(order => { %>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#<%= order.orderId %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                                <%= order.user.name.charAt(0) %>
                                             </div>
-                                        <% }) %>
+                                            <div class="ml-3">
+                                                <div class="text-sm font-medium text-gray-900"><%= order.user.name %></div>
+                                                <div class="text-sm text-gray-500"><%= order.phoneNumber %></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-900">
+                                            <% order.orderedItems.forEach(item => { %>
+                                                <div class="mb-1">
+                                                    <%= item.product.productName %>
+                                                    <span class="text-gray-500">(<%= item.size %> | <%= item.quantity %>)</span>
+                                                </div>
+                                            <% }) %>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
+                                        ₹<%= order.finalAmount.toFixed(2) %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
+                                        -₹<%= ((order.discount || 0) + (order.couponDiscount || 0)).toFixed(2) %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900"><%= new Date(order.createdOn).toLocaleDateString() %></div>
+                                        <div class="text-sm text-gray-500"><%= new Date(order.createdOn).toLocaleTimeString() %></div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <% const itemStatus = order.orderedItems[0]?.status || 'Pending' %>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            <%= itemStatus.toLowerCase() === 'delivered' ? 'bg-green-100 text-green-800' : 
+                                               itemStatus.toLowerCase() === 'cancelled' ? 'bg-red-100 text-red-800' : 
+                                               'bg-yellow-100 text-yellow-800' %>">
+                                            <%= itemStatus %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <div class="bg-gray-100 rounded-full p-3 mb-4">
+                                            <i class="fas fa-box-open text-gray-400 text-2xl"></i>
+                                        </div>
+                                        <h3 class="text-lg font-medium text-gray-900 mb-1">No Orders Found</h3>
+                                        <p class="text-gray-500">
+                                            <%= dateRange.startDate ? 
+                                                `No orders found between ${new Date(dateRange.startDate).toLocaleDateString()} and ${new Date(dateRange.endDate).toLocaleDateString()}` : 
+                                                'No orders found for the selected period' %>
+                                        </p>
                                     </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-                                    ₹<%= order.finalAmount.toFixed(2) %>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
-                                    -₹<%= ((order.discount || 0) + (order.couponDiscount || 0)).toFixed(2) %>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900"><%= new Date(order.createdOn).toLocaleDateString() %></div>
-                                    <div class="text-sm text-gray-500"><%= new Date(order.createdOn).toLocaleTimeString() %></div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <% const itemStatus = order.orderedItems[0]?.status || 'Pending' %>
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                        <%= itemStatus.toLowerCase() === 'delivered' ? 'bg-green-100 text-green-800' : 
-                                           itemStatus.toLowerCase() === 'cancelled' ? 'bg-red-100 text-red-800' : 
-                                           'bg-yellow-100 text-yellow-800' %>">
-                                        <%= itemStatus %>
-                                    </span>
                                 </td>
                             </tr>
-                        <% }) %>
+                        <% } %>
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination -->
+            <% if (pagination.totalPages > 1) { %>
+                <div class="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <% if (pagination.hasPrevPage) { %>
+                            <a href="?page=<%= pagination.prevPage %>&period=<%= currentPeriod %>" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Previous
+                            </a>
+                        <% } %>
+                        <% if (pagination.hasNextPage) { %>
+                            <a href="?page=<%= pagination.nextPage %>&period=<%= currentPeriod %>" 
+                               class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Next
+                            </a>
+                        <% } %>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Showing page <span class="font-medium"><%= pagination.currentPage %></span> of
+                                <span class="font-medium"><%= pagination.totalPages %></span>
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <!-- Previous Page -->
+                                <% if (pagination.hasPrevPage) { %>
+                                    <a href="?page=<%= pagination.prevPage %>&period=<%= currentPeriod %>" 
+                                       class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Previous</span>
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                <% } %>
+
+                                <!-- Page Numbers -->
+                                <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+                                    <a href="?page=<%= i %>&period=<%= currentPeriod %>"
+                                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium
+                                              <%= pagination.currentPage === i ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white text-gray-500 hover:bg-gray-50' %>">
+                                        <%= i %>
+                                    </a>
+                                <% } %>
+
+                                <!-- Next Page -->
+                                <% if (pagination.hasNextPage) { %>
+                                    <a href="?page=<%= pagination.nextPage %>&period=<%= currentPeriod %>" 
+                                       class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Next</span>
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                <% } %>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
         </div>
     </div>
 </div>
@@ -468,6 +565,39 @@ function closeTopSellers() {
 
 // Add click handler to close modal when clicking overlay
 document.getElementById('modalOverlay')?.addEventListener('click', closeTopSellers);
+
+function filterOrders(period) {
+    // Update button styles immediately
+    document.querySelectorAll('[onclick^="filterOrders"]').forEach(btn => {
+        btn.className = 'px-4 py-2 text-sm rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200';
+    });
+    event.target.className = 'px-4 py-2 text-sm rounded-lg bg-blue-500 text-white';
+
+    // Clear date inputs when using period filters
+    document.getElementById('startDate').value = '';
+    document.getElementById('endDate').value = '';
+
+    // Redirect to the same page with the period parameter
+    window.location.href = `/admin?period=${period}`;
+}
+
+function filterByDateRange() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    
+    if (!startDate || !endDate) {
+        alert('Please select both start and end dates');
+        return;
+    }
+    
+    // Reset other filter buttons
+    document.querySelectorAll('[onclick^="filterOrders"]').forEach(btn => {
+        btn.className = 'px-4 py-2 text-sm rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200';
+    });
+    
+    // Redirect with date range parameters
+    window.location.href = `/admin?startDate=${startDate}&endDate=${endDate}`;
+}
 </script>
 
 <!-- Add this right after your main content and before the modal -->

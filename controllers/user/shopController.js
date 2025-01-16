@@ -7,25 +7,37 @@ const { calculatePrice } = require('../../utils/priceCalculator');
 const loadWomenShopping = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 12; // Products per page
+    const limit = 12;
     const skip = (page - 1) * limit;
 
-    // Get total count for pagination
+    // Get total count for pagination - updated to include category check
     const totalProducts = await Product.countDocuments({
       gender: 'Women',
       isBlocked: false,
+    }).populate({
+      path: 'category',
+      match: { isListed: true },
     });
-    const totalPages = Math.ceil(totalProducts / limit);
 
-    // Fetch products
+    // Fetch products with category check
     const products = await Product.find({
       gender: 'Women',
       isBlocked: false,
     })
-      .populate('category')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+      .populate({
+        path: 'category',
+        match: { isListed: true },
+      })
+      .sort({ createdAt: -1 });
+
+    // Filter out products whose categories are not listed
+    const filteredProducts = products.filter((product) => product.category);
+
+    // Apply pagination after filtering
+    const paginatedProducts = filteredProducts.slice(skip, skip + limit);
+
+    // Recalculate total pages based on filtered products
+    const totalPages = Math.ceil(filteredProducts.length / limit);
 
     // Fetch categories for women
     const categories = await Category.find({
@@ -44,7 +56,7 @@ const loadWomenShopping = async (req, res) => {
 
     // Calculate prices with offers
     const productsWithOffers = await Promise.all(
-      products.map(async (product) => {
+      paginatedProducts.map(async (product) => {
         const priceDetails = await calculatePrice(product, product.category);
         return {
           ...product.toObject(),
@@ -59,7 +71,7 @@ const loadWomenShopping = async (req, res) => {
       currentPage: page,
       totalPages: totalPages,
       wishlistProducts,
-      category: categories, // Pass categories to the view
+      category: categories,
     });
   } catch (error) {
     console.error('Error loading women shopping:', error);
@@ -70,27 +82,39 @@ const loadWomenShopping = async (req, res) => {
 const loadMenShopping = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 12; // Products per page
+    const limit = 12;
     const skip = (page - 1) * limit;
 
-    // Get total count for pagination
+    // Get total count for pagination - updated to include category check
     const totalProducts = await Product.countDocuments({
       gender: 'Men',
       isBlocked: false,
+    }).populate({
+      path: 'category',
+      match: { isListed: true },
     });
-    const totalPages = Math.ceil(totalProducts / limit);
 
-    // Fetch products
+    // Fetch products with category check
     const products = await Product.find({
       gender: 'Men',
       isBlocked: false,
     })
-      .populate('category')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+      .populate({
+        path: 'category',
+        match: { isListed: true },
+      })
+      .sort({ createdAt: -1 });
 
-    // Fetch categories for women
+    // Filter out products whose categories are not listed
+    const filteredProducts = products.filter((product) => product.category);
+
+    // Apply pagination after filtering
+    const paginatedProducts = filteredProducts.slice(skip, skip + limit);
+
+    // Recalculate total pages based on filtered products
+    const totalPages = Math.ceil(filteredProducts.length / limit);
+
+    // Fetch categories for men
     const categories = await Category.find({
       gender: 'Men',
       isListed: true,
@@ -107,7 +131,7 @@ const loadMenShopping = async (req, res) => {
 
     // Calculate prices with offers
     const productsWithOffers = await Promise.all(
-      products.map(async (product) => {
+      paginatedProducts.map(async (product) => {
         const priceDetails = await calculatePrice(product, product.category);
         return {
           ...product.toObject(),
@@ -122,7 +146,7 @@ const loadMenShopping = async (req, res) => {
       currentPage: page,
       totalPages: totalPages,
       wishlistProducts,
-      category: categories, // Pass categories to the view
+      category: categories,
     });
   } catch (error) {
     console.error('Error loading men shopping:', error);
@@ -410,9 +434,112 @@ const getFilteredProducts = async (req, res) => {
   }
 };
 
+const filterSearchResults = async (req, res) => {
+  try {
+    const { categories, sizes, priceRanges, sort, searchQuery } = req.body;
+    const user = req.session.user;
+
+    // Base query with search
+    let query = {
+      isBlocked: false,
+      $or: [
+        { productName: { $regex: searchQuery, $options: 'i' } },
+        { description: { $regex: searchQuery, $options: 'i' } },
+      ],
+    };
+
+    // Add category filter
+    if (categories && categories.length > 0) {
+      query.category = { $in: categories };
+    }
+
+    // Add size filter
+    if (sizes && sizes.length > 0) {
+      const sizeQueries = sizes.map((size) => ({
+        [`stock.${size}`]: { $gt: 0 },
+      }));
+      query.$and = query.$and || [];
+      query.$and.push({ $or: sizeQueries });
+    }
+
+    // Add price range filter
+    if (priceRanges && priceRanges.length > 0) {
+      const priceQuery = priceRanges
+        .map((range) => {
+          switch (range) {
+            case 'under500':
+              return { salePrice: { $lt: 500 } };
+            case '500to799':
+              return { salePrice: { $gte: 500, $lte: 799 } };
+            case '800to999':
+              return { salePrice: { $gte: 800, $lte: 999 } };
+            case '1000to1999':
+              return { salePrice: { $gte: 1000, $lte: 1999 } };
+            case '2000plus':
+              return { salePrice: { $gte: 2000 } };
+            default:
+              return null;
+          }
+        })
+        .filter((q) => q !== null);
+
+      if (priceQuery.length > 0) {
+        query.$and = query.$and || [];
+        query.$and.push({ $or: priceQuery });
+      }
+    }
+
+    // Sort criteria
+    let sortCriteria = {};
+    switch (sort) {
+      case 'priceAsc':
+        sortCriteria = { salePrice: 1 };
+        break;
+      case 'priceDesc':
+        sortCriteria = { salePrice: -1 };
+        break;
+      case 'nameAsc':
+        sortCriteria = { productName: 1 };
+        break;
+      case 'nameDesc':
+        sortCriteria = { productName: -1 };
+        break;
+      default:
+        sortCriteria = { createdAt: -1 };
+    }
+
+    // Fetch filtered products
+    const products = await Product.find(query).sort(sortCriteria);
+
+    // Get wishlist
+    let wishlistProducts = [];
+    if (user) {
+      const wishlist = await Wishlist.findOne({ userId: user });
+      wishlistProducts = wishlist
+        ? wishlist.products.map((item) => item.productId.toString())
+        : [];
+    }
+
+    res.json({
+      success: true,
+      products: products.map((product) => ({
+        ...product.toObject(),
+        inWishlist: wishlistProducts.includes(product._id.toString()),
+      })),
+    });
+  } catch (error) {
+    console.error('Search filter error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error filtering search results',
+    });
+  }
+};
+
 module.exports = {
   loadMenShopping,
   loadWomenShopping,
   searchProducts,
   getFilteredProducts,
+  filterSearchResults,
 };

@@ -26,6 +26,7 @@ const getAllProducts = async (req, res) => {
     }
 
     const productData = await Product.find(query)
+      .populate('category', 'name')
       .limit(limit)
       .skip((page - 1) * limit)
       .exec();

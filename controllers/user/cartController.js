@@ -826,6 +826,13 @@ const verifyRazorpayPayment = async (req, res) => {
       });
     }
 
+    // Calculate total discount (MRP - Final Amount)
+    const totalMRP = userCart.items.reduce(
+      (total, item) => total + item.productId.regularPrice * item.quantity,
+      0
+    );
+    const totalDiscount = totalMRP - userCart.finalAmount;
+
     // Create new order
     const newOrder = new Order({
       user: req.session.user,
@@ -837,13 +844,13 @@ const verifyRazorpayPayment = async (req, res) => {
         size: item.size,
         status: 'Pending',
       })),
-      phoneNumber: orderDetails?.phoneNumber || '',
+      phoneNumber: orderDetails.phoneNumber,
       finalAmount: userCart.finalAmount,
       discount: totalDiscount,
-      address: orderDetails?.address || '',
+      address: orderDetails.address,
       paymentMethod: 'Razorpay',
       status: 'Pending',
-      paymentStatus: payment_failed ? 'Failed' : 'Success',
+      paymentStatus: payment_failed ? 'Failed' : 'Completed',
       invoice: {
         invoiceId: generateInvoiceId(),
         dateGenerated: Date.now(),
@@ -854,13 +861,6 @@ const verifyRazorpayPayment = async (req, res) => {
     });
 
     await newOrder.save();
-
-    // Update product stock
-    for (const item of userCart.items) {
-      await Product.findByIdAndUpdate(item.productId._id, {
-        $inc: { [`stock.${item.size}`]: -item.quantity },
-      });
-    }
 
     // Clear the cart
     await Cart.findOneAndUpdate(
@@ -874,7 +874,6 @@ const verifyRazorpayPayment = async (req, res) => {
       }
     );
 
-    // Send success response
     res.json({
       success: true,
       message: payment_failed

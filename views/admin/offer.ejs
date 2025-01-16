@@ -126,6 +126,36 @@
     </table>
   </div>
 
+  <!-- Pagination -->
+  <% if (pagination && pagination.totalPages > 0) { %>
+    <div class="flex items-center justify-center mt-4 space-x-2">
+      <!-- Previous Button -->
+      <a href="?page=<%= pagination.currentPage > 1 ? pagination.currentPage - 1 : 1 %>" 
+         class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= pagination.currentPage === 1 ? 'cursor-not-allowed opacity-50' : '' %>">
+        &laquo;
+      </a>
+
+      <!-- Page Numbers -->
+      <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+        <a href="?page=<%= i %>" 
+           class="px-4 py-2 rounded <%= pagination.currentPage === i ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+          <%= i %>
+        </a>
+      <% } %>
+
+      <!-- Next Button -->
+      <a href="?page=<%= pagination.currentPage < pagination.totalPages ? pagination.currentPage + 1 : pagination.totalPages %>" 
+         class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= pagination.currentPage === pagination.totalPages ? 'cursor-not-allowed opacity-50' : '' %>">
+        &raquo;
+      </a>
+    </div>
+  <% } %>
+
+  <!-- Add this for debugging -->
+  <script>
+    console.log('Pagination Data:', <%- JSON.stringify(pagination) %>);
+  </script>
+
   <!-- Add Offer Modal -->
   <div
     id="addOfferModal"
@@ -505,57 +535,50 @@
   });
 
   async function toggleOfferStatus(offerId, currentStatus) {
-    const action = currentStatus ? 'deactivate' : 'activate';
-
-    // Show confirmation dialog
-    const result = await Swal.fire({
+    try {
+      const result = await Swal.fire({
         title: 'Are you sure?',
-        text: `Do you want to ${action} this offer?`,
+        text: `Do you want to ${currentStatus ? 'deactivate' : 'activate'} this offer?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes',
         cancelButtonText: 'No'
-    });
+      });
 
-    if (result.isConfirmed) {
-        try {
-            const response = await fetch('/admin/offer/toggle-status', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ offerId })
-            });
+      if (result.isConfirmed) {
+        const response = await fetch('/admin/offer/toggle-status', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ offerId })
+        });
 
-            const data = await response.json();
+        const data = await response.json();
 
-            if (!response.ok) {
-                throw new Error(data.message || 'Error updating status');
-            }
-
-            // Show success message
-            await Swal.fire({
-                title: 'Success!',
-                text: data.message,
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false
-            });
-
-            // Reload page to show updated status
-            location.reload();
-
-        } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({
-                title: 'Error!',
-                text: error.message || 'Something went wrong',
-                icon: 'error',
-                confirmButtonText: 'Ok'
-            });
+        if (response.ok) {
+          await Swal.fire({
+            title: 'Success!',
+            text: data.message,
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          });
+          location.reload();
+        } else {
+          throw new Error(data.message || 'Failed to update status');
         }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: error.message || 'Something went wrong',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
     }
   }
 

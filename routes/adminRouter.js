@@ -75,6 +75,8 @@ router.put('/offer/:offerId', adminAuth, offerController.updateOffer);
 // Add this route for creating offers
 router.post('/offer/create', adminAuth, offerController.createOffer);
 
+router.patch('/offer/toggle-status',adminAuth,offerController.toggleOfferStatus);
+
 router.get('/export-excel', adminController.exportToExcel);
 router.get('/export-pdf', adminController.exportToPDF);
 // Add this new route

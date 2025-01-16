@@ -3,26 +3,35 @@ const Product = require('../../models/productSchema');
 const Wishlist = require('../../models/wishlistSchema');
 const { calculatePrice } = require('../../utils/priceCalculator');
 
-// Load Wishlist Page
+// Load Wishlist Page with Pagination
 const loadWishlist = async (req, res) => {
   try {
     const userId = req.session.user;
     const user = await User.findById(userId);
+    const page = parseInt(req.query.page) || 1;
+    const limit = 8; // Items per page
 
-    // Fetch wishlist with populated product details including category for offer calculation
-    const wishlist = await Wishlist.findOne({ userId }).populate({
-      path: 'products.productId',
-      select: 'productName productImage salePrice regularPrice stock category',
-      populate: {
-        path: 'category', // Populate category for offer calculation
-      },
-    });
+    // Fetch total count of wishlist items
+    const wishlist = await Wishlist.findOne({ userId });
+    const totalItems = wishlist ? wishlist.products.length : 0;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    // Fetch wishlist with pagination and populated product details
+    const paginatedWishlist = await Wishlist.findOne({ userId })
+      .populate({
+        path: 'products.productId',
+        select:
+          'productName productImage salePrice regularPrice stock category',
+        populate: {
+          path: 'category',
+        },
+      })
+      .slice('products', [(page - 1) * limit, limit]);
 
     // Format products for display with offer prices
     const wishlistProducts = await Promise.all(
-      wishlist
-        ? wishlist.products.map(async (item) => {
-            // Calculate price with offers
+      paginatedWishlist
+        ? paginatedWishlist.products.map(async (item) => {
             const priceDetails = await calculatePrice(
               item.productId,
               item.productId.category
@@ -32,7 +41,7 @@ const loadWishlist = async (req, res) => {
               _id: item.productId._id,
               productName: item.productId.productName,
               productImage: item.productId.productImage[0],
-              salePrice: priceDetails.finalPrice, // Use offer price
+              salePrice: priceDetails.finalPrice,
               regularPrice: item.productId.regularPrice,
               stock: item.productId.stock,
               addedAt: item.addedAt,
@@ -44,6 +53,13 @@ const loadWishlist = async (req, res) => {
     res.render('wishlist', {
       user: user,
       products: wishlistProducts,
+      currentPage: page,
+      totalPages: totalPages,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+      nextPage: page + 1,
+      prevPage: page - 1,
+      lastPage: totalPages,
     });
   } catch (error) {
     console.error('Error in loadWishlist:', error);

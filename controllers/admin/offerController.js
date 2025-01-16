@@ -4,13 +4,23 @@ const Category = require('../../models/categorySchema');
 
 const getOffers = async (req, res) => {
   try {
-    // Fetch all offers and populate the applicableFor field
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5; // Items per page
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination
+    const totalOffers = await Offer.countDocuments();
+    const totalPages = Math.ceil(totalOffers / limit);
+
+    // Fetch offers with pagination
     const offers = await Offer.find()
       .populate({
         path: 'applicableFor',
-        select: 'productName name', // 'productName' for Product, 'name' for Category
+        select: 'productName name',
       })
-      .sort({ createdAt: -1 }); // Sort by newest first
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     // Fetch products and categories for the modal dropdowns
     const products = await Product.find({ isBlocked: false }).select(
@@ -20,12 +30,16 @@ const getOffers = async (req, res) => {
       'name _id gender'
     );
 
-    console.log('Fetched offers:', offers); // For debugging
-
     res.render('offer', {
-      offers: offers,
-      products: products,
-      categories: categories,
+      offers,
+      products,
+      categories,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
     });
   } catch (error) {
     console.error('Error fetching offers:', error);

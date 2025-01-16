@@ -103,6 +103,31 @@
     </table>
   </div>
 
+  <!-- Pagination -->
+  <% if (pagination && pagination.totalPages > 0) { %>
+    <div class="flex items-center justify-center mt-4 space-x-2">
+      <!-- Previous Button -->
+      <a href="?page=<%= pagination.currentPage > 1 ? pagination.currentPage - 1 : 1 %>" 
+         class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= pagination.currentPage === 1 ? 'cursor-not-allowed opacity-50' : '' %>">
+        &laquo;
+      </a>
+
+      <!-- Page Numbers -->
+      <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+        <a href="?page=<%= i %>" 
+           class="px-4 py-2 rounded <%= pagination.currentPage === i ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+          <%= i %>
+        </a>
+      <% } %>
+
+      <!-- Next Button -->
+      <a href="?page=<%= pagination.currentPage < pagination.totalPages ? pagination.currentPage + 1 : pagination.totalPages %>" 
+         class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 <%= pagination.currentPage === pagination.totalPages ? 'cursor-not-allowed opacity-50' : '' %>">
+        &raquo;
+      </a>
+    </div>
+  <% } %>
+
   <!-- Add Coupon Modal -->
   <div
     id="addCouponModal"

@@ -8,7 +8,8 @@
       <!-- Profile Overview Section -->
       <div class="mb-10">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-gray-900">Profile Overview</h2>
+            <p class="text-gray-600 text-sm">Manage your personal information and preferences here</p>
+    
           <!-- Keeping original edit button with same ID -->
           <button id="editProfileBtn" class="flex items-center px-6 py-2.5  rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
             <i class="fas fa-user-edit mr-2"></i>
@@ -48,26 +49,33 @@
               </div>
               
               <div class="space-y-4">
-                <div class="bg-white rounded-xl p-4 shadow-sm">
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <label class="text-sm text-gray-500 mb-1 block">Password</label>
-                      <p class="text-lg font-semibold text-gray-800">••••••••</p>
+                <% if (!user.googleId) { %>
+                    <div class="bg-white rounded-xl p-4 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="text-sm text-gray-500 mb-1 block">Password</label>
+                                <p class="text-lg font-semibold text-gray-800">••••••••</p>
+                            </div>
+                            <button id="changePasswordBtn" class="flex items-center px-4 py-2 text-sm bg-gray-800 hover:bg-gray-900 text-white rounded-lg transition-all duration-300">
+                                <i class="fas fa-key mr-2"></i>
+                                Change
+                            </button>
+                        </div>
                     </div>
-                    <!-- Keeping original change password button with same ID -->
-                    <button id="changePasswordBtn" class="flex items-center px-4 py-2 text-sm bg-gray-800 hover:bg-gray-900 text-white rounded-lg transition-all duration-300">
-                      <i class="fas fa-key mr-2"></i>
-                      Change
-                    </button>
-                  </div>
-                 
-                </div>
+                <% } else { %>
+                    <div class="bg-white rounded-xl p-4 shadow-sm">
+                        <div class="flex items-center space-x-3">
+                            <i class="fab fa-google text-blue-500"></i>
+                            <p class="text-sm text-gray-600">Signed in with Google Account</p>
+                        </div>
+                    </div>
+                <% } %>
 
                 <div class="bg-white rounded-xl p-4 shadow-sm">
-                  <div class="flex items-center space-x-3">
-                    <i class="fas fa-shield-alt text-gray-400"></i>
-                    <p class="text-sm text-gray-600">Your account is protected with two-factor authentication</p>
-                  </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-shield-alt text-gray-400"></i>
+                        <p class="text-sm text-gray-600">Your account is protected with two-factor authentication</p>
+                    </div>
                 </div>
               </div>
             </div>
@@ -90,34 +98,38 @@
         <div class="grid md:grid-cols-2 gap-6">
           <% if (addresses && addresses.length > 0) { %>
             <% addresses.forEach(addressItem => { %>
-              <% const address = addressItem.address[0]; %>
-              <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
-                <div class="p-6">
-                  <div class="flex justify-between items-start mb-4">
-                    <span class="px-4 py-1.5 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
-                      <%= address.addressType %>
-                    </span>
-                    <% if (address.isDefault) { %>
-                      <span class="px-4 py-1.5 bg-green-100 text-green-800 rounded-full text-sm font-medium">Default</span>
-                    <% } %>
-                  </div>
+              <% addressItem.address.forEach(addr => { %>
+                <% if (!addr.isDelete) { %>
+                  <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+                    <div class="p-6">
+                      <div class="flex justify-between items-start mb-4">
+                        <span class="px-4 py-1.5 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+                          <%= addr.addressType %>
+                        </span>
+                        <% if (addr.isDefault) { %>
+                          <span class="px-4 py-1.5 bg-green-100 text-green-800 rounded-full text-sm font-medium">Default</span>
+                        <% } %>
+                      </div>
 
-                  <h3 class="text-xl font-bold text-gray-900 mb-3"><%= address.name %></h3>
-                  <p class="text-gray-600 leading-relaxed mb-4">
-                    <%= address.landMark %><br>
-                    <%= address.city %>, <%= address.state %> - <%= address.pincode %>
-                  </p>
+                      <h3 class="text-xl font-bold text-gray-900 mb-3"><%= addr.name %></h3>
+                      <p class="text-gray-600 leading-relaxed mb-4">
+                        <%= addr.landMark %><br>
+                        <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>
+                      </p>
 
-                  <div class="flex justify-end items-center space-x-4 pt-4 border-t border-gray-100">
-                    <button class="text-red-500 hover:text-red-600 font-medium text-sm transition-colors duration-300">
-                      <i class="fas fa-trash-alt mr-1"></i> Remove
-                    </button>
-                    <button class="text-blue-500 hover:text-blue-600 font-medium text-sm transition-colors duration-300">
-                      <i class="fas fa-edit mr-1"></i> Edit
-                    </button>
+                      <div class="flex justify-end items-center space-x-4 pt-4 border-t border-gray-100">
+                        <button onclick="deleteAddress('<%= addr._id %>')" class="text-red-500 hover:text-red-600 font-medium text-sm transition-colors duration-300">
+                          <i class="fas fa-trash-alt mr-1"></i> Remove
+                        </button>
+                        <button onclick="editAddress('<%= JSON.stringify(addr) %>')" 
+                                class="text-blue-500 hover:text-blue-600 font-medium text-sm transition-colors duration-300">
+                          <i class="fas fa-edit mr-1"></i> Edit
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                <% } %>
+              <% }) %>
             <% }) %>
           <% } else { %>
             <div class="col-span-2 bg-white rounded-2xl shadow-lg p-8 text-center">
@@ -195,142 +207,114 @@
 </div>
 
 <!-- Modal -->
-<div
-  id="addAddressModal"
-  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden"
->
-  <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg p-8">
-    <div class="flex justify-between items-center border-b pb-4">
-      <h2 class="text-2xl font-bold text-gray-800">Add Address</h2>
-      <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+<div id="addAddressModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all">
+    <!-- Modal Header -->
+    <div class="p-6 border-b border-gray-100">
+      <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-800">Add New Address</h2>
+        <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors duration-300">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
     </div>
-    <form id="addressForm" class="mt-6 space-y-6">
-      <!-- Address Type -->
-      <div>
-        <label for="addressType" class="block text-sm font-semibold text-gray-700">Address Type*</label>
-        <select
-          id="addressType"
-          name="addressType"
-          class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-          required
-        >
-          <option value="" disabled selected>Select type</option>
-          <option value="Home">Home</option>
-          <option value="Work">Work</option>
-          <option value="Office">Office</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
 
-      <!-- Name -->
-      <div>
-        <label for="name" class="block text-sm font-semibold text-gray-700">Name*</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-          placeholder="Enter your full name"
-          minlength="3"
-          maxlength="50"
-          required
-        />
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
-        <!-- City -->
+    <!-- Modal Body -->
+    <div class="p-6">
+      <form id="addressForm" class="space-y-5">
+        <!-- Address Type -->
         <div>
-          <label for="city" class="block text-sm font-semibold text-gray-700">City*</label>
-          <input
-            type="text"
-            id="city"
-            name="city"
-            class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-            placeholder="Enter city"
-            minlength="2"
-            maxlength="100"
-            required
-          />
+          <label for="addressType" class="block text-sm font-medium text-gray-700 mb-1">Address Type</label>
+          <select id="addressType" name="addressType" required
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white">
+            <option value="" disabled selected>Select type</option>
+            <option value="Home">Home</option>
+            <option value="Work">Work</option>
+            <option value="Office">Office</option>
+            <option value="Other">Other</option>
+          </select>
+          <div id="addressTypeError" class="text-red-500 text-sm mt-1 hidden"></div>
         </div>
 
-        <!-- State -->
-        <div>
-          <label for="state" class="block text-sm font-semibold text-gray-700">State*</label>
-          <input
-            type="text"
-            id="state"
-            name="state"
-            class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-            placeholder="Enter state"
-            required
-          />
+        <!-- Name -->
+        <div class="mb-4">
+          <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+          <input type="text" 
+                 id="name" 
+                 name="name" 
+                 required 
+                 minlength="3" 
+                 maxlength="50"
+                 class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                 placeholder="Enter your full name">
+          <div id="nameError" class="text-red-500 text-sm mt-1" style="display: none;"></div>
         </div>
-      </div>
 
-      <!-- Landmark -->
-      <div>
-        <label for="landMark" class="block text-sm font-semibold text-gray-700">Landmark*</label>
-        <input
-          type="text"
-          id="landMark"
-          name="landMark"
-          class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-          placeholder="Enter a nearby landmark"
-          maxlength="100"
-          required
-        />
-      </div>
+        <!-- City & State Grid -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+            <input type="text" id="city" name="city" required minlength="2" maxlength="100"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+              placeholder="Enter city">
+            <div id="cityError" class="text-red-500 text-sm mt-1 hidden"></div>
+          </div>
+          <div>
+            <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+            <input type="text" id="state" name="state" required
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+              placeholder="Enter state">
+            <div id="stateError" class="text-red-500 text-sm mt-1 hidden"></div>
+          </div>
+        </div>
 
-      <!-- Pincode -->
-      <div>
-        <label for="pincode" class="block text-sm font-semibold text-gray-700">Pincode*</label>
-        <input
-          type="number"
-          id="pincode"
-          name="pincode"
-          class="mt-2 block w-full rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-          placeholder="Enter 6-digit pincode"
-          min="100000"
-          max="999999"
-          required
-        />
-      </div>
+        <!-- Landmark -->
+        <div>
+          <label for="landMark" class="block text-sm font-medium text-gray-700 mb-1">Landmark</label>
+          <input type="text" id="landMark" name="landMark" required maxlength="100"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+            placeholder="Enter a nearby landmark">
+          <div id="landMarkError" class="text-red-500 text-sm mt-1 hidden"></div>
+        </div>
 
-      <div class="flex items-center">
-        <label class="flex items-center space-x-3 cursor-pointer">
-          <input
-            type="checkbox"
-            id="isDefault"
-            class="w-5 h-5 rounded border-gray-300 text-yellow-500 focus:ring-yellow-400"
-            onchange="handleDefaultAddressCheckbox()"
-          />
-          <span class="text-sm font-medium text-gray-700">Set as Default Address</span>
-        </label>
-      </div>
+        <!-- Pincode -->
+        <div>
+          <label for="pincode" class="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+          <input type="number" id="pincode" name="pincode" required min="100000" max="999999"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+            placeholder="Enter 6-digit pincode">
+          <div id="pincodeError" class="text-red-500 text-sm mt-1 hidden"></div>
+        </div>
 
-      <div id="error-message" class="text-red-500"></div>
+        <!-- Default Address Checkbox -->
+        <div class="flex items-center">
+          <label class="flex items-center space-x-3 cursor-pointer group">
+            <input type="checkbox" id="isDefault" onchange="handleDefaultAddressCheckbox()"
+              class="w-5 h-5 rounded-lg border-gray-300 text-yellow-500 focus:ring-yellow-500 focus:ring-offset-0">
+            <span class="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">
+              Set as Default Address
+            </span>
+          </label>
+        </div>
 
-      <!-- Buttons -->
-      <div class="flex justify-end space-x-3 pt-4 border-t">
-        <button
-          type="button"
-          id="cancelModalBtn"
-          class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          class="px-6 py-2.5 rounded-lg bg-yellow-500 text-white font-medium hover:bg-yellow-600 transition-colors"
-        >
-          Save Address
-        </button>
-      </div>
-    </form>
+        <!-- General Form Error -->
+        <div id="formError" class="text-red-500 text-sm hidden"></div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+          <button type="button" id="cancelModalBtn"
+            class="px-6 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-all duration-300 transform hover:scale-105">
+            Cancel
+          </button>
+          <button type="submit"
+            class="px-6 py-2.5 rounded-xl bg-yellow-500 text-white font-medium hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+            Save Address
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -369,54 +353,134 @@ window.addEventListener("click", (event) => {
 
 // Submit form
 document.getElementById("addressForm").addEventListener("submit", async function(event) {
-  event.preventDefault();  // Prevent the default form submission
-
-  // Collect form data
-  const formData = {
-    addressType: document.getElementById("addressType").value,
-    name: document.getElementById("name").value,
-    city: document.getElementById("city").value,
-    landMark: document.getElementById("landMark").value,
-    state: document.getElementById("state").value,
-    pincode: document.getElementById("pincode").value,
-    isDefault: document.getElementById("isDefault").checked,
-  };
-
-  try {
-    const response = await fetch("http://localhost:3000/add-address", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+    event.preventDefault();
+    
+    // Reset all error messages
+    const errorElements = document.querySelectorAll('[id$="Error"]');
+    errorElements.forEach(element => {
+        element.classList.add('hidden');
+        element.textContent = '';
     });
 
-    const result = await response.json();
+    let hasError = false;
 
-    if (response.ok) {
-      // If successful, show a success message or update the UI
-      localStorage.setItem("addressAdded", "true");
-      // Optionally, close the modal here
-      modal.classList.add("hidden");
-      addressForm.reset(); // Reset the form fields after successful submission
-    
-    } else {
-      // If there's an error, show an error message
-      localStorage.setItem("addressAdded", "error");
+    // Address Type validation
+    const addressType = document.getElementById('addressType').value;
+    if (!addressType) {
+        document.getElementById('addressTypeError').textContent = 'Please select an address type';
+        document.getElementById('addressTypeError').classList.remove('hidden');
+        hasError = true;
     }
-    location.reload()
-  } catch (error) {
-    console.error("Error:", error);
-    localStorage.setItem("addressAdded", "error");
-    location.reload();
-  }
+
+    // Name validation
+    const name = document.getElementById('name').value.trim();
+    if (!name) {
+        document.getElementById('nameError').textContent = 'Name is required';
+        document.getElementById('nameError').classList.remove('hidden');
+        hasError = true;
+    } else if (name.length < 3) {
+        document.getElementById('nameError').textContent = 'Name must be at least 3 characters long';
+        document.getElementById('nameError').classList.remove('hidden');
+        hasError = true;
+    }
+
+    // City validation
+    const city = document.getElementById('city').value.trim();
+    if (!city) {
+        document.getElementById('cityError').textContent = 'City is required';
+        document.getElementById('cityError').classList.remove('hidden');
+        hasError = true;
+    } else if (city.length < 2) {
+        document.getElementById('cityError').textContent = 'City must be at least 2 characters long';
+        document.getElementById('cityError').classList.remove('hidden');
+        hasError = true;
+    }
+
+    // State validation
+    const state = document.getElementById('state').value.trim();
+    if (!state) {
+        document.getElementById('stateError').textContent = 'State is required';
+        document.getElementById('stateError').classList.remove('hidden');
+        hasError = true;
+    }
+
+    // Landmark validation
+    const landmark = document.getElementById('landMark').value.trim();
+    if (!landmark) {
+        document.getElementById('landMarkError').textContent = 'Landmark is required';
+        document.getElementById('landMarkError').classList.remove('hidden');
+        hasError = true;
+    }
+
+    // Pincode validation
+    const pincode = document.getElementById('pincode').value;
+    if (!pincode) {
+        document.getElementById('pincodeError').textContent = 'Pincode is required';
+        document.getElementById('pincodeError').classList.remove('hidden');
+        hasError = true;
+    } else if (pincode.length !== 6 || !/^\d{6}$/.test(pincode)) {
+        document.getElementById('pincodeError').textContent = 'Please enter a valid 6-digit pincode';
+        document.getElementById('pincodeError').classList.remove('hidden');
+        hasError = true;
+    }
+
+    // If there are any errors, stop form submission
+    if (hasError) {
+        return false;
+    }
+
+    // If validation passes, collect form data
+    const formData = {
+        addressType,
+        name,
+        city,
+        landMark: landmark,
+        state,
+        pincode,
+        isDefault: document.getElementById('isDefault').checked
+    };
+
+    try {
+        const response = await fetch('/add-address', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Success
+            localStorage.setItem('addressAdded', 'true');
+            document.getElementById('addAddressModal').classList.add('hidden');
+            location.reload();
+        } else {
+            // Show error message
+            document.getElementById('formError').textContent = result.message || 'Failed to add address';
+            document.getElementById('formError').classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('formError').textContent = 'Something went wrong. Please try again.';
+        document.getElementById('formError').classList.remove('hidden');
+    }
 });
 
-// Cancel button closes the modal without submitting
-document.getElementById("cancelModalBtn").addEventListener("click", function() {
-  modal.classList.add("hidden");
-  addressForm.reset(); // Reset the form when canceling
-});
+// Reset form and errors when modal is closed
+function resetFormAndErrors() {
+    document.getElementById('addressForm').reset();
+    const errorElements = document.querySelectorAll('[id$="Error"]');
+    errorElements.forEach(element => {
+        element.classList.add('hidden');
+        element.textContent = '';
+    });
+}
+
+// Add reset to close and cancel buttons
+document.getElementById('closeModalBtn').addEventListener('click', resetFormAndErrors);
+document.getElementById('cancelModalBtn').addEventListener('click', resetFormAndErrors);
 
 window.addEventListener("load", () => {
   const addressAdded = localStorage.getItem("addressAdded");
@@ -434,17 +498,23 @@ window.addEventListener("load", () => {
 // Function to show the notification
 function showNotification(message, bgColor) {
   const notification = document.getElementById("notification");
+  if (!notification) {
+    console.error("Notification element not found");
+    return;
+  }
+  
+  // Remove any existing color classes
+  notification.className = "fixed top-4 right-4 px-4 py-2 rounded-lg text-white transform transition-all duration-300";
+  
+  // Add the new color class and show the notification
+  notification.classList.add(bgColor);
   notification.textContent = message;
-
-  // Apply the background color using Tailwind
   notification.classList.remove("hidden");
-  notification.classList.add("show", bgColor); // Dynamically add the color class
-
-  // Show notification for 5 seconds (5000ms)
+  
+  // Hide the notification after 4 seconds
   setTimeout(() => {
-    notification.classList.remove("show");
     notification.classList.add("hidden");
-  }, 4000); // Change this to 5000ms for 5 seconds
+  }, 4000);
 }
 
 // Modal handling
@@ -588,6 +658,144 @@ function showNotification(message, bgColor) {
     notification.classList.add("hidden");
   }, 4000);
 }
+
+// Delete address function
+async function deleteAddress(addressId) {
+    try {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this address?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, remove it!'
+        });
+
+        if (result.isConfirmed) {
+            const response = await fetch('/delete-address', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ addressId })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                await Swal.fire(
+                    'Deleted!',
+                    'Address has been removed.',
+                    'success'
+                );
+                location.reload();
+            } else {
+                await Swal.fire(
+                    'Error!',
+                    data.message || 'Failed to remove address',
+                    'error'
+                );
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        await Swal.fire(
+            'Error!',
+            'Something went wrong',
+            'error'
+        );
+    }
+}
+
+// DOM Content Loaded Event
+document.addEventListener('DOMContentLoaded', () => {
+    // Your other initialization code here
+    console.log('DOM fully loaded');
+});
+
+// Update your existing validateField function
+function validateField(fieldId) {
+    const field = document.getElementById(fieldId);
+    const errorDiv = document.getElementById(`${fieldId}Error`);
+    const value = field.value.trim();
+
+    // Reset error state
+    errorDiv.classList.add('hidden');
+    field.classList.remove('border-red-500');
+    field.classList.add('border-gray-200');
+
+    // Validation rules
+    if (!value) {
+        errorDiv.textContent = `${fieldId.charAt(0).toUpperCase() + fieldId.slice(1)} is required`;
+        errorDiv.classList.remove('hidden');
+        field.classList.add('border-red-500');
+        return false;
+    }
+
+    // Common validation for fields requiring 3 characters and letters only
+    if (['name', 'city', 'state', 'landMark'].includes(fieldId)) {
+        if (value.length < 3) {
+            errorDiv.textContent = `${fieldId.charAt(0).toUpperCase() + fieldId.slice(1)} must be at least 3 characters`;
+            errorDiv.classList.remove('hidden');
+            field.classList.add('border-red-500');
+            return false;
+        }
+        
+        if (!/^[a-zA-Z\s]+$/.test(value)) {
+            errorDiv.textContent = `${fieldId.charAt(0).toUpperCase() + fieldId.slice(1)} should only contain letters`;
+            errorDiv.classList.remove('hidden');
+            field.classList.add('border-red-500');
+            return false;
+        }
+    }
+
+    // Special validation for pincode
+    if (fieldId === 'pincode') {
+        if (!/^\d{6}$/.test(value)) {
+            errorDiv.textContent = 'Please enter a valid 6-digit pincode';
+            errorDiv.classList.remove('hidden');
+            field.classList.add('border-red-500');
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// Make sure these event listeners are properly attached
+document.addEventListener('DOMContentLoaded', function() {
+    const fields = ['name', 'city', 'state', 'landMark', 'pincode'];
+    const form = document.getElementById('addressForm');
+
+    // Add validation on input
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('input', () => validateField(fieldId));
+            field.addEventListener('blur', () => validateField(fieldId));
+        }
+    });
+
+    // Validate all fields on form submit
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        let isValid = true;
+        fields.forEach(fieldId => {
+            if (!validateField(fieldId)) {
+                isValid = false;
+            }
+        });
+
+        if (!isValid) {
+            return false;
+        }
+
+        // Continue with form submission if all validations pass
+        // Your existing form submission code here...
+    });
+});
 
   </script>
   </div>
