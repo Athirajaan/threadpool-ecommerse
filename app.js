@@ -57,7 +57,7 @@ app.use('/admin', adminRouter);
 connectDb()
   .then(() => {
     console.log('database connection established..');
-    app.listen(port, () => {
+    app.listen(port,'0.0.0.0', () => {
       console.log('Server running on port', port);
     });
   })
