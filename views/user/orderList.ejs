@@ -65,16 +65,20 @@
                 </div>
               </div>
               <div class="flex items-center space-x-3">
+                <!-- Add Final Amount Display -->
+                <div class="text-sm font-medium text-gray-900">
+                  Total: ₹<%= order.finalAmount %>
+                </div>
                 <!-- View Details Button -->
                 <button 
-                    data-order='<%= JSON.stringify(order).replace(/'/g, "\\'") %>'
-                    onclick="showOrderDetails(this.dataset.order)" 
-                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 border border-gray-200 hover:border-blue-500 rounded-md transition-all duration-200">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  View Details
-                </button>
+                data-order='<%= JSON.stringify(order).replace(/'/g, "\\'").replace(/"/g, "&quot;") %>'
+                onclick="showOrderDetails(this.dataset.order)" 
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 border border-gray-200 hover:border-blue-500 rounded-md transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                View Details
+              </button>
 
                 <!-- Retry Payment Button - Only show if payment status is Failed -->
                 <% if (order.paymentStatus === 'Failed') { %>
@@ -107,7 +111,7 @@
                         <div class="flex items-center space-x-4 text-sm text-gray-500">
                           <span>Qty: <%= item.quantity %></span>
                           <span>Size: <%= item.size %></span>
-                          <span class="font-medium text-gray-900">₹<%= item.price %></span>
+                          <span class="font-medium text-gray-900">Item Price: ₹<%= item.price %></span>
                         </div>
                         
                         <!-- Status Badge -->
@@ -465,112 +469,53 @@
   
     function showOrderDetails(orderData) {
         try {
-            const order = JSON.parse(orderData);
-            console.log('Order data:', order);
+            // Decode HTML entities
+            const decodedData = orderData.replace(/&quot;/g, '"');
 
-            // Set the order ID for the invoice
-            const modalInvoiceOrderId = document.getElementById('modalInvoiceOrderId');
-            if (modalInvoiceOrderId) {
-                modalInvoiceOrderId.value = order.orderId;
-                console.log('Set invoice orderId:', order.orderId);
-            }
+            // Parse the JSON data
+            const order = JSON.parse(decodedData);
 
-            // Show/hide payment failed warning
-            const paymentFailedWarning = document.getElementById('paymentFailedWarning');
-            if (paymentFailedWarning) {
-                if (order.paymentStatus === 'Failed') {
-                    paymentFailedWarning.classList.remove('hidden');
-                } else {
-                    paymentFailedWarning.classList.add('hidden');
-                }
-            }
+            // Display order details in the modal
+            console.log('Order Details:', order);
 
-            // Basic Order Details
-            const orderIdElement = document.getElementById('modalOrderId');
-            const orderDateElement = document.getElementById('modalOrderDate');
-            if (orderIdElement) orderIdElement.textContent = `Order ${order.orderId}`;
-            if (orderDateElement) orderDateElement.textContent = new Date(order.orderDate).toLocaleString();
+            // Populate modal content with order details
+            document.getElementById('modalOrderId').textContent = order.orderId;
+            document.getElementById('modalOrderDate').textContent = new Date(order.orderDate).toLocaleString();
+            document.getElementById('modalPhone').textContent = order.phoneNumber;
+            document.getElementById('modalAmount').textContent = order.finalAmount;
+            document.getElementById('modalPaymentMethod').textContent = order.paymentMethod;
 
-            // Order Items
-            const itemsContainer = document.getElementById('modalItems');
-            if (itemsContainer) {
-                itemsContainer.innerHTML = order.orderedItems.map(item => `
-                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded mb-2">
-                        <div class="flex items-center gap-4">
-                            <img src="${item.productImage}" 
-                                 alt="${item.productName}" 
-                                 class="w-16 h-16 object-cover rounded">
-                            <div>
-                                <p class="font-medium">${item.productName}</p>
-                                <p class="text-sm text-gray-600">Size: ${item.size} | Quantity: ${item.quantity}</p>
-                                <p class="text-sm ${item.status === 'Delivered' ? 'text-green-600' : 'text-blue-600'}">${item.status}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-medium">₹${item.price}</p>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            // Contact Information
-            const phoneElement = document.getElementById('modalPhone');
-            if (phoneElement) phoneElement.textContent = order.phoneNumber || 'N/A';
-
-            // Address Details
-            const addressElement = document.getElementById('modalAddress');
-            const addressTypeElement = document.getElementById('modalAddressType');
+            // Populate address details
             if (order.address) {
-                if (addressElement) {
-                    const addr = order.address;
-                    const addressParts = [];
-                    if (addr.name) addressParts.push(addr.name);
-                    if (addr.landMark) addressParts.push(addr.landMark);
-                    if (addr.city) addressParts.push(addr.city);
-                    if (addr.state) addressParts.push(addr.state);
-                    if (addr.pincode) addressParts.push(addr.pincode.toString());
-                    addressElement.textContent = addressParts.join(', ') || 'No address details available';
-                }
-                if (addressTypeElement && order.address.addressType) {
-                    addressTypeElement.textContent = order.address.addressType;
-                }
-            } else {
-                if (addressElement) addressElement.textContent = 'No address available';
-                if (addressTypeElement) addressTypeElement.textContent = '';
+                document.getElementById('modalAddress').textContent = `${order.address.landMark}, ${order.address.city}, ${order.address.state}, ${order.address.pincode}`;
+                document.getElementById('modalAddressType').textContent = order.address.addressType;
             }
 
-            // Payment Details
-            const elements = {
-                paymentMethod: document.getElementById('modalPaymentMethod'),
-                coupon: document.getElementById('modalCoupon'),
-                discount: document.getElementById('modalDiscount'),
-                amount: document.getElementById('modalAmount')
-            };
+            // Populate ordered items
+            const itemsContainer = document.getElementById('modalItems');
+            itemsContainer.innerHTML = ''; // Clear previous items
+            order.orderedItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'flex items-center space-x-4 mb-4';
 
-            if (elements.paymentMethod) elements.paymentMethod.textContent = order.paymentMethod || 'N/A';
-            if (elements.coupon) elements.coupon.textContent = order.couponApplied ? order.appliedCoupon?.code : 'No coupon applied';
-            if (elements.discount) elements.discount.textContent = order.couponDiscount || '0';
-            if (elements.amount) elements.amount.textContent = order.finalAmount || '0';
+                itemElement.innerHTML = `
+                    <img src="${item.productImage}" alt="${item.productName}" class="w-16 h-16 object-cover rounded">
+                    <div>
+                        <h4 class="font-medium">${item.productName}</h4>
+                        <p class="text-sm text-gray-500">Quantity: ${item.quantity}</p>
+                        <p class="text-sm text-gray-500">Size: ${item.size}</p>
+                    </div>
+                `;
 
-            // Set the order ID on the download button
-            const downloadButton = document.querySelector('[data-order-id]');
-            if (downloadButton) {
-                downloadButton.setAttribute('data-order-id', order.orderId);
-                console.log('Set order ID for download:', order.orderId); // Debug log
-            }
+                itemsContainer.appendChild(itemElement);
+            });
 
-            // Set up download button
-            const invoiceOrderIdInput = document.getElementById('invoiceOrderId');
-        if (invoiceOrderIdInput) {
-            invoiceOrderIdInput.value = order.orderId;
-        }
-            // Show modal and overlay
+            // Show the modal
             const modal = document.getElementById('orderDetailsModal');
             const overlay = document.getElementById('modalOverlay');
-            if (modal) modal.classList.remove('hidden');
-            if (overlay) overlay.classList.remove('hidden');
+            modal.classList.remove('hidden');
+            overlay.classList.remove('hidden');
             document.body.classList.add('overflow-hidden');
-
         } catch (error) {
             console.error('Error in showOrderDetails:', error);
             console.log('Raw order data:', orderData);
@@ -580,19 +525,8 @@
     function closeModal() {
         const modal = document.getElementById('orderDetailsModal');
         const overlay = document.getElementById('modalOverlay');
-        
-        if (modal) {
-            modal.classList.add('translate-x-full');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('translate-x-full');
-            }, 300);
-        }
-        
-        if (overlay) {
-            overlay.classList.add('hidden');
-        }
-        
+        modal.classList.add('hidden');
+        overlay.classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
     }
 

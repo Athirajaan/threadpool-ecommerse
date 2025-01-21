@@ -22,8 +22,15 @@ const productDetails = async (req, res) => {
       regularPrice: product.regularPrice,
     };
 
+    // Fetch similar products in the same category, excluding the current product
+    const similarProducts = await Product.find({
+      category: product.category._id,
+      _id: { $ne: productId }, // Exclude the current product
+    }).limit(4); // Limit to 4 similar products
+
     res.render('product-details', {
       product: productWithOffer,
+      similarProducts, // Pass similar products to the view
     });
   } catch (error) {
     console.error('Error in product details:', error);

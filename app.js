@@ -5,6 +5,7 @@ const session = require('express-session');
 const passport = require('./config/passport');
 const connectDb = require('./config/databse');
 const path = require('path');
+const { cartQuantityMiddleware } = require('./middlewares/cart');
 
 const userRouter = require('./routes/userRouter');
 const adminRouter = require('./routes/adminRouter');
@@ -47,6 +48,8 @@ app.use((req, res, next) => {
   res.locals.isLoggedIn = req.session && req.session.userId ? true : false;
   next();
 });
+
+app.use(cartQuantityMiddleware);
 
 app.use('/', userRouter);
 app.use('/admin', adminRouter);

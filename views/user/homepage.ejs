@@ -29,7 +29,7 @@
 
 <!-- Section Header -->
 <div class="container mx-auto px-4 py-12">
-  <div class="flex items-center justify-between mb-8">
+  <div class="flex items-center justify-between mb-2">
     <div class="relative">
       <h2 class="text-3xl font-bold text-gray-900">New Arrivals</h2>
       <div class="absolute -bottom-2 left-0 w-24 h-1 bg-yellow-500"></div>
@@ -93,9 +93,141 @@
   </div>
 </div>
 
+<!-- Compact Video Section with Effects -->
+<section class="container mx-auto px-4 pb-8">
+  <div class="relative flex flex-col items-center justify-center bg-gray-100 rounded-2xl mx-auto w-full shadow-md h-[400px] overflow-hidden group">
+    <video 
+      autoplay muted loop 
+      class="absolute top-0 left-0 w-full h-full object-cover rounded-2xl transform scale-100 group-hover:scale-110 transition-transform duration-700 ease-out"
+    >
+        <source src="/videos/menWomenbanner.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <!-- Gradient Overlay with Fade Effect -->
+    <div class="absolute inset-0 bg-gradient-to-r from-black/30 to-black/10 opacity-60 group-hover:opacity-80 transition-opacity duration-500"></div>
+    
+    <!-- Overlay Content with Slide-up Effect -->
+    <div class="relative z-10 text-center text-white px-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+      <h2 class="text-3xl md:text-4xl font-bold mb-3 drop-shadow-lg transform group-hover:scale-105 transition-transform duration-500">
+        Train in Style
+      </h2>
+      <p class="text-lg mb-6 drop-shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+        Premium Gym Wear for Every Workout
+      </p>
+      
+      <!-- Two Buttons Container -->
+      <div class="flex items-center justify-center space-x-6">
+        <!-- Women's Button -->
+        <a href="/womenShop" 
+           class="px-8 py-3 bg-white hover:bg-yellow-500 hover:text-white text-black text-base font-medium 
+                  rounded-lg shadow-md transition-all duration-300 transform -translate-y-2 opacity-0 
+                  group-hover:translate-y-0 group-hover:opacity-100 delay-200
+                  hover:scale-105">
+          WOMEN
+        </a>
+        
+        <!-- Men's Button -->
+        <a href="/menShop" 
+           class="px-8 py-3 bg-black hover:bg-yellow-500 text-white text-base font-medium 
+                  rounded-lg shadow-md transition-all duration-300 transform -translate-y-2 opacity-0 
+                  group-hover:translate-y-0 group-hover:opacity-100 delay-300
+                  hover:scale-105">
+          MEN
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
 
-<!-- Sale Banner -->
-<div class="relative overflow-hidden bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-200 mb-8">
+<!-- Best Sellers Section with Horizontal Scroll -->
+<div class="container mx-auto px-4 pt-8">
+  <div class="flex items-center justify-between mb-8">
+    <div class="relative">
+      <h2 class="text-4xl font-bold text-gray-900">Best Sellers</h2>
+      <div class="absolute -bottom-2 left-0 w-32 h-1 bg-yellow-500 z-10"></div>
+    </div>
+    <a href="/womenShop" class="inline-flex items-center text-yellow-600 hover:text-yellow-700 font-medium">
+      View All
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Horizontal Scrolling Products -->
+  <div class="relative">
+    <div class="flex overflow-x-auto space-x-8 pb-8 scrollbar-hide snap-x snap-mandatory">
+      <% if (featuredProducts && featuredProducts.length > 0) { %>
+        <% for(let i = 0; i < featuredProducts.length; i++) { %>
+          <div class="flex-none w-96 snap-start transform transition-all duration-500 hover:scale-105">
+            <a href="/productDetails?id=<%= featuredProducts[i]._id %>" class="block">
+              <div class="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden 
+                          animate-fadeIn" style="animation-delay: <%= i * 200 %>ms">
+                <!-- Product Images with Enhanced Hover Effect -->
+                <div class="aspect-w-4 aspect-h-5 relative overflow-hidden">
+                  <img 
+                    src="<%= featuredProducts[i].productImage[0] %>" 
+                    alt="<%= featuredProducts[i].productName %>" 
+                    class="w-full h-full object-cover transition-all duration-700 transform hover:scale-110">
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+
+                <!-- Product Name with Animated Underline -->
+                <div class="p-6">
+                  <h3 class="text-xl font-medium text-gray-900 text-center relative overflow-hidden group">
+                    <%= featuredProducts[i].productName %>
+                    <span class="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-500 transform origin-left scale-x-0 
+                               transition-transform duration-300 group-hover:scale-x-100"></span>
+                  </h3>
+                </div>
+              </div>
+            </a>
+          </div>
+        <% } %>
+      <% } else { %>
+        <p class="text-center text-gray-500 w-full">No best sellers available at the moment.</p>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- Zoom Effect Image Section -->
+<div class="container mx-auto px-4 pb-16">
+  <div class="relative overflow-hidden rounded-2xl group h-[600px]">
+    <!-- Main Image -->
+    <img 
+      src="/images/women.avif" 
+      alt="Featured Collection" 
+      class="absolute inset-0 w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-700 ease-in-out"
+    >
+    
+    <!-- Gradient Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div>
+    
+    <!-- Content -->
+    <div class="relative h-full flex flex-col justify-center px-12 text-white">
+      <h2 class="text-5xl font-bold mb-4 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500 leading-tight">
+        THE GYM GIRL<br>ESSENTIALS
+      </h2>
+      <p class="text-xl max-w-lg mb-8 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500 delay-100">
+        Discover our latest arrivals designed for your active lifestyle
+      </p>
+      <a 
+        href="/womenShop" 
+        class="inline-block w-fit px-8 py-3 bg-white text-black font-medium rounded-lg 
+               hover:bg-yellow-500 hover:text-white transition-all duration-300 
+               transform translate-y-8 group-hover:translate-y-0 delay-200"
+      >
+        Shop Now
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Sale Banner with Scroll Animation -->
+<div class="relative overflow-hidden bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-200 mb-8 opacity-0 translate-y-10 transition-all duration-1000 ease-out" 
+     id="saleBanner">
   <div class="absolute inset-0">
     <img src="/images/sale-pattern.jpg" alt="Sale Pattern" class="w-full h-full object-cover opacity-10">
   </div>
@@ -129,66 +261,113 @@
   </div>
 </div>
 
+<script>
+// Intersection Observer for scroll animation
+document.addEventListener('DOMContentLoaded', function() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.remove('opacity-0', 'translate-y-10');
+        observer.unobserve(entry.target); // Stop observing once animated
+      }
+    });
+  }, {
+    threshold: 0.1, // Trigger when 10% of the element is visible
+    rootMargin: '50px' // Trigger slightly before the element comes into view
+  });
 
+  // Start observing the sale banner
+  const saleBanner = document.getElementById('saleBanner');
+  if (saleBanner) {
+    observer.observe(saleBanner);
+  }
+});
+</script>
 
-<!-- Best Sellers Section -->
-<div class="container mx-auto px-4 py-12">
-  <div class="flex items-center justify-between mb-8">
-    <div class="relative">
-      <h2 class="text-3xl font-bold text-gray-900">Best Sellers</h2>
-      <div class="absolute -bottom-2 left-0 w-24 h-1 bg-yellow-500"></div>
-    </div>
-    <a href="/womenShop" class="inline-flex items-center text-yellow-600 hover:text-yellow-700 font-medium">
-      View All
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-      </svg>
-    </a>
-  </div>
+<style>
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
 
-  <!-- Products Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-    <% if (featuredProducts && featuredProducts.length > 0) { %>
-      <% for(let i = 0; i < featuredProducts.length; i++) { %>
-        <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-          <!-- Product Image (Single) -->
-          <a href="/productDetails?id=<%= featuredProducts[i]._id %>">
-            <div class="aspect-w-3 aspect-h-4 relative">
-              <img 
-                src="<%= featuredProducts[i].productImage[0] %>" 
-                alt="<%= featuredProducts[i].productName %>" 
-                class="w-full h-full object-cover rounded-t-lg">
-            </div>
-          </a>
+/* Smooth scrolling behavior */
+.snap-x {
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
 
-          <!-- Product Info -->
-          <div class="p-4">
-            <a href="/productDetails?id=<%= featuredProducts[i]._id %>" 
-               class="block font-medium text-gray-900 hover:text-yellow-600 transition-colors duration-200 mb-2">
-              <%= featuredProducts[i].productName %>
-            </a>
-            <div class="flex items-center justify-between">
-              <div class="flex flex-col">
-                <span class="text-lg font-bold text-gray-900">₹<%= featuredProducts[i].salePrice %></span>
-                <% if (featuredProducts[i].regularPrice > featuredProducts[i].salePrice) { %>
-                  <span class="text-sm text-gray-500 line-through">₹<%= featuredProducts[i].regularPrice %></span>
-                <% } %>
-              </div>
-              <% const discount = Math.round((featuredProducts[i].regularPrice - featuredProducts[i].salePrice) / featuredProducts[i].regularPrice * 100) %>
-              <% if (discount > 0) { %>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  -<%= discount %>%
-                </span>
-              <% } %>
-            </div>
-          </div>
-        </div>
-      <% } %>
-    <% } else { %>
-      <p class="col-span-4 text-center text-gray-500">No best sellers available at the moment.</p>
-    <% } %>
-  </div>
-</div>
+.snap-start {
+  scroll-snap-align: start;
+}
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Hover Effects */
+.group:hover .group-hover\:scale-x-100 {
+  transform: scaleX(1);
+}
+
+/* Enhanced card styles */
+.w-96 {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.w-96:hover {
+  transform: translateY(-10px) scale(1.02);
+}
+
+/* Gradient overlay */
+.from-black\/20 {
+  --tw-gradient-from: rgba(0, 0, 0, 0.2);
+  --tw-gradient-to: transparent;
+}
+
+.group:hover .group-hover\:scale-110 {
+  transform: scale(1.1);
+}
+
+.delay-100 {
+  transition-delay: 100ms;
+}
+
+.delay-200 {
+  transition-delay: 200ms;
+}
+
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+
+/* Add to existing styles */
+.translate-y-10 {
+  transform: translateY(40px);
+}
+
+/* Smooth transition for the animation */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 1000ms;
+}
+</style>
 
 <%- include('../partials/user/userfooter') %> 
 

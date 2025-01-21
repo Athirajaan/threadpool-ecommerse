@@ -15,7 +15,7 @@ const getOrder = async (req, res) => {
   try {
     const user = req.session.user;
     const page = parseInt(req.query.page) || 1;
-    const limit = 5; // Orders per page
+    const limit = 5;
     const skip = (page - 1) * limit;
 
     // Get total count of orders
@@ -24,69 +24,48 @@ const getOrder = async (req, res) => {
 
     // Fetch orders with pagination
     const orders = await Order.find({ user: user._id })
-      .populate({
-        path: 'orderedItems.product',
-        select: 'productName productImage stock status',
-      })
-      .populate({
-        path: 'address',
-        model: 'Address',
-        select: 'address UserId',
-      })
-      .populate('appliedCoupon')
-      .populate('user', 'name email')
+      .populate('orderedItems.product')
       .sort({ createdOn: -1 })
       .skip(skip)
       .limit(limit);
 
-    const orderDetails = orders
-      ? orders.map((order) => {
-          // Debug log
-          console.log('Processing order address:', order.address);
+    // Fetch the user's address document
+    const userAddresses = await Address.findOne({ UserId: user._id });
 
-          // Get the default address from the populated address document
-          const deliveryAddress =
-            order.address?.address?.find((addr) => addr.isDefault) ||
-            order.address?.address?.[0];
+    const orderDetails = orders.map((order) => {
+      // Find the specific address in the user's address array using the address ID from the order
+      const address = userAddresses?.address.find(
+        (addr) => addr._id.toString() === order.address.toString()
+      );
 
-          return {
-            orderId: order.orderId,
-            orderDate: order.createdOn,
-            orderedItems: order.orderedItems.map((item) => ({
-              product: item.product,
-              productName: item.product?.productName,
-              productImage: item.product?.productImage[0],
-              price: item.price,
-              size: item.size,
-              quantity: item.quantity,
-              status: item.status,
-            })),
-            // Format address data
-            address: deliveryAddress
-              ? {
-                  name: deliveryAddress.name,
-                  addressType: deliveryAddress.addressType,
-                  city: deliveryAddress.city,
-                  landMark: deliveryAddress.landMark,
-                  state: deliveryAddress.state,
-                  pincode: deliveryAddress.pincode,
-                }
-              : null,
-            phoneNumber: order.phoneNumber,
-            user: order.user,
-            finalAmount: order.finalAmount,
-            paymentStatus: order.paymentStatus,
-            paymentMethod: order.paymentMethod,
-            couponApplied: order.couponApplied,
-            couponDiscount: order.couponDiscount,
-            appliedCoupon: order.appliedCoupon,
-            invoice: order.invoice,
-            createdAt: order.createdOn,
-            updatedAt: order.updatedAt,
-            discount: order.discount,
-          };
-        })
-      : [];
+      return {
+        orderId: order.orderId,
+        orderDate: order.createdOn,
+        orderedItems: order.orderedItems.map((item) => ({
+          product: item.product,
+          productName: item.product?.productName,
+          productImage: item.product?.productImage[0],
+          price: item.price,
+          size: item.size,
+          quantity: item.quantity,
+          status: item.status,
+        })),
+        address: address
+          ? {
+              name: address.name,
+              city: address.city,
+              landMark: address.landMark,
+              state: address.state,
+              pincode: address.pincode,
+              addressType: address.addressType,
+            }
+          : null,
+        phoneNumber: order.phoneNumber,
+        finalAmount: order.finalAmount,
+        paymentStatus: order.paymentStatus,
+        paymentMethod: order.paymentMethod,
+      };
+    });
 
     res.render('orderList', {
       orders: orderDetails,

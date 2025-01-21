@@ -53,15 +53,13 @@ const loadHomepage = async (req, res) => {
       .limit(4);
 
     // Get best sellers (4 products with highest salesCount)
-    let bestSellers = await Product.find({
+    let featuredProducts = await Product.find({
       isBlocked: false,
       category: { $in: categories.map((category) => category._id) },
       totalQuantity: { $gt: 0 },
-      salesCount: { $gt: 0 }, // Only products that have been sold
     })
-      .sort({ salesCount: -1 }) // Sort by sales count in descending order
-      .limit(4);
-
+      .sort({ salesCount: -1 }) // Sort by salesCount in descending order
+      .limit(15);
 
     // Process products for display
     if (user) {
@@ -78,7 +76,7 @@ const loadHomepage = async (req, res) => {
       }));
 
       // Process best sellers
-      bestSellers = bestSellers.map((product) => ({
+      featuredProducts = featuredProducts.map((product) => ({
         ...product.toObject(),
         inWishlist: wishlistProducts.includes(product._id.toString()),
       }));
@@ -86,17 +84,17 @@ const loadHomepage = async (req, res) => {
       return res.render('homepage', {
         user: userData,
         newArrivals,
-        featuredProducts: bestSellers, // Keep the same variable name in template
+        featuredProducts, // Keep the same variable name in template
         isLoggedIn: true,
       });
     } else {
       // Convert products to plain objects without wishlist info
       newArrivals = newArrivals.map((product) => product.toObject());
-      bestSellers = bestSellers.map((product) => product.toObject());
+      featuredProducts = featuredProducts.map((product) => product.toObject());
 
       return res.render('homepage', {
         newArrivals,
-        featuredProducts: bestSellers, // Keep the same variable name in template
+        featuredProducts, // Keep the same variable name in template
         isLoggedIn: false,
       });
     }
@@ -286,7 +284,6 @@ const loadProfile = async (req, res) => {
     if (user) {
       // Fetch addresses for the user
       const addresses = await Address.find({ UserId: userId }); // Multiple addresses for the user
-    
 
       // Render the profile page and pass user details and address data
       res.render('userProfile', {
@@ -466,8 +463,6 @@ const deleteAddress = async (req, res) => {
     const { addressId } = req.body;
     const userId = req.session.userId;
 
-
-
     // Find the address document that contains the address to be deleted
     const addressDoc = await Address.findOne({
       UserId: userId,
@@ -486,7 +481,6 @@ const deleteAddress = async (req, res) => {
     );
 
     if (addressIndex === -1) {
-    
       return res
         .status(404)
         .json({ success: false, message: 'Address not found' });
@@ -495,8 +489,6 @@ const deleteAddress = async (req, res) => {
     // Update the isDelete flag for the specific address
     addressDoc.address[addressIndex].isDelete = true;
     await addressDoc.save();
-
-   
 
     res.json({ success: true, message: 'Address removed successfully' });
   } catch (error) {
@@ -507,51 +499,59 @@ const deleteAddress = async (req, res) => {
 
 const editAddress = async (req, res) => {
   try {
-      const userId = req.session.user._id;
-      const { addressId, addressType, name, city, state, landMark, pincode, isDefault } = req.body;
+    const userId = req.session.user._id;
+    const {
+      addressId,
+      addressType,
+      name,
+      city,
+      state,
+      landMark,
+      pincode,
+      isDefault,
+    } = req.body;
 
-      // If setting as default, unset any existing default
-      if (isDefault) {
-          await User.updateOne(
-              { _id: userId, "address.isDefault": true },
-              { $set: { "address.$.isDefault": false } }
-          );
-      }
-
-      // Update the address
-      const result = await User.updateOne(
-          { _id: userId, "address._id": addressId },
-          {
-              $set: {
-                  "address.$.addressType": addressType,
-                  "address.$.name": name,
-                  "address.$.city": city,
-                  "address.$.state": state,
-                  "address.$.landMark": landMark,
-                  "address.$.pincode": pincode,
-                  "address.$.isDefault": isDefault
-              }
-          }
+    // If setting as default, unset any existing default
+    if (isDefault) {
+      await User.updateOne(
+        { _id: userId, 'address.isDefault': true },
+        { $set: { 'address.$.isDefault': false } }
       );
+    }
 
-      if (result.modifiedCount === 0) {
-          return res.status(404).json({
-              success: false,
-              message: "Address not found"
-          });
+    // Update the address
+    const result = await User.updateOne(
+      { _id: userId, 'address._id': addressId },
+      {
+        $set: {
+          'address.$.addressType': addressType,
+          'address.$.name': name,
+          'address.$.city': city,
+          'address.$.state': state,
+          'address.$.landMark': landMark,
+          'address.$.pincode': pincode,
+          'address.$.isDefault': isDefault,
+        },
       }
+    );
 
-      res.json({
-          success: true,
-          message: "Address updated successfully"
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Address not found',
       });
+    }
 
+    res.json({
+      success: true,
+      message: 'Address updated successfully',
+    });
   } catch (error) {
-      console.error('Error updating address:', error);
-      res.status(500).json({
-          success: false,
-          message: "Failed to update address"
-      });
+    console.error('Error updating address:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update address',
+    });
   }
 };
 module.exports = {
@@ -572,6 +572,5 @@ module.exports = {
   handleGoogleLogin,
   updatePhone,
   deleteAddress,
-  editAddress 
-
+  editAddress,
 };

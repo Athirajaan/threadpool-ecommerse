@@ -113,24 +113,27 @@
   </div>
 </aside>
 
-<!-- Content Placeholder -->
-<!-- <div class="ml-64 mt-[4rem] mb-[4rem] p-6">
-  <h1 class="text-2xl font-bold text-gray-800">Main Content Area</h1>
-  <p class="text-gray-600 mt-2">Your page content goes here.</p>
-</div> -->
-
 <script>
   function confirmLogoutWithSadModal() {
     event.preventDefault();
     Swal.fire({
-      title: 'We're sad to see you go!',
-      text: "Are you sure you want to log out? Please come back soon.",
-      icon: 'info',
+      title: '<span class="text-xl font-medium">We\'ll Miss You!</span>',
+      html:
+        '<div class="mt-2">' +
+        '<p class="text-gray-600">Are you sure you want to log out?</p>' +
+        '<p class="text-gray-500 text-sm mt-1">Please come back soon!</p>' +
+        '</div>',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#EAB308',
+      cancelButtonColor: '#6B7280',
       confirmButtonText: 'Yes, log me out',
       cancelButtonText: 'Stay logged in',
+      customClass: {
+        popup: 'rounded-xl shadow-2xl',
+        title: 'font-medium',
+        htmlContainer: 'text-center',
+      },
     }).then((result) => {
       if (result.isConfirmed) {
         window.location.href = '/logout';

@@ -331,41 +331,19 @@
 </div>
 
 <!-- Similar Products Section -->
-<div>
+<div class="px-4">
   <h2 class="text-3xl font-extrabold text-gray-900 mb-6">Similar Products</h2>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-6">
-    <!-- Product 1 -->
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out">
-      <img src="https://via.placeholder.com/200" alt="Product 1" class="w-full object-cover rounded-t-lg">
-      <div class="p-4">
-        <h3 class="text-sm font-semibold text-gray-800">Product Name 1</h3>
-        <p class="text-blue-600 font-semibold">$39.99</p>
+    <% similarProducts.forEach(similarProduct => { %>
+      <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out">
+        <img src="<%= similarProduct.productImage[0] %>" alt="<%= similarProduct.productName %>" class="w-full object-cover rounded-t-lg">
+        <div class="p-4">
+          <h3 class="text-sm font-semibold text-gray-800"><%= similarProduct.productName %></h3>
+          <p class="text-blue-600 font-semibold">₹<%= similarProduct.salePrice || similarProduct.regularPrice %></p>
+          <a href="/productDetails?id=<%= similarProduct._id %>" class="text-blue-600 hover:underline">View Details</a>
+        </div>
       </div>
-    </div>
-    <!-- Product 2 -->
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out">
-      <img src="https://via.placeholder.com/200" alt="Product 2" class="w-full object-cover rounded-t-lg">
-      <div class="p-4">
-        <h3 class="text-sm font-semibold text-gray-800">Product Name 2</h3>
-        <p class="text-blue-600 font-semibold">$49.99</p>
-      </div>
-    </div>
-    <!-- Product 3 -->
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out">
-      <img src="https://via.placeholder.com/200" alt="Product 3" class="w-full object-cover rounded-t-lg">
-      <div class="p-4">
-        <h3 class="text-sm font-semibold text-gray-800">Product Name 3</h3>
-        <p class="text-blue-600 font-semibold">$29.99</p>
-      </div>
-    </div>
-    <!-- Product 4 -->
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out">
-      <img src="https://via.placeholder.com/200" alt="Product 4" class="w-full object-cover rounded-t-lg">
-      <div class="p-4">
-        <h3 class="text-sm font-semibold text-gray-800">Product Name 4</h3>
-        <p class="text-blue-600 font-semibold">$59.99</p>
-      </div>
-    </div>
+    <% }) %>
   </div>
 </div>
 

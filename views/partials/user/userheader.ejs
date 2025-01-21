@@ -36,7 +36,7 @@
       <div class="hidden md:flex items-center justify-center space-x-6 mx-6">
         <a href="/womenShop" class="text-gray-700 font-semibold text-lg font-sans">WOMEN'S</a>
         <a href="/menShop" class="text-gray-700 font-semibold text-lg font-sans">MEN'S</a>
-        <a href="/about" class="text-gray-700 font-semibold text-lg font-sans">ABOUT</a>
+        <a href="" class="text-gray-700 font-semibold text-lg font-sans">ABOUT</a>
       </div>
   
       <!-- Right Side: Search Bar, Wishlist, Cart, Profile and Logout -->
@@ -69,10 +69,17 @@
             <i class="fas fa-heart mr-3"></i>
         </a>
   
-        <!-- Cart Icon -->
-        <a href="/cart" class="text-gray-800">
-          <i class="fas fa-shopping-cart mr-3"></i>
-        </a>
+        <!-- Cart Icon with Quantity -->
+        <div class="relative">
+          <a href="/cart" class="text-gray-800">
+            <i class="fa fa-shopping-cart mr-3"></i>
+            <% if (cartQuantity > 0) { %>
+              <span class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
+                <%= cartQuantity %>
+              </span>
+            <% } %>
+          </a>
+        </div>
   
         <!-- Profile Icon -->
         <% if (isLoggedIn) { %>
@@ -81,10 +88,22 @@
             <i class="fas fa-user mr-3"></i>
           </a>
         <% } else { %>
-          <!-- SIGN IN button -->
-          <button onclick="window.location.href='/signup'" class="py-2 px-4 bg-yellow-400 text-black rounded">
-            SIGN IN
-          </button>
+          <!-- Enhanced SIGN IN button -->
+          <div class="flex items-center space-x-3">
+            <a href="/login" class="text-gray-700 hover:text-yellow-500 transition-colors duration-300">
+              Login
+            </a>
+            <button 
+              onclick="window.location.href='/signup'" 
+              class="px-6 py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white font-medium rounded-lg 
+                     hover:from-yellow-500 hover:to-yellow-600 transform hover:scale-105 
+                     transition-all duration-300 shadow-md hover:shadow-lg 
+                     flex items-center space-x-2"
+            >
+              <span>Sign Up</span>
+              <i class="fas fa-arrow-right text-sm"></i>
+            </button>
+          </div>
         <% } %>
       </div>
     </div>
