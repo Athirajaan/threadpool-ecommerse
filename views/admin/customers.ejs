@@ -1,3 +1,4 @@
+<div class="flex h-screen">
 <%- include('../partials/admin/header') %> 
 <!-- Include header from partials -->
 
@@ -13,11 +14,12 @@
 }
 
  </style>
+ <main class="flex-1">
 <div class="flex-1 p-1">
-    <div class=" mx-7 flex items-center justify-between">
+    <div class=" mx-7 mt-6 flex items-center justify-between">
       <nav class="text-sm text-gray-500">
         <a href="#" class="hover:text-yellow-500">Dashboard</a> >
-        <a href="#" class="text-gray-800">Customers</a>
+        <a href="#" class="text-gray-800 mt-4">Customers</a>
       </nav>      
     </div>
 <main class="flex-1 p-2 lg:ml-0 transition-all duration-300">
@@ -136,6 +138,7 @@
 
     </div>
 </main>
+</div>
 <script>
     confirmationModal.setAttribute('aria-hidden', 'false'); // Show modal
     confirmationModal.setAttribute('aria-hidden', 'true');  // Hide modal

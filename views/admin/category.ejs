@@ -1,3 +1,5 @@
+
+<div class="flex h-screen">
 <%- include('../partials/admin/header') %>  <!-- Include header from partials -->
 <style>
   /* Hide modal by default */
@@ -5,13 +7,15 @@
     display: none;
   }
 </style>
-<div class="flex-1 p-1">
+<main class="flex-1">
+<div class="flex-1 px-6 mt-6">
   <div class=" mx-7 flex items-center justify-between">
     <nav class="text-sm text-gray-500">
       <a href="#" class="hover:text-yellow-500">Dashboard</a> >
       <a href="#" class="text-gray-800">Category</a>
     </nav>      
   </div>
+
 
 <div class="flex-1">
   <!-- Sidebar -->
@@ -177,6 +181,8 @@
     </form>
   </div>
 </div>
+</main>
+</div>
 
 <!-- edit category modal -->
  <!-- Add Category Modal (for editing) -->
@@ -338,32 +344,40 @@ function resetForm() {
       const gender = document.querySelector('input[name="gender"]:checked');
       let isValid = true;
 
+      // Name validations
       if (!name) {
-        displayErrorMessage("name-error","Name is required");
+        displayErrorMessage("name-error", "Name is required");
         isValid = false;
       } else if (name.length < 3) {
-        displayErrorMessage("name-error","Name must be at least 3 characters long");
+        displayErrorMessage("name-error", "Name must be at least 3 characters long");
         isValid = false;
-      } else if(!/^[a-zA-Z\s]+$/.test(name)){
-        displayErrorMessage("name-error","category name should contin only alphabetic characters");
+      } else if (name.length > 20) {
+        displayErrorMessage("name-error", "Name cannot exceed 20 characters");
+        isValid = false;
+      } else if(!/^[a-zA-Z\s]+$/.test(name)) {
+        displayErrorMessage("name-error", "Category name should contain only alphabetic characters");
         isValid = false;
       }
 
-
+      // Description validations
       if (!description) {
-         displayErrorMessage("description-error","Description is required");
-         isValid = false;
-       } else if (description.length < 5) {
-         displayErrorMessage("description-error","Description must be at least 10 characters long");
-         isValid = false;
-       }
+        displayErrorMessage("description-error", "Description is required");
+        isValid = false;
+      } else if (description.length < 5) {
+        displayErrorMessage("description-error", "Description must be at least 5 characters long");
+        isValid = false;
+      } else if (description.length > 50) {
+        displayErrorMessage("description-error", "Description cannot exceed 50 characters");
+        isValid = false;
+      }
 
-       if (!gender) {
-       displayErrorMessage("gender-error","Please select a gender");
-       isValid = false;
-       }
+      // Gender validation
+      if (!gender) {
+        displayErrorMessage("gender-error", "Please select a gender");
+        isValid = false;
+      }
 
-       return isValid;
+      return isValid;
     }
 
 
@@ -486,7 +500,8 @@ function showMessage(message, type) {
 }
 
 function closeModal() {
-  document.getElementById('categoryModal').style.display = 'none';
+  document.getElementById('addCategoryModal').style.display = 'none';
+  resetForm();
 }
 
 function handleEditFormSubmit(event) {
@@ -582,6 +597,136 @@ function confirmUnblock(url) {
 function closeEditModal() {
   document.getElementById('editCategoryModal').style.display = 'none';
 }
+
+// Edit form validation
+function validateEditForm() {
+  clearErrorMessage();
+  const name = document.getElementById("editName").value.trim(); 
+  const description = document.getElementById("editDescription").value.trim(); 
+  const gender = document.querySelector('input[name="editGender"]:checked');
+  let isValid = true;
+
+  // Name validations
+  if (!name) {
+    displayErrorMessage("edit-name-error", "Name is required");
+    isValid = false;
+  } else if (name.length < 3) {
+    displayErrorMessage("edit-name-error", "Name must be at least 3 characters long");
+    isValid = false;
+  } else if (name.length > 20) {
+    displayErrorMessage("edit-name-error", "Name cannot exceed 20 characters");
+    isValid = false;
+  } else if(!/^[a-zA-Z\s]+$/.test(name)) {
+    displayErrorMessage("edit-name-error", "Category name should contain only alphabetic characters");
+    isValid = false;
+  }
+
+  // Description validations
+  if (!description) {
+    displayErrorMessage("edit-description-error", "Description is required");
+    isValid = false;
+  } else if (description.length < 5) {
+    displayErrorMessage("edit-description-error", "Description must be at least 5 characters long");
+    isValid = false;
+  } else if (description.length > 50) {
+    displayErrorMessage("edit-description-error", "Description cannot exceed 50 characters");
+    isValid = false;
+  }
+
+  // Gender validation
+  if (!gender) {
+    displayErrorMessage("edit-gender-error", "Please select a gender");
+    isValid = false;
+  }
+
+  return isValid;
+}
+
+// Helper functions
+function displayErrorMessage(elementId, message) {
+  const errorElement = document.getElementById(elementId);
+  if (errorElement) {
+    errorElement.innerHTML = message;
+    errorElement.style.color = "red";
+    errorElement.style.fontSize = "12px";
+    errorElement.style.marginTop = "4px";
+    errorElement.style.display = "block";
+  }
+}
+
+function clearErrorMessage() {
+  const errorElements = document.getElementsByClassName("error-message");
+  Array.from(errorElements).forEach((element) => {
+    element.innerText = "";
+    element.style.display = "none";
+  });
+}
+
+// Add real-time validation for character count
+document.getElementById("Name").addEventListener("input", function() {
+  const charCount = this.value.length;
+  const remainingChars = 20 - charCount;
+  const errorElement = document.getElementById("name-error");
+  
+  if (charCount > 20) {
+    errorElement.innerHTML = `Character limit exceeded by ${charCount - 20} characters`;
+    errorElement.style.color = "red";
+    errorElement.style.display = "block";
+  } else {
+    errorElement.innerHTML = `${remainingChars} characters remaining`;
+    errorElement.style.color = "gray";
+    errorElement.style.display = "block";
+  }
+});
+
+document.getElementById("Description").addEventListener("input", function() {
+  const charCount = this.value.length;
+  const remainingChars = 50 - charCount;
+  const errorElement = document.getElementById("description-error");
+  
+  if (charCount > 50) {
+    errorElement.innerHTML = `Character limit exceeded by ${charCount - 50} characters`;
+    errorElement.style.color = "red";
+    errorElement.style.display = "block";
+  } else {
+    errorElement.innerHTML = `${remainingChars} characters remaining`;
+    errorElement.style.color = "gray";
+    errorElement.style.display = "block";
+  }
+});
+
+// Same real-time validation for edit form
+document.getElementById("editName").addEventListener("input", function() {
+  const charCount = this.value.length;
+  const remainingChars = 20 - charCount;
+  const errorElement = document.getElementById("edit-name-error");
+  
+  if (charCount > 20) {
+    errorElement.innerHTML = `Character limit exceeded by ${charCount - 20} characters`;
+    errorElement.style.color = "red";
+    errorElement.style.display = "block";
+  } else {
+    errorElement.innerHTML = `${remainingChars} characters remaining`;
+    errorElement.style.color = "gray";
+    errorElement.style.display = "block";
+  }
+});
+
+document.getElementById("editDescription").addEventListener("input", function() {
+  const charCount = this.value.length;
+  const remainingChars = 50 - charCount;
+  const errorElement = document.getElementById("edit-description-error");
+  
+  if (charCount > 50) {
+    errorElement.innerHTML = `Character limit exceeded by ${charCount - 50} characters`;
+    errorElement.style.color = "red";
+    errorElement.style.display = "block";
+  } else {
+    errorElement.innerHTML = `${remainingChars} characters remaining`;
+    errorElement.style.color = "gray";
+    errorElement.style.display = "block";
+  }
+});
 
   </script>
 

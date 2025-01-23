@@ -1,21 +1,38 @@
+<div class="flex h-screen">
 <%- include('../partials/admin/header') %> 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
- 
+ <main class="flex-1">
    <div class="flex-1 px-6 mt-0">
-    <!-- <div class="mb-2 flex flex-col md:flex-row items-start justify-between">
-      <nav class="text-sm font-medium mb-0 md:mb-0">
-          <a href="#" class="text-gray-600 hover:text-yellow-500 transition-colors">Dashboard</a> 
-          <span class="text-gray-400 mx-2">></span>
-          <a href="#" class="text-gray-600 hover:text-yellow-500 transition-colors">All Products</a>
-          <span class="text-gray-400 mx-2">></span>
-          <span class="text-yellow-500">Add Product</span>
-      </nav>
-  
-  </div>  -->
+    <!-- Breadcrumbs -->
+    <nav class="text-sm mx-7 my-4 mt-8">
+      <ol class="list-none p-0 inline-flex">
+        <li class="flex items-center">
+          <a href="/admin/dashboard" class="text-gray-600 hover:text-yellow-500">Home</a>
+          <span class="mx-2 text-gray-500">&gt;</span>
+        </li>
+        <li class="flex items-center">
+          <a href="/admin/products" class="text-gray-600 hover:text-yellow-500">All Products</a>
+          <span class="mx-2 text-gray-500">&gt;</span>
+        </li>
+        <li class="flex items-center">
+          <span class="text-gray-800">Add Products</span>
+        </li>
+      </ol>
+    </nav>
 
+    <!-- Page Header -->
+    <div class="mb-1">
+      <div class="flex items-center justify-between">
+        <div>
+         <h2 class="text-xl font-bold mx-8">Add Products</h2>
+        </div>
+       
+      </div>
+      <div class="h-px bg-gray-200"></div>
+    </div>
 
     <!-- Add Product Form -->
     <div class="w-full max-w-6xl mx-auto bg-white rounded-xl shadow-xl p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -172,7 +189,7 @@
           </label>
         </div>
         <div id="imageInput-error" class="text-red-500 text-sm mt-1 error-message"></div>
-     
+       
          <!-- Cropping Modal -->
         <div id="cropModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-4 rounded shadow-lg w-full max-w-lg">
@@ -200,6 +217,8 @@
       </div>
     </div>
   </div>
+</main>
+</div>
       
       <!-- JavaScript -->
       <script>

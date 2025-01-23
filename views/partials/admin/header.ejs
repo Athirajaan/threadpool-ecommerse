@@ -1,79 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-      
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body class="bg-[#FFF9E5] font-sans">
-
-    <!-- Sticky Header -->
-    <header class=" bg-white p-5 ">
-        <div class="container mx-auto flex justify-between items-center px-4 md:px-10">
-            <!-- Logo -->
-            <div class="flex items-center space-x-4">
-              <!-- Logo -->
-              <img src='https://cdn.gymshark.com/images/branding/gs-icon-black.svg' alt="Logo" class="h-10">
-              <div>
-                  <h1 class="text-xl md:text-2xl font-bold text-gray-800 font-serif" >
-                      Thread<span class="text-yellow-500">p</span>ool
-                  </h1>
-                  <p class="text-sm font-medium text-gray-500">Strength — Fashion</p>
-              </div>
-          </div>
-        
-        <button class="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 transition duration-200">
-            Admin
-        </button>
-
-        <!-- Mobile Toggle Button (Visible only on smaller screens) -->
-        <button id="menu-toggle" class="text-black text-2xl lg:hidden focus:outline-none ml-4">
-            <i class="fas fa-bars"></i>
-        </button>
-    </header>
-
+  </head>
+  <body class="bg-[#FFF9E5] font-sans">
     <!-- Container for Sidebar and Content -->
     <div class="flex">
-        <aside id="sidebar" class="bg-white w-64 p-4 border-r fixed lg:relative z-10 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
-    <!-- Navigation Links -->
-    <nav class="space-y-4">
-        <a href="/admin" class="flex items-center p-3 rounded-lg text-gray-700  hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+      <aside
+        id="sidebar"
+        class="bg-white w-64 p-4 border-r fixed lg:relative z-10 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out h-screen"
+      >
+        <!-- Logo Section -->
+        <div class="flex items-center space-x-4 mb-6 p-2">
+          <img
+            src="https://cdn.gymshark.com/images/branding/gs-icon-black.svg"
+            alt="Logo"
+            class="h-10"
+          />
+          <div>
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800 font-serif">
+              Thread<span class="text-yellow-500">p</span>ool
+            </h1>
+            <p class="text-sm font-medium text-gray-500">Strength — Fashion</p>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="space-y-4">
+          <a
+            href="/admin"
+            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out"
+          >
             <i class="fas fa-tachometer-alt mr-3"></i>
             <span>Dashboard</span>
-        </a>
-        <a href="/admin/Products" class="flex items-center p-3 rounded-lg text-gray-700  hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          </a>
+          <a
+            href="/admin/Products"
+            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out"
+          >
             <i class="fas fa-box mr-3"></i>
             <span>All Products</span>
-        </a>
-        <a href="/admin/customers" class="flex items-center p-3 rounded-lg text-gray-700  hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          </a>
+          <a
+            href="/admin/customers"
+            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out"
+          >
             <i class="fas fa-users mr-3"></i>
             <span>Customers</span>
-        </a>
-        <a href="/admin/order" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          </a>
+          <a
+            href="/admin/order"
+            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out"
+          >
             <i class="fas fa-shopping-cart mr-3"></i>
             <span>Order List</span>
-        </a>
-        <a href="/admin/category" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          </a>
+          <a
+            href="/admin/category"
+            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out"
+          >
             <i class="fas fa-list mr-3"></i>
             <span>Category</span>
-        </a>
-        <a href="/admin/coupons" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out">
+          </a>
+          <a
+            href="/admin/coupons"
+            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out"
+          >
             <i class="fas fa-tag mr-3"></i>
             <span>Coupon</span>
-        </a>
-       
-        <a href="/admin/offers" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100  hover:text-gray-900 transition-all duration-300 ease-in-out">
+          </a>
+
+          <a
+            href="/admin/offers"
+            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-all duration-300 ease-in-out"
+          >
             <i class="fas fa-gift mr-3"></i>
             <span>Offer</span>
-        </a>
-        <a href="/admin/logout" class="flex items-center p-3 mt-4 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-all duration-300 ease-in-out">
+          </a>
+          <a
+            href="/admin/logout"
+            class="flex items-center p-3 mt-4 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-all duration-300 ease-in-out"
+          >
             <i class="fas fa-sign-out-alt mr-3"></i>
             <span>Logout</span>
-        </a>
-    </nav>
-</aside>
+          </a>
+        </nav>
+      </aside>
+    </div>
+  </body>
+</html>

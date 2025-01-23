@@ -40,7 +40,7 @@
   <div class="flex flex-col md:flex-row h-screen">
     <!-- Left Image Section -->
     <div class="md:w-1/2 hidden md:block bg-white">
-      <div class="h-screen flex items-center">
+      <div class="h-screen  md:h-full flex items-center">
         <img src="./images/signup.jpg" 
              alt="Sign Up" 
              class="w-full h-[90vh] object-cover shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
@@ -50,7 +50,7 @@
 
     <!-- Right Form Section -->
     <div class="md:w-1/2 flex items-top justify-center bg-white ">
-      <div class="w-full max-w-md p-8 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl">
+      <div class="w-full max-w-md p-2 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl">
         <% if (typeof message !== 'undefined' && message) { %>
           <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
             <span class="block sm:inline"><%= message %></span>

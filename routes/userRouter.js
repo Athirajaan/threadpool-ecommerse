@@ -20,6 +20,7 @@ router.post('/signup', userController.signup);
 router.get('/verify-otp', userController.loadVerifyOtpPage);
 router.post('/verify-otp', userController.verifyOtp);
 router.post('/resend-otp', userController.resendOtp);
+
 router.get(
   '/auth/google',
   passport.authenticate('google', {
@@ -39,6 +40,14 @@ router.get(
 router.get('/login', userController.loadLoginPage);
 router.post('/login', userController.login);
 router.get('/logout', userController.logOutUser);
+
+router.get('/forgot-password', userController.loadForgotPassword);
+router.post('/forgot-password', userController.handleForgotPassword);
+router.post('/otpVerification', userController.verifyOtpForgotPassword);
+router.post(
+  '/resend-otp-forgot-password',
+  userController.resendOtpForgotPassword
+);
 
 //shopping page
 router.get('/womenShop', userAuth, shopController.loadWomenShopping);
@@ -122,5 +131,8 @@ router.post('/download-invoice', userAuth, orderController.downloadInvoice);
 
 router.post('/delete-address', userAuth, userController.deleteAddress);
 router.post('/edit-address', userAuth, userController.editAddress);
+
+router.get('/reset-password', userController.loadResetPassword);
+router.post('/reset-password', userController.resetPassword);
 
 module.exports = router;

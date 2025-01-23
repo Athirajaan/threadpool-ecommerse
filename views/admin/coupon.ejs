@@ -1,9 +1,10 @@
+<div class="flex h-screen">
 <%- include('../partials/admin/header') %>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<div class="container mx-auto px-4 py-8">
-  <div class="flex justify-between items-center mb-6">
+<main class="flex-1">
+<div class="container mx-auto px-4 py-8 mt-8">
+  <div class="flex justify-between items-center mb-10">
     <h1 class="text-2xl font-bold text-gray-900">Coupon Management</h1>
     <button
       onclick="openAddCouponModal()"
@@ -127,6 +128,8 @@
       </a>
     </div>
   <% } %>
+  </main>
+  </div>
 
   <!-- Add Coupon Modal -->
   <div
@@ -176,11 +179,8 @@
         </button>
       </div>
 
-
-
-
       <!-- Modal Content -->
-      <form id="addCouponForm" onsubmit="submitCoupon(event)">
+      <form id="addCouponForm" onsubmit="return submitCoupon(event)">
         <div class="grid grid-cols-2 gap-x-12 gap-y-6">
           <!-- Left Column -->
           <div class="bg-gray-50 p-6 rounded-xl">
@@ -373,8 +373,6 @@
   </div>
 </div>
 
-
-
 <div
   id="successToast"
   class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-green-500 text-white rounded-lg shadow-lg transition-all duration-500 flex items-center space-x-2"
@@ -411,39 +409,99 @@
     const errorElement = document.getElementById(elementId);
     errorElement.textContent = message;
     errorElement.classList.remove('hidden');
+    errorElement.classList.add('text-red-600', 'text-xs', 'mt-1', 'font-medium');
   }
 
   function hideError(elementId) {
-    document.getElementById(elementId).classList.add('hidden');
+    const errorElement = document.getElementById(elementId);
+    errorElement.classList.add('hidden');
   }
 
-
-  //validation function 
   function validateCouponName() {
     const nameInput = document.getElementById('couponName');
-    const letterCount = (nameInput.value.match(/[a-zA-Z]/g) || []).length;
+    const errorElement = document.getElementById('nameError');
+    const name = nameInput.value.trim();
+    const charCount = name.length;
 
-    if (letterCount < 3) {
-      showError('nameError', 'Coupon name must contain at least 3 letters');
+    // Clear previous error
+    hideError('nameError');
+
+    // Validation rules
+    if (!name) {
+      showError('nameError', 'Coupon name is required');
       return false;
     }
-    hideError('nameError');
+
+    if (name.length < 3) {
+      showError('nameError', 'Coupon name must contain at least 3 characters');
+      return false;
+    }
+
+    if (!/^[A-Za-z0-9]+$/.test(name)) {
+      showError('nameError', 'Only letters and numbers are allowed');
+      return false;
+    }
+
+    // Only show message if character limit is exceeded
+    if (charCount > 25) {
+      showError('nameError', `Character limit exceeded by ${charCount - 25} characters`);
+      return false;
+    }
+
     return true;
   }
 
   function validateMinimumPrice() {
     const minPrice = parseFloat(document.getElementById('minimumPrice').value);
+    const maxAllowedPrice = 50000; // ₹50,000 maximum limit
+    const errorElement = document.getElementById('minPriceError');
 
-    if (minPrice < 100) {
-      showError(
-        'minPriceError',
-        'Minimum purchase amount must be at least ₹100'
-      );
+    if (!minPrice && minPrice !== 0) {
+      showError('minPriceError', 'Minimum purchase amount is required');
       return false;
     }
+
+    // Check if it's a valid number
+    if (isNaN(minPrice) || minPrice < 0) {
+      showError('minPriceError', 'Please enter a valid amount');
+      return false;
+    }
+
+    // Check if it's a whole number
+    if (!Number.isInteger(minPrice)) {
+      showError('minPriceError', 'Amount must be a whole number');
+      return false;
+    }
+
+    if (minPrice < 100) {
+      showError('minPriceError', 'Minimum purchase amount must be at least ₹100');
+      return false;
+    }
+
+    if (minPrice > maxAllowedPrice) {
+      showError('minPriceError', `Amount cannot exceed ₹${maxAllowedPrice.toLocaleString('en-IN')}`);
+      return false;
+    }
+
+    // Clear error if validation passes
     hideError('minPriceError');
     return true;
   }
+
+  // Add event listener for real-time validation
+  document.getElementById('minimumPrice').addEventListener('input', function(e) {
+    // Allow only numbers and prevent 'e', '+', '-'
+    if (!/^\d*$/.test(e.target.value)) {
+      e.target.value = e.target.value.replace(/[^\d]/g, '');
+    }
+    
+    // Prevent leading zeros
+    if (e.target.value.length > 1 && e.target.value[0] === '0') {
+      e.target.value = e.target.value.slice(1);
+    }
+
+    validateMinimumPrice();
+  });
 
   function updateDiscountSymbol() {
     const discountType = document.getElementById('discountType').value;
@@ -470,58 +528,81 @@
     const discountAmount = parseFloat(document.getElementById('discountAmount').value);
     const minPrice = parseFloat(document.getElementById('minimumPrice').value);
 
-    if (!discountAmount) return false;
+    if (!discountAmount) {
+      showError('discountError', 'Discount amount is required');
+      return false;
+    }
 
     if (discountType === 'percentage') {
-        if (discountAmount > 80) {
-            showError('discountError', 'Percentage discount cannot exceed 80%');
-            return false;
-        }
+      if (discountAmount > 80) {
+        showError('discountError', 'Percentage discount cannot exceed 80%');
+        return false;
+      }
     } else if (discountType === 'fixed') {
-        if (discountAmount >= minPrice) {
-            showError('discountError', 'Fixed discount cannot be greater than or equal to minimum purchase amount');
-            return false;
-        }
+      if (discountAmount >= minPrice) {
+        showError('discountError', 'Discount amount cannot be greater than minimum purchase amount');
+        return false;
+      }
     }
+
     hideError('discountError');
     return true;
   }
 
   function validateMaxDiscount() {
-    const maxDiscount = document.getElementById('maxDiscount').value;
+    const maxDiscount = parseFloat(document.getElementById('maxDiscount').value);
+    const minPrice = parseFloat(document.getElementById('minimumPrice').value);
 
-    if (!/^\d+$/.test(maxDiscount)) {
-      showError(
-        'maxDiscountError',
-        'Maximum discount must contain only numbers'
-      );
+    if (!maxDiscount) {
+      showError('maxDiscountError', 'Maximum discount amount is required');
       return false;
     }
+
+    if (maxDiscount >= minPrice) {
+      showError('maxDiscountError', 'Maximum discount cannot be greater than minimum purchase amount');
+      return false;
+    }
+
     hideError('maxDiscountError');
     return true;
   }
 
   function validateExpiryDate() {
-    const expiryDate = document.getElementById('expiryDate').value;
-    const today = new Date().toISOString().split('T')[0];
+    const expiryDate = new Date(document.getElementById('expiryDate').value);
+    const today = new Date();
 
-    if (expiryDate < today) {
-      showError('expiryError', 'Expiry date must be today or later');
+    if (!expiryDate) {
+      showError('expiryError', 'Expiry date is required');
       return false;
     }
+
+    if (expiryDate <= today) {
+      showError('expiryError', 'Expiry date must be in the future');
+      return false;
+    }
+
     hideError('expiryError');
     return true;
   }
 
   function validateUsagePerUser() {
-    const usagePerUser = parseInt(
-      document.getElementById('usagePerUser').value
-    );
+    const usage = parseInt(document.getElementById('usagePerUser').value);
 
-    if (usagePerUser < 1) {
-      showError('usagePerUserError', 'Usage per user must be at least 1');
+    if (!usage) {
+      showError('usagePerUserError', 'Usage limit is required');
       return false;
     }
+
+    if (usage < 1) {
+      showError('usagePerUserError', 'Usage limit must be at least 1');
+      return false;
+    }
+
+    if (usage > 10) {
+      showError('usagePerUserError', 'Usage limit cannot exceed 10 per user');
+      return false;
+    }
+
     hideError('usagePerUserError');
     return true;
   }
@@ -584,6 +665,20 @@
   async function submitCoupon(event) {
     event.preventDefault();
     
+    // Run all validations
+    const isNameValid = validateCouponName();
+    const isMinPriceValid = validateMinimumPrice();
+    const isDiscountValid = validateDiscountAmount();
+    const isMaxDiscountValid = validateMaxDiscount();
+    const isUsageValid = validateUsagePerUser();
+    const isExpiryValid = validateExpiryDate();
+
+    // Check if all validations pass
+    if (!isNameValid || !isMinPriceValid || !isDiscountValid || 
+        !isMaxDiscountValid || !isUsageValid || !isExpiryValid) {
+        return false; // Stop form submission if any validation fails
+    }
+
     const form = event.target;
     const couponId = form.getAttribute('data-coupon-id');
     const isEdit = !!couponId;
