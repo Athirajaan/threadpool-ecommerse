@@ -405,6 +405,67 @@ const addAddress = async (req, res) => {
   }
 };
 
+const editAddress = async (req, res) => {
+  try {
+    const userId = req.session.userId; // Changed from req.session.user._id
+    const {
+      addressId,
+      addressType,
+      name,
+      city,
+      state,
+      landMark,
+      pincode,
+      isDefault,
+    } = req.body;
+
+    // If setting as default, unset any existing default
+    if (isDefault) {
+      await Address.updateMany(
+        { UserId: userId, 'address.isDefault': true },
+        { $set: { 'address.$.isDefault': false } }
+      );
+    }
+
+    // Update the address in Address model
+    const result = await Address.updateOne(
+      {
+        UserId: userId,
+        'address._id': addressId,
+      },
+      {
+        $set: {
+          'address.$.addressType': addressType,
+          'address.$.name': name,
+          'address.$.city': city,
+          'address.$.state': state,
+          'address.$.landMark': landMark,
+          'address.$.pincode': pincode,
+          'address.$.isDefault': isDefault,
+        },
+      }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Address not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Address updated successfully',
+    });
+  } catch (error) {
+    console.error('Error updating address:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update address',
+    });
+  }
+};
+
 const updateProfile = async (req, res) => {
   try {
     const userId = req.session.userId;
@@ -549,64 +610,6 @@ const deleteAddress = async (req, res) => {
   } catch (error) {
     console.error('Error deleting address:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
-  }
-};
-
-const editAddress = async (req, res) => {
-  try {
-    const userId = req.session.user._id;
-    const {
-      addressId,
-      addressType,
-      name,
-      city,
-      state,
-      landMark,
-      pincode,
-      isDefault,
-    } = req.body;
-
-    // If setting as default, unset any existing default
-    if (isDefault) {
-      await User.updateOne(
-        { _id: userId, 'address.isDefault': true },
-        { $set: { 'address.$.isDefault': false } }
-      );
-    }
-
-    // Update the address
-    const result = await User.updateOne(
-      { _id: userId, 'address._id': addressId },
-      {
-        $set: {
-          'address.$.addressType': addressType,
-          'address.$.name': name,
-          'address.$.city': city,
-          'address.$.state': state,
-          'address.$.landMark': landMark,
-          'address.$.pincode': pincode,
-          'address.$.isDefault': isDefault,
-        },
-      }
-    );
-
-    if (result.modifiedCount === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Address not found',
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Address updated successfully',
-    });
-  } catch (error) {
-    console.error('Error updating address:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update address',
-    });
   }
 };
 

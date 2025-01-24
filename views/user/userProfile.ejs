@@ -376,8 +376,8 @@ window.addEventListener("click", (event) => {
   }
 });
 
-// Submit form
-document.getElementById("addressForm").addEventListener("submit", async function(event) {
+// Update the form submission event listener
+document.getElementById('addressForm').addEventListener('submit', async function(event) {
     event.preventDefault();
     
     // Reset all error messages
@@ -387,109 +387,72 @@ document.getElementById("addressForm").addEventListener("submit", async function
         element.textContent = '';
     });
 
-    let hasError = false;
+    // Check if this is an edit operation
+    const addressIdInput = this.querySelector('input[name="addressId"]');
+    const isEditMode = !!addressIdInput;
 
-    // Address Type validation
-    const addressType = document.getElementById('addressType').value;
-    if (!addressType) {
-        document.getElementById('addressTypeError').textContent = 'Please select an address type';
-        document.getElementById('addressTypeError').classList.remove('hidden');
-        hasError = true;
-    }
+    // Validate form
+    if (validateForm(event)) {
+        try {
+            // Collect form data
+            const formData = {
+                addressType: document.getElementById('addressType').value,
+                name: document.getElementById('name').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                landMark: document.getElementById('landMark').value,
+                pincode: document.getElementById('pincode').value,
+                isDefault: document.getElementById('isDefault').checked
+            };
 
-    // Name validation
-    const name = document.getElementById('name').value.trim();
-    if (!name) {
-        document.getElementById('nameError').textContent = 'Name is required';
-        document.getElementById('nameError').classList.remove('hidden');
-        hasError = true;
-    } else if (name.length < 3) {
-        document.getElementById('nameError').textContent = 'Name must be at least 3 characters long';
-        document.getElementById('nameError').classList.remove('hidden');
-        hasError = true;
-    }
+            // If in edit mode, add the addressId
+            if (isEditMode) {
+                formData.addressId = addressIdInput.value;
+            }
 
-    // City validation
-    const city = document.getElementById('city').value.trim();
-    if (!city) {
-        document.getElementById('cityError').textContent = 'City is required';
-        document.getElementById('cityError').classList.remove('hidden');
-        hasError = true;
-    } else if (city.length < 2) {
-        document.getElementById('cityError').textContent = 'City must be at least 2 characters long';
-        document.getElementById('cityError').classList.remove('hidden');
-        hasError = true;
-    }
+            // Send to appropriate endpoint based on mode
+            const url = isEditMode ? '/edit-address' : '/add-address';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
 
-    // State validation
-    const state = document.getElementById('state').value.trim();
-    if (!state) {
-        document.getElementById('stateError').textContent = 'State is required';
-        document.getElementById('stateError').classList.remove('hidden');
-        hasError = true;
-    }
+            const result = await response.json();
 
-    // Landmark validation
-    const landmark = document.getElementById('landMark').value.trim();
-    if (!landmark) {
-        document.getElementById('landMarkError').textContent = 'Landmark is required';
-        document.getElementById('landMarkError').classList.remove('hidden');
-        hasError = true;
-    }
-
-    // Pincode validation
-    const pincode = document.getElementById('pincode').value;
-    if (!pincode) {
-        document.getElementById('pincodeError').textContent = 'Pincode is required';
-        document.getElementById('pincodeError').classList.remove('hidden');
-        hasError = true;
-    } else if (pincode.length !== 6 || !/^\d{6}$/.test(pincode)) {
-        document.getElementById('pincodeError').textContent = 'Please enter a valid 6-digit pincode';
-        document.getElementById('pincodeError').classList.remove('hidden');
-        hasError = true;
-    }
-
-    // If there are any errors, stop form submission
-    if (hasError) {
-        return false;
-    }
-
-    // If validation passes, collect form data
-    const formData = {
-        addressType,
-        name,
-        city,
-        landMark: landmark,
-        state,
-        pincode,
-        isDefault: document.getElementById('isDefault').checked
-    };
-
-    try {
-        const response = await fetch('/add-address', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            // Success
-            localStorage.setItem('addressAdded', 'true');
-            document.getElementById('addAddressModal').classList.add('hidden');
-            location.reload();
-        } else {
-            // Show error message
-            document.getElementById('formError').textContent = result.message || 'Failed to add address';
+            if (response.ok) {
+                // Success with custom design
+                Swal.fire({
+                    icon: 'success',
+                    title: isEditMode ? 'Address Updated!' : 'Address Added!',
+                    text: isEditMode ? 'Your address has been updated successfully.' : 'Your address has been added successfully.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#1F2937', // Tailwind gray-800
+                    customClass: {
+                        popup: 'rounded-xl',
+                        title: 'text-xl font-bold text-gray-800',
+                        htmlContainer: 'text-gray-600',
+                        confirmButton: 'px-6 py-2.5 rounded-lg text-white transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg'
+                    },
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                throw new Error(result.message || 'Operation failed');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('formError').textContent = error.message || 'Something went wrong. Please try again.';
             document.getElementById('formError').classList.remove('hidden');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('formError').textContent = 'Something went wrong. Please try again.';
-        document.getElementById('formError').classList.remove('hidden');
     }
 });
 
@@ -820,6 +783,106 @@ document.addEventListener('DOMContentLoaded', function() {
         // Continue with form submission if all validations pass
         // Your existing form submission code here...
     });
+});
+
+// Function to handle edit address
+function editAddress(addressData) {
+    try {
+        // Parse the address data if it's a string
+        const address = typeof addressData === 'string' ? JSON.parse(addressData) : addressData;
+        
+        // Get the modal and populate fields
+        const modal = document.getElementById('addAddressModal');
+        const form = document.getElementById('addressForm');
+        
+        // Update modal title
+        modal.querySelector('h2').textContent = 'Edit Address';
+        
+        // Populate form fields
+        document.getElementById('addressType').value = address.addressType;
+        document.getElementById('name').value = address.name;
+        document.getElementById('city').value = address.city;
+        document.getElementById('state').value = address.state;
+        document.getElementById('landMark').value = address.landMark;
+        document.getElementById('pincode').value = address.pincode;
+        document.getElementById('isDefault').checked = address.isDefault;
+        
+        // Add address ID to form
+        const addressIdInput = document.createElement('input');
+        addressIdInput.type = 'hidden';
+        addressIdInput.name = 'addressId';
+        addressIdInput.value = address._id;
+        form.appendChild(addressIdInput);
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        
+        // Update form submission handler
+        form.onsubmit = async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                addressId: address._id,
+                addressType: document.getElementById('addressType').value,
+                name: document.getElementById('name').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                landMark: document.getElementById('landMark').value,
+                pincode: document.getElementById('pincode').value,
+                isDefault: document.getElementById('isDefault').checked
+            };
+
+            try {
+                const response = await fetch('/edit-address', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Address updated successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to update address'
+                });
+            }
+        };
+    } catch (error) {
+        console.error('Error in editAddress:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load address details'
+        });
+    }
+}
+
+// Reset form when modal is closed
+document.getElementById('closeModalBtn').addEventListener('click', () => {
+    const form = document.getElementById('addressForm');
+    form.reset();
+    form.onsubmit = null; // Remove custom submit handler
+    document.querySelector('#addAddressModal h2').textContent = 'Add New Address';
+    const addressIdInput = form.querySelector('input[name="addressId"]');
+    if (addressIdInput) addressIdInput.remove();
 });
 
   </script>

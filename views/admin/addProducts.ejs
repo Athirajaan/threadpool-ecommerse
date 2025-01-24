@@ -191,16 +191,18 @@
         <div id="imageInput-error" class="text-red-500 text-sm mt-1 error-message"></div>
        
          <!-- Cropping Modal -->
-        <div id="cropModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-4 rounded shadow-lg w-full max-w-lg">
-          <div class="w-[500px] h-[400px] overflow-hidden">
-              <img id="cropImage" class="object-contain w-full h-full" />
+        <div id="cropModal" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          <div class="bg-white rounded-lg shadow-xl" style="width: 450px;">
+            <div class="p-3">
+              <div class="h-[300px]">
+                <img id="cropImage" src="" alt="Image to crop" class="max-w-full">
+              </div>
+              <div class="flex justify-end gap-2 mt-3">
+                <button id="cropCancel" class="px-3 py-1.5 bg-gray-200 text-gray-800 text-sm rounded">Cancel</button>
+                <button id="cropConfirm" class="px-3 py-1.5 bg-blue-500 text-white text-sm rounded">Crop</button>
+              </div>
+            </div>
           </div>
-          <div class="mt-4 flex justify-between">
-              <button id="cropConfirm" class="bg-blue-500 text-white px-4 py-2 rounded">Crop</button>
-              <button id="cropCancel" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Cancel</button>
-          </div>
-        </div>
         </div>
         <!-- Uploaded Images Section -->
         <div id="imagePreview" class="mt-6 space-y-4"></div>
@@ -379,10 +381,9 @@ function validateForm(event) {
 
   
     if (totalQuantity === 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Quantity Error',
-            text: 'At least one size must have a quantity.'
+        // Display error message for all size fields since it's a collective error
+        sizeFields.forEach(size => {
+            displayErrorMessage(`size${size}Qty-error`, 'At least one size must have a quantity.');
         });
         isValid = false;
     }

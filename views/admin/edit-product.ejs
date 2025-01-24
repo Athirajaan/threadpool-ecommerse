@@ -131,35 +131,20 @@
   <div id="imageInput-error" class="text-red-500 text-sm mt-1 error-message"></div>
 
   <!-- Cropping Modal -->
-  <div id="cropModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-4 rounded shadow-lg w-full max-w-lg">
-      <div class="w-[500px] h-[400px] overflow-hidden">
-        <img id="cropImage" class="object-contain w-full h-full" />
-      </div>
-      <div class="mt-4 flex justify-between">
-        <button id="cropConfirm" class="bg-blue-500 text-white px-4 py-2 rounded">Crop</button>
-        <button id="cropCancel" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Cancel</button>
+  <div id="cropModal" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+    <div class="bg-white rounded-lg shadow-xl" style="width: 420px;">
+      <div class="p-3">
+        <div class="h-[280px]">
+          <img id="cropImage" src="" alt="Image to crop" class="max-w-full">
+        </div>
+        <div class="flex justify-end gap-2 mt-3">
+          <button type="button" id="cropCancel" class="px-3 py-1.5 bg-gray-200 text-gray-800 text-sm rounded">Cancel</button>
+          <button type="button" id="cropConfirm" class="px-3 py-1.5 bg-blue-500 text-white text-sm rounded">Crop</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- <div>
-    <h3 class="text-xl font-semibold text-gray-800 mb-4">Current Images</h3>
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      <% if (existingImages && existingImages.length > 0) { %>
-        <% existingImages.forEach(image => { %>
-          <div class="relative">
-            <img src="<%= image %>" alt="Product Image" class="w-full h-32 object-cover rounded-lg" />
-            <button class="absolute top-1 right-1 text-red-600 bg-white p-2 rounded-full delete-image-button" data-image="<%= image %>" type="button">
-              X
-            </button>
-          </div>
-        <% }) %>
-      <% } else { %>
-        <p>No images available.</p>
-      <% } %>
-    </div>
-  </div> -->
 
   <!-- Submit Button -->
   <div id="imagePreview" class="mt-4 space-y-2"></div>
@@ -180,6 +165,9 @@
 </div>
   
       <script>
+      // Add this at the start of your script to store existing images
+      const existingProductImages = <%- JSON.stringify(product.productImage) %>; // Get existing images from backend
+
       function populateProductDetails(product) {
     // Set hidden product ID
     document.getElementById('productId').value = product._id;
@@ -266,8 +254,8 @@ function validateForm(event) {
     const gender = document.getElementById('gender').value;
     const category = document.getElementById('category').value;
     const description = document.getElementById('description').value.trim();
-    const regularPrice = document.getElementById('regularPrice').value.trim();
-    const salePrice = document.getElementById('salePrice').value.trim();
+    const regularPrice = parseFloat(document.getElementById('regularPrice').value);
+    const salePrice = parseFloat(document.getElementById('salePrice').value);
 
     // Basic validations
     if (!productName) {
@@ -291,17 +279,17 @@ function validateForm(event) {
     }
 
     // Price validations
-    if (!regularPrice || parseFloat(regularPrice) <= 0) {
-        displayErrorMessage('regularPrice-error', 'Please enter a valid regular price.');
+    if (isNaN(regularPrice) || regularPrice <= 0) {
+        displayErrorMessage('regularPrice-error', 'Please enter a valid regular price greater than 0.');
         isValid = false;
     }
 
-    if (!salePrice || parseFloat(salePrice) <= 0) {
-        displayErrorMessage('salePrice-error', 'Please enter a valid sale price.');
+    if (isNaN(salePrice) || salePrice <= 0) {
+        displayErrorMessage('salePrice-error', 'Please enter a valid sale price greater than 0.');
         isValid = false;
     }
 
-    if (parseFloat(regularPrice) <= parseFloat(salePrice)) {
+    if (regularPrice <= salePrice) {
         displayErrorMessage('regularPrice-error', 'Regular price must be greater than sale price.');
         isValid = false;
     }
@@ -310,6 +298,10 @@ function validateForm(event) {
     let totalQuantity = 0;
     ['S', 'M', 'L', 'XL'].forEach(size => {
         const qty = parseInt(document.getElementById(`size${size}Qty`).value) || 0;
+        if (qty < 0) {
+            displayErrorMessage(`size${size}Qty-error`, 'Quantity cannot be negative.');
+            isValid = false;
+        }
         totalQuantity += qty;
     });
 
@@ -319,23 +311,11 @@ function validateForm(event) {
     }
 
     // Image validation
-    const existingImages = document.querySelectorAll('#imagePreview img').length; // Count existing images
-    const newImages = imageFiles ? imageFiles.length : 0;
-    const deletedImages = document.querySelectorAll('.deleted-image').length;
-    
-    // Calculate total images after changes
-    const totalImages = existingImages + newImages - deletedImages;
-    
-    console.log('Image counts:', {
-        existing: existingImages,
-        new: newImages,
-        deleted: deletedImages,
-        total: totalImages
-    });
+    const totalImages = getCurrentImageCount();
+    console.log('Validation total images:', totalImages);
 
-    // Only validate image count if new images are being added or existing ones are deleted
-    if ((newImages > 0 || deletedImages > 0) && (totalImages < 3 || totalImages > 5)) {
-        displayErrorMessage('imageInput-error', 'Product must have between 3 and 5 images.');
+    if (totalImages < 3 || totalImages > 5) {
+        displayErrorMessage('imageInput-error', `Product must have between 3 and 5 images. Current count: ${totalImages}`);
         isValid = false;
     }
 
@@ -364,22 +344,39 @@ cropConfirm.addEventListener('click', confirmCrop);
 // Handle image input
 function handleImageInput(e) {
     const files = e.target.files;
+    const currentImages = getCurrentImageCount();
+    const totalImagesAfterAdd = currentImages + files.length;
+    
+    console.log('Image counts on input:', {
+        current: currentImages,
+        adding: files.length,
+        total: totalImagesAfterAdd
+    });
 
-    // Check image limit
-    if (files.length + imageFiles.length > MAX_IMAGES) {
-        showAlert('Limit Exceeded', `You can only upload up to ${MAX_IMAGES} images.`, 'error');
+    if (totalImagesAfterAdd > 5) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Too Many Images',
+            text: 'You can only have a maximum of 5 images. Please delete some existing images first.',
+            confirmButtonColor: '#3085d6'
+        });
+        e.target.value = '';
         return;
     }
 
     Array.from(files).forEach(file => {
         if (!file.type.startsWith("image/")) {
-            showAlert('Invalid File Type', 'Please upload only image files.', 'error');
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid File Type',
+                text: 'Please upload only image files.',
+                confirmButtonColor: '#3085d6'
+            });
             return;
         }
 
         const reader = new FileReader();
         reader.onload = (e) => showCropModal(e.target.result);
-        reader.onerror = () => showAlert('Error', 'Failed to read the image file.', 'error');
         reader.readAsDataURL(file);
     });
 }
@@ -392,12 +389,12 @@ function showCropModal(imageSrc) {
     cropper = new Cropper(cropImage, {
         aspectRatio: 1,
         viewMode: 2,
-        autoCropArea: 0.8,
+        autoCropArea: 1,
         scalable: true,
         zoomable: true,
-        responsive: true,
-        minCropBoxWidth: 100,
-        minCropBoxHeight: 100,
+        movable: true,
+        minCropBoxWidth: 200,
+        minCropBoxHeight: 200,
     });
 }
 
@@ -408,45 +405,109 @@ function cancelCrop() {
 }
 
 // Confirm crop
-function confirmCrop(event) {
-    event.preventDefault();
+function confirmCrop() {
+    if (!cropper) return;
 
     const canvas = cropper.getCroppedCanvas({
+        width: 600,
+        height: 600,
         imageSmoothingEnabled: true,
         imageSmoothingQuality: 'high',
     });
 
-    if (!canvas) {
-        showAlert('Error', 'Failed to crop the image.', 'error');
-        return;
-    }
-
     canvas.toBlob(blob => {
-        if (!blob) return;
-
         const fileName = `cropped-${Date.now()}.webp`;
         const file = new File([blob], fileName, { type: "image/webp" });
         imageFiles.push(file);
-        addImageToPreview(file);
+        
+        // Create preview
+        const imageRow = createImageRow(URL.createObjectURL(blob), file);
+        document.getElementById('imagePreview').appendChild(imageRow);
 
-        cropModal.classList.add('hidden');
+        // Close modal and cleanup
+        document.getElementById('cropModal').classList.add('hidden');
         cropper.destroy();
-    }, "image/webp", 1.0);
-}
-
-// Add image to preview section
-function addImageToPreview(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const imageRow = createImageRow(e.target.result, file);
-        imagePreview.appendChild(imageRow);
-    };
-    reader.readAsDataURL(file);
+        cropper = null;
+    }, 'image/webp', 0.9);
 }
 
 // Create image row
-// Create image row for existing or newly uploaded images
+function createImageRow(imageSrc, file) {
+    const imageRow = document.createElement('div');
+    imageRow.classList.add('flex', 'items-center', 'justify-between', 'border', 'rounded-lg', 'p-4', 'bg-gray-50', 'my-3', 'image-row');
 
+    const imageInfo = document.createElement('div');
+    imageInfo.classList.add('flex', 'items-center', 'space-x-4');
+
+    const img = document.createElement('img');
+    img.src = imageSrc;
+    img.alt = 'Product Image';
+    img.classList.add('w-16', 'h-16', 'object-cover', 'rounded');
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('flex', 'space-x-2');
+
+    // Set as thumbnail button
+    const thumbnailBtn = document.createElement('button');
+    thumbnailBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+    </svg>`;
+    thumbnailBtn.classList.add('text-blue-500', 'hover:text-blue-700');
+    thumbnailBtn.onclick = () => setThumbnail(imageRow);
+
+    // Delete button
+    const deleteBtn = document.createElement('button');
+    deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    </svg>`;
+    deleteBtn.classList.add('text-red-500', 'hover:text-red-700');
+    deleteBtn.onclick = () => {
+        const index = imageFiles.indexOf(file);
+        if (index > -1) {
+            imageFiles.splice(index, 1);
+        }
+        imageRow.remove();
+    };
+
+    imageInfo.appendChild(img);
+    buttonContainer.appendChild(thumbnailBtn);
+    buttonContainer.appendChild(deleteBtn);
+    imageRow.appendChild(imageInfo);
+    imageRow.appendChild(buttonContainer);
+
+    return imageRow;
+}
+
+// Show crop modal
+function showCropModal(imageSrc) {
+    const cropModal = document.getElementById('cropModal');
+    const cropImage = document.getElementById('cropImage');
+    
+    cropImage.src = imageSrc;
+    cropModal.classList.remove('hidden');
+
+    cropper = new Cropper(cropImage, {
+        aspectRatio: 1,
+        viewMode: 2,
+        autoCropArea: 1,
+        scalable: true,
+        zoomable: true,
+        movable: true,
+        minCropBoxWidth: 200,
+        minCropBoxHeight: 200,
+    });
+}
+
+// Add event listeners
+document.getElementById('imageInput').addEventListener('change', handleImageInput);
+document.getElementById('cropConfirm').addEventListener('click', confirmCrop);
+document.getElementById('cropCancel').addEventListener('click', () => {
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+    document.getElementById('cropModal').classList.add('hidden');
+});
 
 // Remove image from preview
 function removeImageFromPreview(imageRow, file) {
@@ -593,48 +654,49 @@ function showAlert(title, text, icon) {
 
 document.querySelector('form').addEventListener('submit', async function(event) {
     event.preventDefault();
-    console.log('Form submission started'); // Debug log
+    console.log('Form submission started');
+
+    const totalImages = getCurrentImageCount();
+    console.log('Total images at submission:', totalImages);
 
     if (validateForm(event)) {
-        const formData = new FormData(this);
-        
-        // Log form data for debugging
-        console.log('Form data before sending:');
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
-
-        // Add any cropped/new images from imageFiles array
-        if (imageFiles && imageFiles.length > 0) {
-            imageFiles.forEach((file, index) => {
-                formData.append('images', file);
-            });
-        }
-
-        // Add deleted images if any
-        const deletedImages = Array.from(document.querySelectorAll('.deleted-image'))
-            .map(el => el.getAttribute('data-url'))
-            .filter(url => url); // Filter out any null/undefined values
-
-        if (deletedImages.length > 0) {
-            formData.append('deletedImages', JSON.stringify(deletedImages));
-        }
-
         try {
-            console.log('Sending request to:', this.action); // Debug log
+            const formData = new FormData(this);
+            
+            // Add new images if any
+            if (imageFiles && imageFiles.length > 0) {
+                imageFiles.forEach((file, index) => {
+                    formData.append('images', file);
+                    console.log(`Adding new image: ${file.name}`);
+                });
+            }
+
+            // Add deleted images if any
+            const deletedImages = Array.from(document.querySelectorAll('.deleted-image'))
+                .map(el => el.getAttribute('data-url'))
+                .filter(url => url);
+
+            if (deletedImages.length > 0) {
+                formData.append('deletedImages', JSON.stringify(deletedImages));
+                console.log('Deleted images:', deletedImages);
+            }
+
+            // Log final form data
+            console.log('Final form data before sending:');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+
             const response = await fetch(this.action, {
                 method: 'POST',
                 body: formData
             });
 
-            console.log('Response received:', response.status); // Debug log
+            const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(data.message || `Server responded with status ${response.status}`);
             }
-
-            const data = await response.json();
-            console.log('Response data:', data); // Debug log
 
             if (data.success) {
                 await Swal.fire({
@@ -648,16 +710,23 @@ document.querySelector('form').addEventListener('submit', async function(event) 
             } else {
                 throw new Error(data.message || 'Update failed');
             }
+
         } catch (error) {
-            console.error('Error during submission:', error); // Debug log
+            console.error('Detailed error:', error);
+            
+            let errorMessage = 'An unexpected error occurred';
+            if (error.message) {
+                errorMessage = error.message;
+            }
+
             Swal.fire({
                 icon: 'error',
                 title: 'Update Failed',
-                text: error.message || 'An unexpected error occurred while updating the product'
+                text: errorMessage,
+                showConfirmButton: true
             });
         }
     } else {
-        console.log('Form validation failed'); // Debug log
         Swal.fire({
             icon: 'error',
             title: 'Validation Error',
@@ -685,6 +754,30 @@ function displayErrorMessage(elementId, message) {
     if (errorElement) {
         errorElement.textContent = message;
     }
+}
+
+// Update the getCurrentImageCount function
+function getCurrentImageCount() {
+    // Get all visible image rows in the preview
+    const visibleImageRows = document.querySelectorAll('#imagePreview .image-row').length;
+    
+    // Get existing product images count
+    const existingCount = existingProductImages ? existingProductImages.length : 0;
+    
+    // Get new images count
+    const newImagesCount = imageFiles ? imageFiles.length : 0;
+    
+    // Calculate total (use the greater of visible rows or existing + new)
+    const totalCount = Math.max(visibleImageRows, existingCount + newImagesCount);
+    
+    console.log('Image count details:', {
+        visibleRows: visibleImageRows,
+        existingImages: existingCount,
+        newImages: newImagesCount,
+        totalCount: totalCount
+    });
+    
+    return totalCount;
 }
       </script>
   </div>
