@@ -10,15 +10,15 @@ const { deleteModel } = require('mongoose');
 
 const getAllProducts = async (req, res) => {
   try {
-    const search = req.query.search || '';
+    const searchQuery = req.query.search || '';
     const gender = req.query.gender || '';
     const page = req.query.page || 1;
     const limit = 5;
 
     const query = {
       $or: [
-        { productName: { $regex: new RegExp('.*' + search + '.*', 'i') } },
-        { gender: { $regex: new RegExp('.*' + search + '.*', 'i') } },
+        { productName: { $regex: new RegExp('.*' + searchQuery + '.*', 'i') } },
+        { gender: { $regex: new RegExp('.*' + searchQuery + '.*', 'i') } },
       ],
     };
     if (gender) {
@@ -41,6 +41,7 @@ const getAllProducts = async (req, res) => {
         totalPages: Math.ceil(count / limit),
         cat: category,
         gender: gender,
+        searchQuery: searchQuery,
       });
     } else {
       res.render('page-404');
@@ -423,6 +424,37 @@ const editProduct = async (req, res) => {
   }
 };
 
+const searchProducts = async (req, res) => {
+  try {
+    const search = req.query.search || '';
+    const searchRegex = new RegExp(
+      search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'),
+      'i'
+    );
+
+    const products = await Product.find({
+      $or: [
+        { productName: { $regex: searchRegex } },
+        { gender: { $regex: searchRegex } },
+        { 'category.name': { $regex: searchRegex } },
+      ],
+    })
+      .populate('category', 'name')
+      .lean();
+
+    res.json({
+      success: true,
+      products: products,
+    });
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error performing search',
+    });
+  }
+};
+
 module.exports = {
   getAllProducts,
   getProductAddPage,
@@ -432,4 +464,5 @@ module.exports = {
   blockProduct,
   unblockProduct,
   editProduct,
+  searchProducts,
 };

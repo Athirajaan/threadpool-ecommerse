@@ -71,14 +71,14 @@
                 </div>
                 <!-- View Details Button -->
                 <button 
-                data-order='<%= JSON.stringify(order).replace(/'/g, "\\'").replace(/"/g, "&quot;") %>'
-                onclick="showOrderDetails(this.dataset.order)" 
-                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 border border-gray-200 hover:border-blue-500 rounded-md transition-all duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                View Details
-              </button>
+                  data-order="<%= encodeURIComponent(JSON.stringify(order)) %>"
+                  onclick="showOrderDetails(this.dataset.order)" 
+                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 border border-gray-200 hover:border-blue-500 rounded-md transition-all duration-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  View Details
+                </button>
 
                 <!-- Retry Payment Button - Only show if payment status is Failed -->
                 <% if (order.paymentStatus === 'Failed') { %>
@@ -469,9 +469,9 @@
   
     function showOrderDetails(orderData) {
         try {
-            // Decode HTML entities
-            const decodedData = orderData.replace(/&quot;/g, '"');
-
+            // Decode the URL-encoded JSON string
+            const decodedData = decodeURIComponent(orderData);
+            
             // Parse the JSON data
             const order = JSON.parse(decodedData);
 
@@ -567,6 +567,14 @@
                 }
             });
 
+            // Show/hide payment failed warning
+            const paymentFailedWarning = document.getElementById('paymentFailedWarning');
+            if (order.paymentStatus === 'Failed') {
+                paymentFailedWarning.classList.remove('hidden');
+            } else {
+                paymentFailedWarning.classList.add('hidden');
+            }
+
             // Show the modal
             const modal = document.getElementById('orderDetailsModal');
             const overlay = document.getElementById('modalOverlay');
@@ -576,6 +584,14 @@
         } catch (error) {
             console.error('Error in showOrderDetails:', error);
             console.log('Raw order data:', orderData);
+            
+            // Show user-friendly error message
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong while loading order details. Please try again.',
+                confirmButtonColor: '#3B82F6'
+            });
         }
     }
 

@@ -309,8 +309,12 @@ const getCheckOut = async (req, res) => {
       return res.status(404).send('User not found');
     }
 
+    // Fetch address data and filter out deleted addresses
     const addressData = await Address.find({ UserId: userId });
-    const addresses = addressData.flatMap((data) => data.address);
+    const addresses = addressData.flatMap((data) =>
+      // Only include addresses where isDelete is false or undefined
+      data.address.filter((addr) => !addr.isDelete)
+    );
 
     // Fetch cart details and populate product details and coupon
     const cart = await Cart.findOne({ userId })
@@ -375,8 +379,8 @@ const getCheckOut = async (req, res) => {
       isWalletSufficient,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Server Error');
+    console.error('Error in checkout:', error);
+    res.status(500).send('Internal Server Error');
   }
 };
 

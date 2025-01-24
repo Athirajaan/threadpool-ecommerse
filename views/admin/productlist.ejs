@@ -16,7 +16,13 @@
     
         <!-- Search Bar -->
         <div class="mb-4">
-          <input type="text" placeholder="Search products..." class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <input 
+            type="text" 
+            id="productSearch" 
+            placeholder="Search products..." 
+            value="<%= searchQuery || '' %>"
+            class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          >
         </div>
     
         <!-- Responsive Table -->
@@ -276,7 +282,90 @@ function closeModal() {
   });
 });
 
+let searchTimeout;
 
+document.getElementById('productSearch').addEventListener('input', function(e) {
+    clearTimeout(searchTimeout);
+    
+    searchTimeout = setTimeout(() => {
+        const searchQuery = e.target.value.trim();
+        
+        // Update URL with search parameter without refreshing
+        const url = new URL(window.location.href);
+        if (searchQuery) {
+            url.searchParams.set('search', searchQuery);
+        } else {
+            url.searchParams.delete('search');
+        }
+        window.history.pushState({}, '', url);
+
+        // Fetch and update products
+        fetch(`/admin/searchProducts?search=${encodeURIComponent(searchQuery)}`)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+
+                if (data.products.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="p-4 text-center text-gray-500">
+                                No products found
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                data.products.forEach(product => {
+                    const row = `
+                        <tr class="border-b hover:bg-gray-100">
+                            <td class="p-4">${product.productName}</td>
+                            <td class="p-4">${product.gender}</td>
+                            <td class="p-4">${product.category ? product.category.name : 'N/A'}</td>
+                            <td class="p-4 text-orange-500">${product.totalQuantity <= 10 ? 'Low Stock' : 'In Stock'}</td>
+                            <td class="p-4">${product.salePrice}</td>
+                            <td class="p-4">
+                                <button 
+                                    onclick="openModal(event, '${product._id}', '${product.productName}')" 
+                                    class="px-3 py-1 text-yellow-600 border border-yellow-500 rounded hover:bg-yellow-500 hover:text-white">
+                                    View
+                                </button>
+                            </td>
+                            <td class="p-4 flex space-x-2">
+                                <button title="Edit product details" class="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600">
+                                    <a href="/admin/editProduct/${product._id}">Edit</a>
+                                </button>
+                                ${product.isBlocked === false ? 
+                                    `<button class="block-btn bg-red-500 text-white w-24 h-10 rounded-lg font-semibold hover:bg-red-600 transition duration-200" 
+                                        data-action="block" data-product-id="${product._id}">
+                                        Block
+                                    </button>` :
+                                    `<button class="unblock-btn bg-green-500 text-white w-24 h-10 rounded-lg font-semibold hover:bg-green-600 transition duration-200 ml-2" 
+                                        data-action="unblock" data-product-id="${product._id}">
+                                        Unblock
+                                    </button>`
+                                }
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }, 300); // Debounce time of 300ms
+});
+
+// Add this to handle browser back/forward
+window.addEventListener('popstate', function() {
+    const url = new URL(window.location.href);
+    const searchQuery = url.searchParams.get('search') || '';
+    document.getElementById('productSearch').value = searchQuery;
+    // Trigger the search
+    document.getElementById('productSearch').dispatchEvent(new Event('input'));
+});
 
     </script>
     

@@ -75,7 +75,11 @@ router.put('/offer/:offerId', adminAuth, offerController.updateOffer);
 // Add this route for creating offers
 router.post('/offer/create', adminAuth, offerController.createOffer);
 
-router.patch('/offer/toggle-status',adminAuth,offerController.toggleOfferStatus);
+router.patch(
+  '/offer/toggle-status',
+  adminAuth,
+  offerController.toggleOfferStatus
+);
 
 router.get('/export-excel', adminController.exportToExcel);
 router.get('/export-pdf', adminController.exportToPDF);
@@ -85,5 +89,8 @@ router.get('/filter-orders', adminAuth, adminController.filterOrders);
 router.get('/sales-data', adminAuth, adminController.getSalesData);
 
 router.get('/top-sellers', adminAuth, adminController.getTopSellers);
+
+// Add this new route
+router.get('/searchProducts', adminAuth, productController.searchProducts);
 
 module.exports = router;
