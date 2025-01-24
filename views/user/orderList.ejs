@@ -510,6 +510,63 @@
                 itemsContainer.appendChild(itemElement);
             });
 
+            // Set up the invoice form
+            const invoiceForm = document.getElementById('invoiceForm');
+            document.getElementById('modalInvoiceOrderId').value = order.orderId;
+
+            // Add event listener for invoice download
+            invoiceForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    const response = await fetch('/download-invoice', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId: order.orderId })
+                    });
+
+                    if (response.ok) {
+                        // Create a blob from the PDF stream
+                        const blob = await response.blob();
+                        // Create a link to download the PDF
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `invoice-${order.orderId}.pdf`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+
+                        // Show toast notification in top-right
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Invoice downloaded',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'colored-toast',
+                                title: 'text-sm font-medium'
+                            }
+                        });
+                    } else {
+                        throw new Error('Failed to download invoice');
+                    }
+                } catch (error) {
+                    console.error('Error downloading invoice:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Failed to download invoice. Please try again.'
+                    });
+                }
+            });
+
             // Show the modal
             const modal = document.getElementById('orderDetailsModal');
             const overlay = document.getElementById('modalOverlay');
@@ -1273,6 +1330,21 @@ function retryPayment(orderId, amount) {
 
   .animate-ping-slow {
     animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  .colored-toast {
+    background: #1F2937 !important;
+    color: white !important;
+    padding: 0.5rem 1.5rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  }
+  .colored-toast .swal2-title {
+    color: white !important;
+    font-size: 0.875rem !important;
+  }
+  .colored-toast .swal2-icon {
+    font-size: 0.75rem !important;
+    margin: 0.25rem !important;
   }
 </style>
 

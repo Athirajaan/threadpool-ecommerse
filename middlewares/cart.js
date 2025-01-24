@@ -1,4 +1,4 @@
-const Cart = require('../models/cartSchema'); 
+const Cart = require('../models/cartSchema');
 
 const cartQuantityMiddleware = async (req, res, next) => {
   if (req.session.user) {
@@ -6,10 +6,8 @@ const cartQuantityMiddleware = async (req, res, next) => {
       const userId = req.session.user;
       const cart = await Cart.findOne({ userId });
 
-      // Calculate total quantity of items in the cart
-      const cartQuantity = cart
-        ? cart.items.reduce((total, item) => total + item.quantity, 0)
-        : 0;
+      // Calculate total number of unique items in the cart (ignoring quantities)
+      const cartQuantity = cart ? cart.items.length : 0;
 
       // Make cartQuantity available to all views
       res.locals.cartQuantity = cartQuantity;
@@ -25,5 +23,4 @@ const cartQuantityMiddleware = async (req, res, next) => {
 
 module.exports = {
   cartQuantityMiddleware,
- 
 };
