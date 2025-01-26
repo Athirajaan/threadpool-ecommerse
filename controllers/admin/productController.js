@@ -105,6 +105,14 @@ const getProductAddPage = async (req, res) => {
 
 const addProducts = async (req, res) => {
   try {
+    // First validate if files exist
+    if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload product images',
+      });
+    }
+
     const {
       productName,
       description,
@@ -118,16 +126,22 @@ const addProducts = async (req, res) => {
       sizeXLQty,
     } = req.body;
 
+    // Input validation
     const validationErrors = [];
     const MAX_PRICE = 100000;
     const regularPriceNum = parseFloat(regularPrice);
     const salePriceNum = parseFloat(salePrice);
 
-    if (regularPriceNum <= 0 || regularPriceNum > MAX_PRICE) {
+    // Price validation
+    if (
+      isNaN(regularPriceNum) ||
+      regularPriceNum <= 0 ||
+      regularPriceNum > MAX_PRICE
+    ) {
       validationErrors.push('Invalid regular price');
     }
 
-    if (salePriceNum <= 0 || salePriceNum > MAX_PRICE) {
+    if (isNaN(salePriceNum) || salePriceNum <= 0 || salePriceNum > MAX_PRICE) {
       validationErrors.push('Invalid sale price');
     }
 
@@ -135,6 +149,7 @@ const addProducts = async (req, res) => {
       validationErrors.push('Regular price must be greater than sale price');
     }
 
+    // Stock validation
     const stock = {
       S: parseInt(sizeSQty, 10) || 0,
       M: parseInt(sizeMQty, 10) || 0,
@@ -146,11 +161,13 @@ const addProducts = async (req, res) => {
       validationErrors.push('At least one size must have a quantity');
     }
 
+    // Category validation
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
       validationErrors.push('Invalid category ID');
     }
 
+    // Check if product already exists
     const productExists = await Product.findOne({
       productName: { $regex: new RegExp(`^${productName}$`, 'i') },
     });
@@ -162,6 +179,7 @@ const addProducts = async (req, res) => {
       });
     }
 
+    // Image validation
     if (!req.files || req.files.length < 3 || req.files.length > 5) {
       return res.status(400).json({
         success: false,
@@ -169,22 +187,39 @@ const addProducts = async (req, res) => {
       });
     }
 
+    // Return if there are validation errors
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: validationErrors.join(', '),
+      });
+    }
+
     // Image upload section
     const images = [];
     try {
-      for (let file of req.files) {
+      for (const file of req.files) {
+        if (!file.path) {
+          throw new Error('File path is missing');
+        }
+
         const result = await cloudinary.uploader.upload(file.path, {
-          folder: 'product-images', // Ensure images are uploaded to the correct folder
+          folder: 'product-images',
           transformation: [
             {
               width: 800,
               height: 800,
               crop: 'fill',
               quality: 'auto:best',
-              format: 'webp', // Ensure images are saved in WebP format
+              format: 'webp',
             },
           ],
         });
+
+        if (!result || !result.secure_url) {
+          throw new Error('Failed to get secure URL from Cloudinary');
+        }
+
         images.push(result.secure_url);
       }
     } catch (uploadError) {
@@ -192,11 +227,14 @@ const addProducts = async (req, res) => {
       return res.status(500).json({
         success: false,
         message: 'Failed to upload images',
+        error: uploadError.message,
       });
     }
 
+    // Calculate total quantity
     const totalQuantity = Object.values(stock).reduce((a, b) => a + b, 0);
 
+    // Create new product
     const newProduct = new Product({
       productName,
       description,
@@ -212,17 +250,18 @@ const addProducts = async (req, res) => {
     });
 
     await newProduct.save();
+
     return res.status(200).json({
       success: true,
+      message: 'Product added successfully',
       redirectUrl: '/admin/products',
     });
   } catch (error) {
-    console.error('Error saving product', error);
+    console.error('Error saving product:', error);
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
-      details:
-        process.env.NODE_ENV === 'development' ? error.message : undefined,
+      error: error.message,
     });
   }
 };
@@ -243,7 +282,7 @@ const getProductForEdit = async (req, res) => {
 
     // Render the edit page and pass the product details
     const categories = await Category.find();
-    res.render('edit-Product', {
+    res.render('edit-product', {
       title: 'Edit Product',
       product,
       categories,

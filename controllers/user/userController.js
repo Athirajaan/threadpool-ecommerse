@@ -117,10 +117,26 @@ const loadHomepage = async (req, res) => {
 //load login page
 const loadLoginPage = async (req, res) => {
   try {
-    return res.render('login');
+    // Get error message from either query params or flash
+    const error = req.query.error || '';
+    const blocked = req.query.blocked || false;
+
+    res.render('login', {
+      title: 'Login',
+      message: error, // Pass the error message as 'message' for the view
+      error: error, // Keep error for backward compatibility
+      blocked: blocked,
+      user: null,
+    });
   } catch (error) {
-    console.log('login page not found');
-    res.status(500).send('server error');
+    console.error('Error loading login page:', error);
+    res.status(500).render('login', {
+      title: 'Login',
+      message: 'Internal server error occurred',
+      error: 'Internal server error occurred',
+      blocked: false,
+      user: null,
+    });
   }
 };
 
@@ -273,7 +289,6 @@ const resendOtp = async (req, res) => {
 
     if (emailSent) {
       console.log('Resent otp:', newOtp);
-      // Save the session explicitly to ensure data persistence
       req.session.save((err) => {
         if (err) {
           console.error('Session save error:', err);
@@ -618,7 +633,6 @@ const verifyOtpForgotPassword = async (req, res) => {
     const submittedOtp = req.body.otp;
     console.log('Submitted OTP:', submittedOtp);
     console.log('Session OTP:', req.session.userOtp);
-    console.log('Full Session:', req.session);
 
     // Basic validation
     if (!submittedOtp) {
@@ -649,12 +663,6 @@ const verifyOtpForgotPassword = async (req, res) => {
     // Convert both to strings and compare
     const submittedOtpString = String(submittedOtp);
     const storedOtpString = String(req.session.userOtp);
-
-    console.log('Comparing:', {
-      submitted: submittedOtpString,
-      stored: storedOtpString,
-      areEqual: submittedOtpString === storedOtpString,
-    });
 
     if (submittedOtpString === storedOtpString) {
       return res.json({

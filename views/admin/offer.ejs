@@ -154,10 +154,6 @@
   </main>
   </div>
 
-  <!-- Add this for debugging -->
-  <script>
-    console.log('Pagination Data:', <%- JSON.stringify(pagination) %>);
-  </script>
 
   <!-- Add Offer Modal -->
   <div
@@ -385,9 +381,6 @@
     const gender = document.getElementById('gender').value;
     const applicableFor = document.getElementById('applicableFor');
 
-    console.log('Selected Type:', offerType); // For debugging
-    console.log('Selected Gender:', gender); // For debugging
-
     // Clear existing options
     applicableFor.innerHTML = '<option value="">Select an option</option>';
 
@@ -397,7 +390,7 @@
 
     if (offerType === 'Product') {
         <% products.forEach(function(product) { %>
-            console.log('Checking product:', '<%= product.gender %>', gender); // For debugging
+         
             if ('<%= product.gender %>' === gender) {
                 applicableFor.innerHTML += `
                     <option value="<%= product._id %>">
@@ -408,7 +401,6 @@
         <% }); %>
     } else if (offerType === 'Category') {
         <% categories.forEach(function(category) { %>
-            console.log('Checking category:', '<%= category.gender %>', gender); // For debugging
             if ('<%= category.gender %>' === gender) {
                 applicableFor.innerHTML += `
                     <option value="<%= category._id %>">
@@ -419,7 +411,6 @@
         <% }); %>
     }
 
-    console.log('Final dropdown HTML:', applicableFor.innerHTML); // For debugging
   }
 
   async function submitOffer(event) {

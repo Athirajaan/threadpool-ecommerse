@@ -33,6 +33,8 @@ const categoryInfo = async (req, res) => {
   }
 };
 
+
+
 // Add category function
 const addCategory = async (req, res) => {
   const { name, description, gender } = req.body;
@@ -144,3 +146,5 @@ module.exports = {
   getUnListCategory,
   EditCategory,
 };
+
+

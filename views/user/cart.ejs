@@ -540,8 +540,6 @@ async function confirmRemove() {
       const result = await response.json();
 
       if (response.ok) {
-       // setTimeout(() => location.reload(), 2000);
-        // showSmallNotification("Item removed from your cart!", "success");
           location.reload()
       } else {
         showSmallNotification("Failed to remove item from cart.", "error");

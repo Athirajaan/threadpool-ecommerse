@@ -475,8 +475,6 @@
             // Parse the JSON data
             const order = JSON.parse(decodedData);
 
-            // Display order details in the modal
-            console.log('Order Details:', order);
 
             // Populate modal content with order details
             document.getElementById('modalOrderId').textContent = order.orderId;
@@ -583,7 +581,7 @@
             document.body.classList.add('overflow-hidden');
         } catch (error) {
             console.error('Error in showOrderDetails:', error);
-            console.log('Raw order data:', orderData);
+        
             
             // Show user-friendly error message
             Swal.fire({
@@ -759,7 +757,6 @@ function showNotification(message, bgColor) {
 
 // Update the track order function with better error handling
 function trackOrder(orderId, productId) {
-    console.log('Tracking order:', { orderId, productId });
     
     if (!orderId || !productId) {
         console.error('Missing parameters:', { orderId, productId });
@@ -786,7 +783,6 @@ function trackOrder(orderId, productId) {
         return response.json();
     })
     .then(data => {
-        console.log('Received data:', data);
         
         if (!data || !data.productName) {
             throw new Error('Invalid data received from server');
@@ -888,8 +884,6 @@ function updateTrackingStatus(orderId, productId, data) {
     const currentStatus = data.status.toLowerCase();
     const currentIndex = statuses.indexOf(currentStatus);
     
-    console.log('Order Date:', data.orderDate);
-    console.log('Current Status:', currentStatus);
     
     // Calculate all dates based on order date
     const orderDate = new Date(data.orderDate);
@@ -960,7 +954,6 @@ function updateTrackingStatus(orderId, productId, data) {
         }
     });
 
-    console.log('Expected Dates:', expectedDates);
 }
 
 function confirmReturn(orderId, productId, quantity, size) {

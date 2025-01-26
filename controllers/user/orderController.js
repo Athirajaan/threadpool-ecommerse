@@ -463,21 +463,18 @@ const updatePaymentStatus = async (req, res) => {
       if (order) {
         order.paymentStatus = 'Completed';
         await order.save();
-        console.log('Payment verified and order updated successfully');
 
         res.json({
           success: true,
           message: 'Payment verified and status updated successfully',
         });
       } else {
-        console.log('Order not found:', orderId);
         res.status(404).json({
           success: false,
           message: 'Order not found',
         });
       }
     } else {
-      console.log('Payment verification failed');
       res.status(400).json({
         success: false,
         message: 'Payment verification failed',
@@ -495,7 +492,6 @@ const updatePaymentStatus = async (req, res) => {
 const downloadInvoice = async (req, res) => {
   try {
     const orderId = req.body.orderId;
-    console.log('Attempting to generate invoice for orderId:', orderId);
 
     const order = await Order.findOne({ orderId: orderId })
       .populate('orderedItems.product')

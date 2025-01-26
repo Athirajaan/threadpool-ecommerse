@@ -139,7 +139,7 @@ const addToCart = async (req, res) => {
 
     // Calculate price with offers
     const priceDetails = await calculatePrice(product, product.category);
-    const finalPrice = priceDetails.finalPrice; // Remove size-based adjustment
+    const finalPrice = priceDetails.finalPrice;
 
     let cart = await Cart.findOne({ userId });
 
@@ -158,7 +158,7 @@ const addToCart = async (req, res) => {
           },
         ],
         totalCartPrice: finalPrice * quantity,
-        finalAmount: finalPrice * quantity,
+        finalAmount: finalPrice * quantity, // For new cart, finalAmount equals totalCartPrice as there's no coupon
       });
     } else {
       // Check if product with same size exists
@@ -207,6 +207,7 @@ const addToCart = async (req, res) => {
         return total + item.totalPrice;
       }, 0);
 
+      // Calculate final amount by subtracting coupon discount from total cart price
       cart.finalAmount = cart.totalCartPrice - (cart.couponDiscount || 0);
     }
 

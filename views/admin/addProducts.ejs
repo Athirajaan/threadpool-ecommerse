@@ -229,68 +229,119 @@ document.querySelector('form').addEventListener('submit', function(event) {
     event.preventDefault();
     // Validate the form
     if (validateForm(event)) {
-        // Create a FormData object to properly handle file uploads
-        const formData = new FormData(this);
+        // Create a FormData object
+        const formData = new FormData();
 
-       // Append additional form fields manually
-       formData.append('productName', document.getElementById('productName').value);
-       formData.append('description', document.getElementById('description').value);
-       formData.append('gender', document.getElementById('gender').value);
-       formData.append('category', document.getElementById('category').value);
-       formData.append('regularPrice', document.getElementById('regularPrice').value);
-       formData.append('salePrice', document.getElementById('salePrice').value);
-       formData.append('sizeSQty', document.getElementById('sizeSQty').value || '0');
-       formData.append('sizeMQty', document.getElementById('sizeMQty').value || '0');
-       formData.append('sizeLQty', document.getElementById('sizeLQty').value || '0');
-       formData.append('sizeXLQty', document.getElementById('sizeXLQty').value || '0');
+        // Append all form fields with proper error checking
+        try {
+            // Basic product details
+            const productName = document.getElementById('productName').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const gender = document.getElementById('gender').value;
+            const category = document.getElementById('category').value;
+            const regularPrice = document.getElementById('regularPrice').value;
+            const salePrice = document.getElementById('salePrice').value;
 
-        // Clear any existing file inputs
-        const fileInput = document.getElementById('imageInput');
-        fileInput.value = ''; // Clear the file input
+            // Validate required fields
+            if (!productName || !description || !gender || !category || !regularPrice || !salePrice) {
+                throw new Error('Please fill in all required fields');
+            }
 
-        // Append cropped images to the form data
-        imageFiles.forEach((file, index) => {
-            formData.append('images', file, `image-${index}.png`);
-        });
+            formData.append('productName', productName);
+            formData.append('description', description);
+            formData.append('gender', gender);
+            formData.append('category', category);
+            formData.append('regularPrice', regularPrice);
+            formData.append('salePrice', salePrice);
 
-        // Use AJAX to submit the form
-        fetch('/admin/addProducts', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    text: 'Product added sucessfully',
-                    timer: 1500
-                }).then(() => {
-                    window.location.href = data.redirectUrl;
-                });
-            } else {
-                // Handle validation errors
+            // Size quantities
+            formData.append('sizeSQty', document.getElementById('sizeSQty').value || '0');
+            formData.append('sizeMQty', document.getElementById('sizeMQty').value || '0');
+            formData.append('sizeLQty', document.getElementById('sizeLQty').value || '0');
+            formData.append('sizeXLQty', document.getElementById('sizeXLQty').value || '0');
+
+            // Validate images
+            if (!imageFiles || imageFiles.length < 3 || imageFiles.length > 5) {
+                throw new Error('Please upload between 3 and 5 images');
+            }
+
+            // Append images with proper naming
+            imageFiles.forEach((file, index) => {
+                formData.append('images', file, `image-${index}.png`);
+            });
+
+            // Show loading state
+            Swal.fire({
+                title: 'Adding Product...',
+                text: 'Please wait while we process your request',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Submit the form
+            fetch('/admin/addProducts', {
+                method: 'POST',
+                body: formData
+            })
+            .then(async response => {
+                const contentType = response.headers.get("content-type");
+                if (!response.ok) {
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Server error occurred');
+                    } else {
+                        const errorText = await response.text();
+                        console.error('Server Response:', errorText);
+                        throw new Error('Server error: Invalid response format');
+                    }
+                }
+                
+                if (!contentType || contentType.indexOf("application/json") === -1) {
+                    throw new Error('Invalid response format from server');
+                }
+                
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        text: 'Product added successfully',
+                        timer: 1500
+                    }).then(() => {
+                        window.location.href = data.redirectUrl || '/admin/products';
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to add product'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Submission Error:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Validation Error',
-                    html: data.errors ? data.errors.join('<br>') : data.message
+                    title: 'Submission Error',
+                    text: error.message || 'There was a problem submitting the form. Please check your inputs and try again.'
                 });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
+            });
+
+        } catch (error) {
+            console.error('Form Processing Error:', error);
             Swal.fire({
                 icon: 'error',
-                title: 'Submission Error',
-                text: 'There was a problem submitting the form'
+                title: 'Form Error',
+                text: error.message || 'Please check your inputs and try again'
             });
-        });
+        }
     }
 });
 
 function validateForm(event) {
-    // Clear any previous error messages
-    console.log('form validation started')
     clearErrorMessages();
     
     // Flag to track overall form validity

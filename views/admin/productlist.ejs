@@ -153,8 +153,6 @@
   
 // Function to open the modal
 function openModal(event, productId, productName) {
-  console.log('Product ID:', productId);
-  console.log('Product Name:', productName);
 
   const modal = document.getElementById('variantModal');
   const title = document.getElementById('productTitle');
@@ -176,7 +174,6 @@ function openModal(event, productId, productName) {
       return response.json();
     })
     .then(data => {
-      console.log('Fetched data:', data);
       tbody.innerHTML = ''; 
 
       if (data.length === 0) {

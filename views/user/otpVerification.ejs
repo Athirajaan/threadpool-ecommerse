@@ -214,14 +214,12 @@
         otpInputs.forEach((input) => {
           otp += input.value;
         });
-        console.log('Collected OTP:', otp); // Debug log
         return otp;
       }
 
       function submitOtpForm(event) {
         event.preventDefault();
         const otpValue = getOtp();
-        console.log('Submitting OTP:', otpValue); // Debug log
 
         $.ajax({
           type: 'POST',
@@ -242,7 +240,6 @@
             }
           },
           error: function(xhr) {
-            console.log('Error response:', xhr.responseJSON);
             
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = xhr.responseJSON?.message || 'Invalid OTP. Please try again.';

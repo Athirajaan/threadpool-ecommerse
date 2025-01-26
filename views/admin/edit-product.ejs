@@ -312,7 +312,6 @@ function validateForm(event) {
 
     // Image validation
     const totalImages = getCurrentImageCount();
-    console.log('Validation total images:', totalImages);
 
     if (totalImages < 3 || totalImages > 5) {
         displayErrorMessage('imageInput-error', `Product must have between 3 and 5 images. Current count: ${totalImages}`);
@@ -347,11 +346,7 @@ function handleImageInput(e) {
     const currentImages = getCurrentImageCount();
     const totalImagesAfterAdd = currentImages + files.length;
     
-    console.log('Image counts on input:', {
-        current: currentImages,
-        adding: files.length,
-        total: totalImagesAfterAdd
-    });
+
 
     if (totalImagesAfterAdd > 5) {
         Swal.fire({
@@ -635,26 +630,9 @@ function showAlert(title, text, icon) {
         timerProgressBar: true,
     });
 }
-      // Event listener to fetch and populate product details
-      /* document.addEventListener('DOMContentLoaded', () => {
-          fetch(`/admin/getProductDetails/${productId}`)
-              .then(response => response.json())
-              .then(product => {
-                  populateProductDetails(product);
-              })
-              .catch(error => {
-                  console.error('Error fetching product details:', error);
-                  Swal.fire({
-                      icon: 'error',
-                      title: 'Error',
-                      text: 'Failed to load product details'
-                  });
-              });
-      }); */
-
+ 
 document.querySelector('form').addEventListener('submit', async function(event) {
     event.preventDefault();
-    console.log('Form submission started');
 
     const totalImages = getCurrentImageCount();
     console.log('Total images at submission:', totalImages);
@@ -681,8 +659,6 @@ document.querySelector('form').addEventListener('submit', async function(event) 
                 console.log('Deleted images:', deletedImages);
             }
 
-            // Log final form data
-            console.log('Final form data before sending:');
             for (let pair of formData.entries()) {
                 console.log(pair[0] + ': ' + pair[1]);
             }
@@ -769,13 +745,6 @@ function getCurrentImageCount() {
     
     // Calculate total (use the greater of visible rows or existing + new)
     const totalCount = Math.max(visibleImageRows, existingCount + newImagesCount);
-    
-    console.log('Image count details:', {
-        visibleRows: visibleImageRows,
-        existingImages: existingCount,
-        newImages: newImagesCount,
-        totalCount: totalCount
-    });
     
     return totalCount;
 }
