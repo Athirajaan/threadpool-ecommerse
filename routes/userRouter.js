@@ -28,6 +28,7 @@ router.get(
     prompt: 'select_account',
   })
 );
+
 router.get(
   '/auth/google/callback',
   passport.authenticate('google', {
@@ -35,33 +36,7 @@ router.get(
     failureFlash: true,
     passReqToCallback: true,
   }),
-  async (req, res, next) => {
-    try {
-      // Check if user is blocked before proceeding with login
-      const user = req.user;
-      if (user && user.isBlocked) {
-        req.logout((err) => {
-          if (err) {
-            console.error('Logout error:', err);
-          }
-          // Redirect to login with query parameters instead of direct render
-          return res.redirect(
-            '/login?error=' +
-              encodeURIComponent('Your account has been blocked by admin') +
-              '&blocked=true'
-          );
-        });
-      } else {
-        // If user is not blocked, proceed with normal login handling
-        return userController.handleGoogleLogin(req, res, next);
-      }
-    } catch (error) {
-      console.error('Google auth callback error:', error);
-      return res.redirect(
-        '/login?error=' + encodeURIComponent('An error occurred during login')
-      );
-    }
-  }
+  userController.handleGoogleCallback
 );
 
 router.get('/login', userController.loadLoginPage);

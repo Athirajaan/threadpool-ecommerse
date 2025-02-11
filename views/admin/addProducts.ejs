@@ -692,13 +692,23 @@ function confirmDelete(imageRow, file) {
 function showAlert(title, text, icon) {
     Swal.fire({
         icon,
-        title,
+        title: `${icon === 'success' ? '✓ ' : ''}${title}`,
         text,
-        toast: true,
-        position: 'top',
         showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
+        timer: 2000,
+        background: icon === 'success' ? '#4CAF50' : '#3F51B5',
+        color: '#ffffff',
+        customClass: {
+            popup: 'rounded-lg shadow-xl',
+            title: 'font-bold',
+            content: 'text-lg'
+        },
+        showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+        }
     });
 }
 

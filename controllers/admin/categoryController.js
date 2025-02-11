@@ -29,7 +29,7 @@ const categoryInfo = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in fetching categories:', error);
-    res.redirect('/pageerror');
+    res.redirect('/admin/pageerror');
   }
 };
 
@@ -70,7 +70,7 @@ const getListCategory = async (req, res) => {
     await Category.updateOne({ _id: id }, { $set: { isListed: false } });
     res.redirect('/admin/category');
   } catch (error) {
-    res.redirect('/pageerror');
+    res.redirect('/admin/pageerror');
   }
 };
 
@@ -80,7 +80,7 @@ const getUnListCategory = async (req, res) => {
     await Category.updateOne({ _id: id }, { $set: { isListed: true } });
     res.redirect('/admin/category');
   } catch (error) {
-    res.redirect('/pageerror');
+    res.redirect('/admin/pageerror');
   }
 };
 

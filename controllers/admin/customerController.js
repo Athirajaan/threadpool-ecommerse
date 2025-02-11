@@ -38,7 +38,7 @@ const coustomerInfo = async (req, res) => {
       currentPage: page,
     });
   } catch (error) {
-    res.redirect("/pageerror");
+    res.redirect('/admin/pageerror');
   }
 };
 
@@ -48,7 +48,7 @@ const customerBlocked = async (req, res) => {
     await User.updateOne({ _id: id }, { $set: { isBlocked: true } });
     res.redirect("/admin/customers");
   } catch (error) {
-    res.redirect("/pageerror");
+    res.redirect('/admin/pageerror');
   }
 };
 
@@ -58,7 +58,7 @@ const customerunBlocked = async (req, res) => {
     await User.updateOne({ _id: id }, { $set: { isBlocked: false } });
     res.redirect("/admin/customers");
   } catch (error) {
-    res.redirect("/pageerror");
+    res.redirect('/admin/pageerror');
   }
 };
 

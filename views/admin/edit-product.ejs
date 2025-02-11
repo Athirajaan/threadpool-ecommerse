@@ -168,6 +168,9 @@
       // Add this at the start of your script to store existing images
       const existingProductImages = <%- JSON.stringify(product.productImage) %>; // Get existing images from backend
 
+      // Add this variable at the start of your script to track deleted images
+      let deletedImages = [];
+
       function populateProductDetails(product) {
     // Set hidden product ID
     document.getElementById('productId').value = product._id;
@@ -609,8 +612,18 @@ function confirmDelete(imageRow, file) {
         confirmButtonText: 'Yes, delete it!'
     }).then(result => {
         if (result.isConfirmed) {
+            // Get the image URL from the img element
+            const imgElement = imageRow.querySelector('img');
+            const imageUrl = imgElement.src;
+            
+            // Add the URL to deletedImages array if it's an existing image
+            if (existingProductImages.includes(imageUrl)) {
+                deletedImages.push(imageUrl);
+            }
+            
             const indexToDelete = imageFiles.indexOf(file);
             if (indexToDelete !== -1) imageFiles.splice(indexToDelete, 1);
+            
             imageRow.remove();
             showAlert('Deleted!', 'Your image has been deleted.', 'success');
         }
@@ -649,20 +662,14 @@ document.querySelector('form').addEventListener('submit', async function(event) 
                 });
             }
 
-            // Add deleted images if any
-            const deletedImages = Array.from(document.querySelectorAll('.deleted-image'))
-                .map(el => el.getAttribute('data-url'))
-                .filter(url => url);
-
+            // Add deleted images to formData
             if (deletedImages.length > 0) {
                 formData.append('deletedImages', JSON.stringify(deletedImages));
-                console.log('Deleted images:', deletedImages);
             }
 
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ': ' + pair[1]);
-            }
-
+            // Debug logging
+            console.log('Deleted images being sent:', deletedImages);
+            
             const response = await fetch(this.action, {
                 method: 'POST',
                 body: formData
@@ -738,7 +745,7 @@ function getCurrentImageCount() {
     const visibleImageRows = document.querySelectorAll('#imagePreview .image-row').length;
     
     // Get existing product images count
-    const existingCount = existingProductImages ? existingProductImages.length : 0;
+    const existingCount = existingProductImages ? existingProductImages.length - deletedImages.length : 0;
     
     // Get new images count
     const newImagesCount = imageFiles ? imageFiles.length : 0;

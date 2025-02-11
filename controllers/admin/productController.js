@@ -47,7 +47,7 @@ const getAllProducts = async (req, res) => {
       res.render('page-404');
     }
   } catch (error) {
-    res.redirect('/pageerror');
+    res.redirect('/admin/pageerror');
   }
 };
 
@@ -88,7 +88,7 @@ const getVarients = async (req, res) => {
     res.status(200).json(availableVariants);
   } catch (error) {
     console.error('Error fetching product variants:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.redirect('/admin/pageerror');
   }
 };
 
@@ -99,7 +99,7 @@ const getProductAddPage = async (req, res) => {
       cat: category,
     });
   } catch (error) {
-    res.redirect('/pageerror');
+    res.redirect('/admin/pageerror');
   }
 };
 
@@ -290,11 +290,7 @@ const getProductForEdit = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching product for edit:', error);
-
-    // Render an error page in case of a server error
-    res.status(500).render('error', {
-      message: 'Error retrieving product details',
-    });
+    res.redirect('/admin/pageerror');
   }
 };
 
@@ -382,17 +378,29 @@ const editProduct = async (req, res) => {
     // Handle image updates
     let productImages = [...existingProduct.productImage]; // Start with existing images
 
-    // Remove deleted images from Cloudinary and the array
+    // Parse deletedImages if it's a string
+    let deletedImagesList = [];
     if (deletedImages) {
-      const deletedImageUrls = Array.isArray(deletedImages)
-        ? deletedImages
-        : [deletedImages];
+      try {
+        deletedImagesList = JSON.parse(deletedImages);
+      } catch (e) {
+        deletedImagesList = [deletedImages];
+      }
+    }
 
-      for (const imageUrl of deletedImageUrls) {
-        // Extract public_id from Cloudinary URL
-        const publicId = imageUrl.split('/').slice(-1)[0].split('.')[0];
+    // Remove deleted images from Cloudinary and the array
+    if (deletedImagesList.length > 0) {
+      for (const imageUrl of deletedImagesList) {
         try {
-          await cloudinary.uploader.destroy(`product-images/${publicId}`);
+          // Extract public_id from Cloudinary URL
+          const urlParts = imageUrl.split('/');
+          const publicIdWithExtension = urlParts[urlParts.length - 1];
+          const publicId = `product-images/${publicIdWithExtension.split('.')[0]}`;
+
+          // Delete from Cloudinary
+          await cloudinary.uploader.destroy(publicId);
+
+          // Remove from productImages array
           productImages = productImages.filter((img) => img !== imageUrl);
         } catch (error) {
           console.error('Error deleting image from Cloudinary:', error);

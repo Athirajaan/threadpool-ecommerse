@@ -86,7 +86,7 @@ const orderInfo = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in orderInfo:', error);
-    res.status(500).send('Failed to fetch orders');
+    res.redirect('/admin/pageerror');
   }
 };
 
@@ -140,7 +140,7 @@ const updateStatus = async (req, res) => {
     res.redirect('/admin/order');
   } catch (error) {
     console.error(error);
-    res.status(500).render('error', { message: 'Server error' });
+    res.redirect('/admin/pageerror');
   }
 };
 

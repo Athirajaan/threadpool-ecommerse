@@ -177,7 +177,7 @@ const loadDashboard = async (req, res) => {
       });
     } catch (error) {
       console.log('Dashboard error:', error);
-      res.redirect('/pageerror');
+      res.redirect('/admin/pageerror');
     }
   }
 };
@@ -189,19 +189,77 @@ const logout = async (req, res) => {
     res.redirect('/admin/login');
   } catch (error) {
     console.log('unexpected error during logout', error);
-    res.redirect('/pageerror');
+    res.redirect('/admin/pageerror');
   }
 };
 
 //pageerror
 const pageerror = async (req, res) => {
-  res.render('error');
+  try {
+    res.render('error', {
+      title: 'Error Page',
+      message: 'An unexpected error occurred',
+      error: {
+        status: 500,
+        stack: process.env.NODE_ENV === 'development' ? err?.stack : '',
+      },
+    });
+  } catch (error) {
+    console.error('Error rendering error page:', error);
+    res.status(500).send('Internal Server Error');
+  }
 };
 
 // Export to Excel
 const exportToExcel = async (req, res) => {
   try {
-    const orders = await Order.find()
+    const { period, startDate, endDate } = req.query;
+    let dateFilter = {};
+
+    // Handle date range filter
+    if (startDate && endDate) {
+      dateFilter = {
+        createdOn: {
+          $gte: new Date(startDate),
+          $lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
+        },
+      };
+    }
+    // Handle period filter
+    else if (period) {
+      const now = new Date();
+      switch (period) {
+        case 'today':
+          dateFilter = {
+            createdOn: {
+              $gte: new Date(now.setHours(0, 0, 0, 0)),
+              $lt: new Date(now.setHours(23, 59, 59, 999)),
+            },
+          };
+          break;
+        case 'week':
+          const weekStart = new Date(now);
+          weekStart.setDate(now.getDate() - 7);
+          dateFilter = {
+            createdOn: {
+              $gte: weekStart,
+              $lt: new Date(),
+            },
+          };
+          break;
+        case 'month':
+          const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+          dateFilter = {
+            createdOn: {
+              $gte: monthStart,
+              $lt: new Date(),
+            },
+          };
+          break;
+      }
+    }
+
+    const orders = await Order.find(dateFilter)
       .populate('orderedItems.product')
       .populate('user');
 
@@ -257,14 +315,60 @@ const exportToExcel = async (req, res) => {
     res.end();
   } catch (error) {
     console.error('Excel export error:', error);
-    res.status(500).json({ error: 'Failed to export Excel' });
+    res.redirect('/admin/pageerror');
   }
 };
 
 // Export to PDF
 const exportToPDF = async (req, res) => {
   try {
-    const orders = await Order.find()
+    const { period, startDate, endDate } = req.query;
+    let dateFilter = {};
+
+    // Handle date range filter
+    if (startDate && endDate) {
+      dateFilter = {
+        createdOn: {
+          $gte: new Date(startDate),
+          $lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
+        },
+      };
+    }
+    // Handle period filter
+    else if (period) {
+      const now = new Date();
+      switch (period) {
+        case 'today':
+          dateFilter = {
+            createdOn: {
+              $gte: new Date(now.setHours(0, 0, 0, 0)),
+              $lt: new Date(now.setHours(23, 59, 59, 999)),
+            },
+          };
+          break;
+        case 'week':
+          const weekStart = new Date(now);
+          weekStart.setDate(now.getDate() - 7);
+          dateFilter = {
+            createdOn: {
+              $gte: weekStart,
+              $lt: new Date(),
+            },
+          };
+          break;
+        case 'month':
+          const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+          dateFilter = {
+            createdOn: {
+              $gte: monthStart,
+              $lt: new Date(),
+            },
+          };
+          break;
+      }
+    }
+
+    const orders = await Order.find(dateFilter)
       .populate('orderedItems.product')
       .populate('user')
       .sort({ createdOn: -1 });
@@ -282,14 +386,37 @@ const exportToPDF = async (req, res) => {
 
     // Header
     doc
-      .image('public/images/logo.jpg', 30, 30, { width: 40 })
+      .fontSize(20)
+      .text('Threadpool', 30, 40)
       .fontSize(16)
-      .text('Threadpool - Orders Report', 80, 40)
-      .fontSize(10)
       .text(`Generated on: ${new Date().toLocaleString()}`, 350, 40)
       .moveDown(2);
 
-    // Calculate summary data
+    // Filter information
+    if (period || (startDate && endDate)) {
+      doc
+        .fontSize(10)
+        .text(
+          `Filter: ${
+            startDate && endDate
+              ? `Date Range (${new Date(startDate).toLocaleDateString()} - ${new Date(
+                  endDate
+                ).toLocaleDateString()})`
+              : period === 'today'
+                ? 'Today'
+                : period === 'week'
+                  ? 'This Week'
+                  : period === 'month'
+                    ? 'This Month'
+                    : 'All Orders'
+          }`,
+          30,
+          doc.y
+        )
+        .moveDown();
+    }
+
+    // Summary section
     const totalAmount = orders.reduce(
       (sum, order) => sum + order.finalAmount,
       0
@@ -299,7 +426,6 @@ const exportToPDF = async (req, res) => {
       0
     );
 
-    // Summary section
     doc
       .fontSize(12)
       .text(`Total Orders: ${orders.length}`, 30, doc.y)
@@ -309,11 +435,8 @@ const exportToPDF = async (req, res) => {
 
     // Table headers
     const startY = doc.y;
+    doc.fillColor('#f0f0f0').rect(30, startY, 535, 20).fill().fillColor('#000');
 
-    // Draw header background
-    doc.fillColor('#f0f0f0').rect(30, startY, 565, 20).fill().fillColor('#000');
-
-    // Add headers
     doc
       .fontSize(10)
       .text('Order ID', 35, startY + 5)
@@ -337,17 +460,18 @@ const exportToPDF = async (req, res) => {
       if (i % 2 === 0) {
         doc
           .fillColor('#f9f9f9')
-          .rect(30, y - 5, 565, 25)
+          .rect(30, y - 5, 535, 25)
           .fill()
           .fillColor('#000');
       }
 
-      // Format products string to fit in cell
+      // Format products string
       const productsText = order.orderedItems
-        .map((item) => `${item.product.productName}(${item.quantity})`)
+        .map(
+          (item) => `${item.product.productName}(${item.size}x${item.quantity})`
+        )
         .join(', ');
 
-      // Calculate order discount
       const orderDiscount = (order.discount || 0) + (order.couponDiscount || 0);
 
       doc
@@ -370,7 +494,7 @@ const exportToPDF = async (req, res) => {
     doc.end();
   } catch (error) {
     console.error('PDF export error:', error);
-    res.status(500).json({ error: 'Failed to export PDF' });
+    res.redirect('/admin/pageerror');
   }
 };
 
