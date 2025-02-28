@@ -1,16 +1,15 @@
 const User = require('../../models/userSchema');
 const Order = require('../../models/orderSchema');
+const { StatusCode, Messages } = require('../../utils/statusCodes');
 
 const orderInfo = async (req, res) => {
   try {
     const { page = 1, limit = 4 } = req.query;
 
-    // First, get total count (excluding failed payments)
     const totalOrders = await Order.countDocuments({
       paymentStatus: { $ne: 'Failed' },
     });
 
-    // Then get orders with proper sorting (excluding failed payments)
     const orders = await Order.find({ paymentStatus: { $ne: 'Failed' } })
       .populate({
         path: 'orderedItems.product',
@@ -33,7 +32,6 @@ const orderInfo = async (req, res) => {
       .limit(parseInt(limit));
 
     const formattedOrders = orders.map((order) => {
-
       let formattedAddress = 'N/A';
       if (
         order.address &&
@@ -86,7 +84,7 @@ const orderInfo = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in orderInfo:', error);
-    res.redirect('/admin/pageerror');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/admin/pageerror');
   }
 };
 
@@ -94,22 +92,22 @@ const updateStatus = async (req, res) => {
   const { orderId, productId, size, status } = req.body;
 
   try {
-    // Find the order by its _id
     const order = await Order.findById(orderId)
       .populate('orderedItems.product')
       .populate('user');
 
     if (!order) {
-      return res.status(404).render('error', { message: 'Order not found' });
+      return res.status(StatusCode.NOT_FOUND).render('error', {
+        message: 'Order not found',
+      });
     }
 
-    // Find the specific order item matching both product ID and size
     const orderedItem = order.orderedItems.find(
       (item) => item.product._id.toString() === productId && item.size === size
     );
 
     if (!orderedItem) {
-      return res.status(404).render('error', {
+      return res.status(StatusCode.NOT_FOUND).render('error', {
         message: 'Specific product variant not found in this order',
       });
     }
@@ -124,23 +122,19 @@ const updateStatus = async (req, res) => {
     ];
     const currentStatus = orderedItem.status;
 
-    // Prevent backward transitions
     if (validStatuses.indexOf(status) < validStatuses.indexOf(currentStatus)) {
-      return res
-        .status(400)
-        .render('error', { message: 'Backward transitions are not allowed' });
+      return res.status(StatusCode.BAD_REQUEST).render('error', {
+        message: 'Backward transitions are not allowed',
+      });
     }
 
-    // Update status
     orderedItem.status = status;
-
     await order.save();
 
-    // Redirect to the admin orders page or use your existing route for rendering orders
     res.redirect('/admin/order');
   } catch (error) {
     console.error(error);
-    res.redirect('/admin/pageerror');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/admin/pageerror');
   }
 };
 

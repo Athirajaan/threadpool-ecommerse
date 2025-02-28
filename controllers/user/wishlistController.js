@@ -2,6 +2,7 @@ const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const Wishlist = require('../../models/wishlistSchema');
 const { calculatePrice } = require('../../utils/priceCalculator');
+const { StatusCode, Messages } = require('../../utils/statusCodes');
 
 // Load Wishlist Page with Pagination
 const loadWishlist = async (req, res) => {
@@ -9,9 +10,9 @@ const loadWishlist = async (req, res) => {
     const userId = req.session.user;
     const user = await User.findById(userId);
     const page = parseInt(req.query.page) || 1;
-    const limit = 8; // Items per page
+    const limit = 8; 
 
-    // Fetch total count of wishlist items
+  
     const wishlist = await Wishlist.findOne({ userId });
     const totalItems = wishlist ? wishlist.products.length : 0;
     const totalPages = Math.ceil(totalItems / limit);
@@ -63,7 +64,7 @@ const loadWishlist = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in loadWishlist:', error);
-    res.status(500).redirect('/pageNotFound');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/pageNotFound');
   }
 };
 
@@ -74,47 +75,43 @@ const toggleWishlist = async (req, res) => {
     const userId = req.session.user;
 
     if (!userId) {
-      return res.status(401).json({
+      return res.status(StatusCode.UNAUTHORIZED).json({
         success: false,
-        message: 'Please login first',
+        message: Messages.UNAUTHORIZED,
       });
     }
 
-    // Find user's wishlist
+
     let wishlist = await Wishlist.findOne({ userId });
 
-    // If no wishlist exists, create one
     if (!wishlist) {
       wishlist = new Wishlist({ userId, products: [] });
     }
 
-    // Check if product is already in wishlist
     const existingProduct = wishlist.products.find(
       (item) => item.productId.toString() === productId
     );
 
     if (existingProduct) {
-      // Remove product if it exists
       wishlist.products = wishlist.products.filter(
         (item) => item.productId.toString() !== productId
       );
     } else {
-      // Add product if it doesn't exist
       wishlist.products.push({ productId });
     }
 
     await wishlist.save();
 
-    res.json({
+    res.status(StatusCode.OK).json({
       success: true,
       action: existingProduct ? 'removed' : 'added',
       message: `Product ${existingProduct ? 'removed from' : 'added to'} wishlist`,
     });
   } catch (error) {
     console.error('Wishlist toggle error:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Error updating wishlist',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -130,22 +127,21 @@ const checkWishlistStatus = async (req, res) => {
       'products.productId': productId,
     });
 
-    res.json({
+    res.status(StatusCode.OK).json({
       success: true,
       inWishlist: !!wishlist,
     });
   } catch (error) {
     console.error('Error checking wishlist status:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Failed to check wishlist status',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
 
 module.exports = {
   loadWishlist,
-
   toggleWishlist,
   checkWishlistStatus,
 };

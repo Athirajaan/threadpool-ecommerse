@@ -10,6 +10,7 @@ const crypto = require('crypto');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
+const { StatusCode, Messages } = require('../../utils/statusCodes');
 
 const getOrder = async (req, res) => {
   try {
@@ -22,18 +23,16 @@ const getOrder = async (req, res) => {
     const totalOrders = await Order.countDocuments({ user: user._id });
     const totalPages = Math.ceil(totalOrders / limit);
 
-    // Fetch orders with pagination
     const orders = await Order.find({ user: user._id })
       .populate('orderedItems.product')
       .sort({ createdOn: -1 })
       .skip(skip)
       .limit(limit);
 
-    // Fetch the user's address document
     const userAddresses = await Address.findOne({ UserId: user._id });
 
     const orderDetails = orders.map((order) => {
-      // Find the specific address in the user's address array using the address ID from the order
+      
       const address = userAddresses?.address.find(
         (addr) => addr._id.toString() === order.address.toString()
       );
@@ -80,10 +79,10 @@ const getOrder = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching order details:', error);
-    res.render('orderList', {
+    res.status(StatusCode.INTERNAL_SERVER).render('orderList', {
       orders: [],
       user: req.session.user,
-      error: 'Failed to fetch order details',
+      error: Messages.INTERNAL_ERROR,
       currentPage: 1,
       totalPages: 0,
       hasNextPage: false,
@@ -101,19 +100,21 @@ const CancelOrder = async (req, res) => {
     const order = await Order.findOne({ orderId: orderId }).populate(
       'orderedItems.product'
     );
+
     if (!order) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Order not found',
       });
     }
 
-    // Find the item in the order to cancel
+    
     const item = order.orderedItems.find(
       (item) => item.product._id.toString() === productId && item.size === size
     );
+
     if (!item) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Item not found in the order',
       });
@@ -122,22 +123,23 @@ const CancelOrder = async (req, res) => {
     // Update product stock
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Product not found',
       });
     }
 
-    // Convert both values to numbers before addition
+    
     product.stock[size] = Number(product.stock[size]) + Number(quantity);
     product.totalQuantity = Number(product.totalQuantity) + Number(quantity);
 
-    // If order was paid, process refund to wallet
+  
     if (order.paymentStatus === 'Completed') {
-      // Calculate refund amount
+     
+
       let refundAmount = Math.floor(item.price * quantity);
 
-      // If coupon was applied, adjust refund amount
+  
       if (order.couponDiscount > 0) {
         const totalItems = order.orderedItems.reduce(
           (sum, item) => sum + item.quantity,
@@ -169,14 +171,12 @@ const CancelOrder = async (req, res) => {
       await wallet.save();
     }
 
-    // Update the order item status to 'Cancelled'
     item.status = 'Cancelled';
 
-    // Save the changes
+ 
     await Promise.all([order.save(), product.save()]);
 
-    // Send response
-    res.json({
+    res.status(StatusCode.OK).json({
       success: true,
       message:
         order.paymentStatus === 'Paid'
@@ -187,9 +187,9 @@ const CancelOrder = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'An error occurred while cancelling the order',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -204,7 +204,7 @@ const trackOrder = async (req, res) => {
     );
 
     if (!order) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Order not found',
       });
@@ -215,7 +215,7 @@ const trackOrder = async (req, res) => {
     );
 
     if (!orderedItem) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Product not found in order',
       });
@@ -231,9 +231,9 @@ const trackOrder = async (req, res) => {
     return res.json(response);
   } catch (error) {
     console.error('Error tracking order:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Error tracking order',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -246,13 +246,13 @@ const getOrderDetails = async (req, res) => {
     const order = await Order.findOne({ orderId })
       .populate({
         path: 'orderedItems.product',
-        select: 'productName productImage', // Only select needed fields
+        select: 'productName productImage', 
       })
       .populate('address')
-      .lean(); // Convert to plain JavaScript object
+      .lean(); 
 
     if (!order) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Order not found',
       });
@@ -285,9 +285,9 @@ const getOrderDetails = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in getOrderDetails:', error);
-    return res.status(500).json({
+    return res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Internal server error',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -297,25 +297,24 @@ const returnOrder = async (req, res) => {
     const { orderId, productId, quantity, size, returnReason } = req.body;
     const userId = req.session.user._id;
 
-    // Find the order
     const order = await Order.findOne({ orderId: orderId }).populate(
       'orderedItems.product'
     );
 
     if (!order) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Order not found',
       });
     }
 
-    // Find the specific item in the order
+  
     const item = order.orderedItems.find(
       (item) => item.product._id.toString() === productId && item.size === size
     );
 
     if (!item) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Product not found in the order',
       });
@@ -326,23 +325,19 @@ const returnOrder = async (req, res) => {
 
     // If coupon was applied to the order, adjust refund amount
     if (order.couponDiscount > 0) {
-      // Calculate total number of items in order
       const totalItems = order.orderedItems.reduce(
         (sum, item) => sum + item.quantity,
         0
       );
 
-      // Calculate per-item coupon discount (rounded down to ensure whole number)
+    
       const perItemDiscount = Math.floor(order.couponDiscount / totalItems);
 
-      // Subtract coupon discount from refund amount
       refundAmount = Math.floor(refundAmount - perItemDiscount * quantity);
     }
 
-    // Ensure final amount is a whole number
     refundAmount = Math.floor(refundAmount);
 
-    // Find or create user's wallet
     let wallet = await Wallet.findOne({ userId: userId });
     if (!wallet) {
       wallet = new Wallet({
@@ -360,28 +355,23 @@ const returnOrder = async (req, res) => {
       description: 'order_returned',
       date: new Date(),
     });
-
-    // Update the item status to 'Returned'
     item.status = 'Returned';
 
-    // Update product stock
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Product not found',
       });
     }
 
-    // Increase product stock
     product.stock[size] = Number(product.stock[size]) + Number(quantity);
     product.totalQuantity = Number(product.totalQuantity) + Number(quantity);
 
-    // Save all changes
     await Promise.all([order.save(), product.save(), wallet.save()]);
 
-    // Send success response
-    res.json({
+
+    res.status(StatusCode.OK).json({
       success: true,
       message: 'Return processed and refund added to wallet',
       updatedItem: item,
@@ -390,9 +380,9 @@ const returnOrder = async (req, res) => {
     });
   } catch (error) {
     console.error('Error processing return request:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'An error occurred while processing the return request',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -421,9 +411,9 @@ const createRazorpayOrder = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating Razorpay order:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Failed to create payment order',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -439,26 +429,24 @@ const updatePaymentStatus = async (req, res) => {
 
     // Only proceed if we have all required fields for verification
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'Missing payment verification details',
       });
     }
 
-    // Create the verification data string
+
     const body = razorpay_order_id + '|' + razorpay_payment_id;
 
-    // Create the signature verification using crypto
     const expectedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(body.toString())
       .digest('hex');
 
-    // Compare the signatures
     const isAuthentic = expectedSignature === razorpay_signature;
 
     if (isAuthentic) {
-      // Payment is verified, update order status
+  
       const order = await Order.findOne({ orderId: orderId });
       if (order) {
         order.paymentStatus = 'Completed';
@@ -469,22 +457,22 @@ const updatePaymentStatus = async (req, res) => {
           message: 'Payment verified and status updated successfully',
         });
       } else {
-        res.status(404).json({
+        res.status(StatusCode.NOT_FOUND).json({
           success: false,
           message: 'Order not found',
         });
       }
     } else {
-      res.status(400).json({
+      res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'Payment verification failed',
       });
     }
   } catch (error) {
     console.error('Error in payment verification:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Internal server error',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -499,16 +487,15 @@ const downloadInvoice = async (req, res) => {
       .populate('user');
 
     if (!order) {
-      return res.status(404).send('Order not found');
+      return res.status(StatusCode.NOT_FOUND).send('Order not found');
     }
 
-    // Create PDF
+
     const doc = new PDFDocument({
       size: 'A4',
       margin: 40,
     });
 
-    // Set response headers
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
@@ -517,9 +504,9 @@ const downloadInvoice = async (req, res) => {
     doc.pipe(res);
 
     // Colors
-    const primaryColor = '#2563eb'; // Blue
-    const secondaryColor = '#1e293b'; // Slate
-    const borderColor = '#e2e8f0'; // Light gray
+    const primaryColor = '#2563eb'; 
+    const secondaryColor = '#1e293b';
+    const borderColor = '#e2e8f0';
 
     // Header
     doc
@@ -545,10 +532,9 @@ const downloadInvoice = async (req, res) => {
       .text(`Invoice No: #${order.orderId}`, { align: 'right' })
       .moveDown(1);
 
-    // Customer Details Section
+
     const startY = doc.y;
 
-    // Billing Info (Left Side)
     doc
       .font('Helvetica-Bold')
       .fontSize(12)
@@ -579,20 +565,20 @@ const downloadInvoice = async (req, res) => {
         );
     }
 
-    doc.moveDown(3); // Increased spacing
+    doc.moveDown(3); 
 
     // Order Items Table
     const tableTop = doc.y;
     const tableHeaders = ['Product', 'Size', 'Qty', 'Price', 'Total'];
     const colWidths = [250, 60, 60, 80, 80];
 
-    // Table Header Background
+  
     doc
       .fillColor(primaryColor)
       .rect(40, tableTop - 5, 515, 25)
       .fill();
 
-    // Table Headers
+  
     doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(10);
 
     let xPos = 50;
@@ -604,12 +590,12 @@ const downloadInvoice = async (req, res) => {
       xPos += colWidths[i];
     });
 
-    // Table Rows
+
     let yPos = tableTop + 30;
     doc.fillColor(secondaryColor).font('Helvetica').fontSize(10);
 
     order.orderedItems.forEach((item, i) => {
-      // Zebra striping
+    
       if (i % 2 === 0) {
         doc
           .fillColor('#f8fafc')
@@ -652,10 +638,10 @@ const downloadInvoice = async (req, res) => {
       yPos += 25;
     });
 
-    // Store the final y position of the table
-    const tableEndY = yPos + 20; // Add some padding
+  
+    const tableEndY = yPos + 20; 
 
-    // Summary Section - Start from table end position
+
     const summaryX = 355;
     const summaryWidth = 200;
 
@@ -665,14 +651,13 @@ const downloadInvoice = async (req, res) => {
     const discount = Number(order.couponDiscount || 0);
     const total = Number(order.finalAmount);
 
-    // Position summary box below the table
+    
     doc
       .rect(summaryX - 10, tableEndY, summaryWidth + 20, 120)
       .fillColor('#f8fafc')
       .fill()
       .fillColor(secondaryColor);
 
-    // Summary Content - Position relative to the box
     doc
       .font('Helvetica-Bold')
       .fontSize(12)
@@ -698,8 +683,7 @@ const downloadInvoice = async (req, res) => {
         .moveDown(0.5);
     });
 
-    // Footer - Position relative to the summary end
-    const footerY = tableEndY + 160; // Adjust based on summary height
+    const footerY = tableEndY + 160; 
     doc
       .fontSize(10)
       .fillColor(primaryColor)
@@ -712,11 +696,10 @@ const downloadInvoice = async (req, res) => {
         { align: 'center' }
       );
 
-    // Finalize PDF
     doc.end();
   } catch (error) {
     console.error('Error generating invoice:', error);
-    res.status(500).send('Error generating invoice');
+    res.status(StatusCode.INTERNAL_SERVER).send(Messages.INTERNAL_ERROR);
   }
 };
 

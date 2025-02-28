@@ -1,16 +1,15 @@
 const Coupon = require('../../models/couponSchema');
+const { StatusCode, Messages } = require('../../utils/statusCodes');
 
 const loadCoupons = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 5; // Items per page
+    const limit = 5; 
     const skip = (page - 1) * limit;
 
-    // Get total count for pagination
     const totalCoupons = await Coupon.countDocuments();
     const totalPages = Math.ceil(totalCoupons / limit);
 
-    // Fetch coupons with pagination
     const coupons = await Coupon.find()
       .sort({ createdOn: -1 })
       .select({
@@ -41,7 +40,7 @@ const loadCoupons = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in loadCoupons:', error);
-    res.status(500).send('Internal Server Error');
+    res.status(StatusCode.INTERNAL_SERVER).send(Messages.INTERNAL_ERROR);
   }
 };
 
@@ -57,7 +56,6 @@ const addCoupon = async (req, res) => {
       usagePerUser,
     } = req.body;
 
-    // Validate the request body
     if (
       !name ||
       !minPurchase ||
@@ -67,7 +65,7 @@ const addCoupon = async (req, res) => {
       !expireOn ||
       !usagePerUser
     ) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'All fields are required',
       });
@@ -76,13 +74,12 @@ const addCoupon = async (req, res) => {
     // Check if coupon with same name exists
     const existingCoupon = await Coupon.findOne({ name });
     if (existingCoupon) {
-      return res.status(400).json({
+      return res.status(StatusCode.CONFLICT).json({
         success: false,
         message: 'Coupon with this name already exists',
       });
     }
 
-    // Create new coupon
     const newCoupon = new Coupon({
       name,
       minPurchase,
@@ -96,15 +93,15 @@ const addCoupon = async (req, res) => {
 
     await newCoupon.save();
 
-    res.status(200).json({
+    res.status(StatusCode.CREATED).json({
       success: true,
-      message: 'Coupon added successfully',
+      message: Messages.CREATED,
     });
   } catch (error) {
     console.error('Error in addCoupon:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: error.message || 'Internal server error',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -115,21 +112,21 @@ const getCouponById = async (req, res) => {
     const coupon = await Coupon.findById(couponId);
 
     if (!coupon) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Coupon not found',
       });
     }
 
-    res.status(200).json({
+    res.status(StatusCode.OK).json({
       success: true,
       coupon,
     });
   } catch (error) {
     console.error('Error in getCouponById:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Internal server error',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -147,7 +144,7 @@ const updateCoupon = async (req, res) => {
       usagePerUser,
     } = req.body;
 
-    // Validate required fields
+    
     if (
       !name ||
       !minPurchase ||
@@ -157,20 +154,20 @@ const updateCoupon = async (req, res) => {
       !expireOn ||
       !usagePerUser
     ) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'All fields are required',
       });
     }
 
-    // Check if another coupon exists with the same name (excluding current coupon)
+    // Check if another coupon exists with the same name 
     const existingCoupon = await Coupon.findOne({
       name: name,
       _id: { $ne: couponId },
     });
 
     if (existingCoupon) {
-      return res.status(400).json({
+      return res.status(StatusCode.CONFLICT).json({
         success: false,
         message: 'Coupon with this name already exists',
       });
@@ -191,22 +188,22 @@ const updateCoupon = async (req, res) => {
     );
 
     if (!updatedCoupon) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Coupon not found',
       });
     }
 
-    res.status(200).json({
+    res.status(StatusCode.OK).json({
       success: true,
-      message: 'Coupon updated successfully',
+      message: Messages.UPDATED,
       coupon: updatedCoupon,
     });
   } catch (error) {
     console.error('Error in updateCoupon:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: error.message || 'Internal server error',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -222,22 +219,22 @@ const toggleCouponStatus = async (req, res) => {
     );
 
     if (!coupon) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Coupon not found',
       });
     }
 
-    res.status(200).json({
+    res.status(StatusCode.OK).json({
       success: true,
       message: `Coupon ${coupon.isActive ? 'activated' : 'deactivated'} successfully`,
       isActive: coupon.isActive,
     });
   } catch (error) {
     console.error('Error in toggleCouponStatus:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: error.message || 'Internal server error',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };

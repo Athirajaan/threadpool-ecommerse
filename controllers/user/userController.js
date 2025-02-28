@@ -7,13 +7,14 @@ const env = require('dotenv').config();
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const Wishlist = require('../../models/wishlistSchema');
+const { StatusCode, Messages } = require('../../utils/statusCodes');
 
 //pageNotFound
 const pageNotFound = async (req, res) => {
   try {
-    res.render('pageNotFound');
+    res.status(StatusCode.NOT_FOUND).render('pageNotFound');
   } catch (error) {
-    res.status(500).send('server error');
+    res.status(StatusCode.INTERNAL_SERVER).send(Messages.INTERNAL_ERROR);
   }
 };
 
@@ -23,7 +24,7 @@ const loadSignup = async (req, res) => {
     return res.render('signup');
   } catch (error) {
     console.log('homepage not found');
-    res.status(500).send('server error');
+    res.status(StatusCode.INTERNAL_SERVER).send(Messages.INTERNAL_ERROR);
   }
 };
 
@@ -33,7 +34,7 @@ const loadVerifyOtpPage = async (req, res) => {
     return res.render('verify-otp');
   } catch (error) {
     console.log('homepage not found');
-    res.status(500).send('server error');
+    res.status(StatusCode.INTERNAL_SERVER).send(Messages.INTERNAL_ERROR);
   }
 };
 
@@ -43,7 +44,7 @@ const loadForgotPassword = async (req, res) => {
     res.render('enterEmail');
   } catch (error) {
     console.error('Error loading forgot password page:', error);
-    res.redirect('/pageNotFound');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/pageNotFound');
   }
 };
 
@@ -53,7 +54,6 @@ const loadHomepage = async (req, res) => {
     const user = req.session.user;
     const categories = await Category.find({ isListed: true });
 
-    // Get new arrivals (latest 4 products)
     let newArrivals = await Product.find({
       isBlocked: false,
       category: { $in: categories.map((category) => category._id) },
@@ -62,16 +62,14 @@ const loadHomepage = async (req, res) => {
       .sort({ createdOn: -1 })
       .limit(4);
 
-    // Get best sellers (4 products with highest salesCount)
     let featuredProducts = await Product.find({
       isBlocked: false,
       category: { $in: categories.map((category) => category._id) },
       totalQuantity: { $gt: 0 },
     })
-      .sort({ salesCount: -1 }) // Sort by salesCount in descending order
+      .sort({ salesCount: -1 })
       .limit(15);
 
-    // Process products for display
     if (user) {
       const userData = await User.findOne({ _id: user._id });
       const wishlist = await Wishlist.findOne({ userId: user._id });
@@ -79,13 +77,13 @@ const loadHomepage = async (req, res) => {
         ? wishlist.products.map((item) => item.productId.toString())
         : [];
 
-      // Process new arrivals
+  
       newArrivals = newArrivals.map((product) => ({
         ...product.toObject(),
         inWishlist: wishlistProducts.includes(product._id.toString()),
       }));
 
-      // Process best sellers
+      
       featuredProducts = featuredProducts.map((product) => ({
         ...product.toObject(),
         inWishlist: wishlistProducts.includes(product._id.toString()),
@@ -94,46 +92,44 @@ const loadHomepage = async (req, res) => {
       return res.render('homepage', {
         user: userData,
         newArrivals,
-        featuredProducts, // Keep the same variable name in template
+        featuredProducts,
         isLoggedIn: true,
       });
     } else {
-      // Convert products to plain objects without wishlist info
       newArrivals = newArrivals.map((product) => product.toObject());
       featuredProducts = featuredProducts.map((product) => product.toObject());
 
       return res.render('homepage', {
         newArrivals,
-        featuredProducts, // Keep the same variable name in template
+        featuredProducts,
         isLoggedIn: false,
       });
     }
   } catch (error) {
     console.error('Error loading homepage:', error);
-    res.status(500).send('Server error');
+    res.status(StatusCode.INTERNAL_SERVER).send(Messages.INTERNAL_ERROR);
   }
 };
 
 //load login page
 const loadLoginPage = async (req, res) => {
   try {
-    // Get error message from either query params or flash
     const error = req.query.error || '';
     const blocked = req.query.blocked || false;
 
     res.render('login', {
       title: 'Login',
-      message: error, // Pass the error message as 'message' for the view
-      error: error, // Keep error for backward compatibility
+      message: error,
+      error: error,
       blocked: blocked,
       user: null,
     });
   } catch (error) {
     console.error('Error loading login page:', error);
-    res.status(500).render('login', {
+    res.status(StatusCode.INTERNAL_SERVER).render('login', {
       title: 'Login',
-      message: 'Internal server error occurred',
-      error: 'Internal server error occurred',
+      message: Messages.INTERNAL_ERROR,
+      error: Messages.INTERNAL_ERROR,
       blocked: false,
       user: null,
     });
@@ -180,12 +176,14 @@ const signup = async (req, res) => {
   try {
     const { name, phone, email, password, cpassword } = req.body;
     if (password !== cpassword) {
-      return res.render('signup', { message: 'passwords donot match' });
+      return res.status(StatusCode.BAD_REQUEST).render('signup', {
+        message: 'passwords do not match',
+      });
     }
     const findUser = await User.findOne({ email });
     if (findUser) {
-      return res.render('signup', {
-        message: 'User with this email already exists',
+      return res.status(StatusCode.CONFLICT).render('signup', {
+        message: Messages.DUPLICATE_ENTRY,
       });
     }
 
@@ -196,23 +194,25 @@ const signup = async (req, res) => {
       return res.json('Email-error');
     }
 
-    // Store data in session
+    
     req.session.userOtp = otp;
     req.session.otpTimestamp = Date.now();
     req.session.userData = { name, phone, email, password };
 
-    // Save session explicitly
+
     req.session.save((err) => {
       if (err) {
         console.error('Session save error:', err);
-        return res.status(500).send('Error saving session');
+        return res
+          .status(StatusCode.INTERNAL_SERVER)
+          .send(Messages.INTERNAL_ERROR);
       }
       res.render('verify-otp', { message: '' });
       console.log('OTP sent', otp);
     });
   } catch (error) {
     console.error('signup error', error);
-    res.redirect('/pageNotFound');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/pageNotFound');
   }
 };
 
@@ -236,7 +236,7 @@ const verifyOtp = async (req, res) => {
 
     if (timeDifference > 60000) {
       // 60000 milliseconds = 60 seconds
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'OTP has expired. Please request a new one',
       });
@@ -255,16 +255,22 @@ const verifyOtp = async (req, res) => {
 
       await saveUserData.save();
       req.session.user = saveUserData._id;
-      res.json({ success: true, redirectUrl: '/login' });
+      res.status(StatusCode.OK).json({
+        success: true,
+        redirectUrl: '/login',
+      });
     } else {
-      res.status(400).json({
+      res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'Invalid OTP, Please try again',
       });
     }
   } catch (error) {
     console.error('Error verifying OTP', error);
-    res.status(500).json({ success: false, message: 'An error occurred' });
+    res.status(StatusCode.INTERNAL_SERVER).json({
+      success: false,
+      message: Messages.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -272,7 +278,7 @@ const resendOtp = async (req, res) => {
   try {
     // Check if user data exists in session
     if (!req.session.userData || !req.session.userData.email) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'Session expired. Please try signing up again.',
       });
@@ -292,19 +298,21 @@ const resendOtp = async (req, res) => {
       req.session.save((err) => {
         if (err) {
           console.error('Session save error:', err);
-          return res.status(500).json({
+          return res.status(StatusCode.INTERNAL_SERVER).json({
             success: false,
-            message: 'Error saving session',
+            message: Messages.INTERNAL_ERROR,
           });
         }
         res.json({ success: true, message: 'OTP resent successfully' });
       });
     } else {
-      res.status(500).json({ success: false, message: 'Failed to send OTP' });
+      res
+        .status(StatusCode.INTERNAL_SERVER)
+        .json({ success: false, message: 'Failed to send OTP' });
     }
   } catch (error) {
     console.error('Error resending OTP:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
       message: 'Error resending OTP. Please try again.',
     });
@@ -341,27 +349,25 @@ const login = async (req, res) => {
 const logOutUser = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      return res.status(500).send('Unable to log out');
+      return res.status(StatusCode.INTERNAL_SERVER).send('Unable to log out');
     }
-    res.redirect('/logIn'); // Redirect to home page after logging out
+    res.redirect('/logIn');
   });
 };
 
 const loadProfile = async (req, res) => {
   try {
-    const userId = req.session.userId; // Get user ID from the session
-    const user = await User.findById(userId); // Fetch user from the database
+    const userId = req.session.userId;
+    const user = await User.findById(userId);
     if (user) {
-      // Fetch addresses for the user
-      const addresses = await Address.find({ UserId: userId }); // Multiple addresses for the user
+      const addresses = await Address.find({ UserId: userId });
 
-      // Render the profile page and pass user details and address data
       res.render('userProfile', {
         user,
-        addresses: addresses.length > 0 ? addresses : [], // Pass addresses to the template
+        addresses: addresses.length > 0 ? addresses : [],
       });
     } else {
-      res.redirect('/login'); // Redirect if the user doesn't exist
+      res.redirect('/login');
     }
   } catch (error) {
     console.error('Error loading profile:', error);
@@ -402,7 +408,7 @@ const addAddress = async (req, res) => {
 
     if (!userId || !address) {
       return res
-        .status(400)
+        .status(StatusCode.BAD_REQUEST)
         .json({ message: 'User ID and address are required' });
     }
 
@@ -412,17 +418,17 @@ const addAddress = async (req, res) => {
     });
 
     await newAddress.save();
-    res.status(200).json({ message: 'Address added successfully' });
+    res.status(StatusCode.OK).json({ message: 'Address added successfully' });
   } catch (err) {
     res
-      .status(500)
+      .status(StatusCode.INTERNAL_SERVER)
       .json({ message: 'Something went wrong', error: err.message });
   }
 };
 
 const editAddress = async (req, res) => {
   try {
-    const userId = req.session.userId; // Changed from req.session.user._id
+    const userId = req.session.userId;
     const {
       addressId,
       addressType,
@@ -434,7 +440,6 @@ const editAddress = async (req, res) => {
       isDefault,
     } = req.body;
 
-    // If setting as default, unset any existing default
     if (isDefault) {
       await Address.updateMany(
         { UserId: userId, 'address.isDefault': true },
@@ -462,7 +467,7 @@ const editAddress = async (req, res) => {
     );
 
     if (result.modifiedCount === 0) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Address not found',
       });
@@ -474,7 +479,7 @@ const editAddress = async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating address:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
       message: 'Failed to update address',
     });
@@ -488,11 +493,15 @@ const updateProfile = async (req, res) => {
 
     // Validate input
     if (!name || name.length < 2) {
-      return res.status(400).json({ message: 'Invalid name' });
+      return res.status(StatusCode.BAD_REQUEST).json({
+        message: 'Invalid name',
+      });
     }
 
     if (!phone || !/^\d{10}$/.test(phone)) {
-      return res.status(400).json({ message: 'Invalid phone number' });
+      return res.status(StatusCode.BAD_REQUEST).json({
+        message: 'Invalid phone number',
+      });
     }
 
     // Update user profile
@@ -503,13 +512,19 @@ const updateProfile = async (req, res) => {
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(StatusCode.NOT_FOUND).json({
+        message: Messages.NOT_FOUND,
+      });
     }
 
-    res.json({ message: 'Profile updated successfully' });
+    res.status(StatusCode.OK).json({
+      message: Messages.UPDATED,
+    });
   } catch (error) {
     console.error('Error updating profile:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(StatusCode.INTERNAL_SERVER).json({
+      message: Messages.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -520,13 +535,15 @@ const changePassword = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res
+        .status(StatusCode.NOT_FOUND)
+        .json({ message: 'User not found' });
     }
-
-    // Verify current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Current password is incorrect' });
+      return res
+        .status(StatusCode.BAD_REQUEST)
+        .json({ message: 'Current password is incorrect' });
     }
 
     // Hash new password
@@ -539,11 +556,13 @@ const changePassword = async (req, res) => {
     res.json({ message: 'Password changed successfully' });
   } catch (error) {
     console.error('Error changing password:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res
+      .status(StatusCode.INTERNAL_SERVER)
+      .json({ message: 'Internal server error' });
   }
 };
 
-const handleGoogleLogin = async (req, res) => {
+const handleGoogleLogin = async (req, res, next) => {
   try {
     // The user data will be available in req.user after successful Google authentication
     const user = req.user;
@@ -570,21 +589,19 @@ const updatePhone = async (req, res) => {
     const { phoneNumber } = req.body;
     const userId = req.session.user;
 
-    // Validate phone number
     if (!/^\d{10}$/.test(phoneNumber)) {
       return res
-        .status(400)
+        .status(StatusCode.BAD_REQUEST)
         .json({ success: false, message: 'Invalid phone number' });
     }
 
-    // Update user's phone number
     await User.findByIdAndUpdate(userId, { phone: phoneNumber });
 
     res.json({ success: true, message: 'Phone number updated successfully' });
   } catch (error) {
     console.error('Error updating phone number:', error);
     res
-      .status(500)
+      .status(StatusCode.INTERNAL_SERVER)
       .json({ success: false, message: 'Failed to update phone number' });
   }
 };
@@ -602,7 +619,7 @@ const deleteAddress = async (req, res) => {
 
     if (!addressDoc) {
       return res
-        .status(404)
+        .status(StatusCode.NOT_FOUND)
         .json({ success: false, message: 'Address not found' });
     }
 
@@ -613,7 +630,7 @@ const deleteAddress = async (req, res) => {
 
     if (addressIndex === -1) {
       return res
-        .status(404)
+        .status(StatusCode.NOT_FOUND)
         .json({ success: false, message: 'Address not found' });
     }
 
@@ -624,7 +641,9 @@ const deleteAddress = async (req, res) => {
     res.json({ success: true, message: 'Address removed successfully' });
   } catch (error) {
     console.error('Error deleting address:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    res
+      .status(StatusCode.INTERNAL_SERVER)
+      .json({ success: false, message: 'Internal server error' });
   }
 };
 
@@ -634,17 +653,15 @@ const verifyOtpForgotPassword = async (req, res) => {
     console.log('Submitted OTP:', submittedOtp);
     console.log('Session OTP:', req.session.userOtp);
 
-    // Basic validation
     if (!submittedOtp) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'Please enter OTP',
       });
     }
 
-    // Check session
     if (!req.session.userOtp || !req.session.userEmail) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'Session expired. Please try again.',
       });
@@ -654,7 +671,7 @@ const verifyOtpForgotPassword = async (req, res) => {
     const currentTime = Date.now();
     const timeDifference = currentTime - req.session.otpTimestamp;
     if (timeDifference > 60000) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'OTP has expired. Please request a new one.',
       });
@@ -672,13 +689,13 @@ const verifyOtpForgotPassword = async (req, res) => {
       });
     }
 
-    return res.status(400).json({
+    return res.status(StatusCode.BAD_REQUEST).json({
       success: false,
       message: 'Invalid OTP. Please try again.',
     });
   } catch (error) {
     console.error('Error in verifyOtpForgotPassword:', error);
-    return res.status(500).json({
+    return res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
       message: 'Something went wrong. Please try again.',
     });
@@ -739,7 +756,7 @@ const resendOtpForgotPassword = async (req, res) => {
   try {
     // Check if email exists in session
     if (!req.session.userEmail) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'Session expired. Please restart the process.',
       });
@@ -752,22 +769,20 @@ const resendOtpForgotPassword = async (req, res) => {
     );
 
     if (!emailSent) {
-      return res.status(500).json({
+      return res.status(StatusCode.INTERNAL_SERVER).json({
         success: false,
         message: 'Failed to send OTP. Please try again.',
       });
     }
-
-    // Update session with new OTP
     req.session.userOtp = newOtp;
     req.session.otpTimestamp = Date.now();
 
     req.session.save((err) => {
       if (err) {
         console.error('Session save error:', err);
-        return res.status(500).json({
+        return res.status(StatusCode.INTERNAL_SERVER).json({
           success: false,
-          message: 'Error saving session',
+          message: Messages.INTERNAL_ERROR,
         });
       }
       console.log('Resent forgot password OTP:', newOtp);
@@ -778,7 +793,7 @@ const resendOtpForgotPassword = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in resendOtpForgotPassword:', error);
-    return res.status(500).json({
+    return res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
       message: 'Something went wrong. Please try again.',
     });
@@ -804,7 +819,7 @@ const resetPassword = async (req, res) => {
 
     // Check if user email exists in session
     if (!req.session.userEmail) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'Session expired. Please try again.',
       });
@@ -812,7 +827,7 @@ const resetPassword = async (req, res) => {
 
     // Validate passwords
     if (password !== confirmPassword) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: 'Passwords do not match',
       });
@@ -839,7 +854,7 @@ const resetPassword = async (req, res) => {
     });
   } catch (error) {
     console.error('Error resetting password:', error);
-    return res.status(500).json({
+    return res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
       message: 'Something went wrong. Please try again.',
     });

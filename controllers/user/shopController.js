@@ -3,6 +3,7 @@ const Category = require('../../models/categorySchema');
 const User = require('../../models/userSchema');
 const Wishlist = require('../../models/wishlistSchema');
 const { calculatePrice } = require('../../utils/priceCalculator');
+const { StatusCode, Messages } = require('../../utils/statusCodes');
 
 const loadWomenShopping = async (req, res) => {
   try {
@@ -10,7 +11,6 @@ const loadWomenShopping = async (req, res) => {
     const limit = 12;
     const skip = (page - 1) * limit;
 
-    // Get total count for pagination - updated to include category check
     const totalProducts = await Product.countDocuments({
       gender: 'Women',
       isBlocked: false,
@@ -18,8 +18,6 @@ const loadWomenShopping = async (req, res) => {
       path: 'category',
       match: { isListed: true },
     });
-
-    // Fetch products with category check
     const products = await Product.find({
       gender: 'Women',
       isBlocked: false,
@@ -30,16 +28,11 @@ const loadWomenShopping = async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    // Filter out products whose categories are not listed
     const filteredProducts = products.filter((product) => product.category);
 
-    // Apply pagination after filtering
     const paginatedProducts = filteredProducts.slice(skip, skip + limit);
-
-    // Recalculate total pages based on filtered products
     const totalPages = Math.ceil(filteredProducts.length / limit);
 
-    // Fetch categories for women
     const categories = await Category.find({
       gender: 'Women',
       isListed: true,
@@ -75,7 +68,7 @@ const loadWomenShopping = async (req, res) => {
     });
   } catch (error) {
     console.error('Error loading women shopping:', error);
-    res.status(500).redirect('/pageNotFound');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/pageNotFound');
   }
 };
 
@@ -105,22 +98,18 @@ const loadMenShopping = async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    // Filter out products whose categories are not listed
     const filteredProducts = products.filter((product) => product.category);
 
-    // Apply pagination after filtering
     const paginatedProducts = filteredProducts.slice(skip, skip + limit);
 
     // Recalculate total pages based on filtered products
     const totalPages = Math.ceil(filteredProducts.length / limit);
 
-    // Fetch categories for men
     const categories = await Category.find({
       gender: 'Men',
       isListed: true,
     });
 
-    // Get user's wishlist
     let wishlistProducts = [];
     if (req.session.user) {
       const wishlist = await Wishlist.findOne({ userId: req.session.user });
@@ -150,7 +139,7 @@ const loadMenShopping = async (req, res) => {
     });
   } catch (error) {
     console.error('Error loading men shopping:', error);
-    res.status(500).redirect('/pageNotFound');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/pageNotFound');
   }
 };
 
@@ -158,7 +147,7 @@ const searchProducts = async (req, res) => {
   try {
     const user = req.session.user;
     if (!user) {
-      return res.redirect('/login');
+      return res.status(StatusCode.UNAUTHORIZED).redirect('/login');
     }
 
     // Sanitize search query
@@ -167,7 +156,7 @@ const searchProducts = async (req, res) => {
     // Check for invalid or dangerous search patterns
     if (searchQuery.match(/^[*?+]$/) || searchQuery.length < 1) {
       if (req.xhr) {
-        return res.json({
+        return res.status(StatusCode.BAD_REQUEST).json({
           products: [],
           hasMore: false,
           message: 'Please enter a valid search term',
@@ -184,7 +173,6 @@ const searchProducts = async (req, res) => {
       });
     }
 
-    // Escape special regex characters
     searchQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
     const isAjax = req.xhr;
@@ -283,7 +271,6 @@ const searchProducts = async (req, res) => {
         : [];
     }
 
-    // Calculate prices with offers
     const productsWithOffers = await Promise.all(
       productsToSend.map(async (product) => {
         const priceDetails = await calculatePrice(product, product.category);
@@ -295,9 +282,9 @@ const searchProducts = async (req, res) => {
       })
     );
 
-    // If AJAX request, return JSON
+  
     if (isAjax) {
-      return res.json({
+      return res.status(StatusCode.OK).json({
         products: productsWithOffers,
         hasMore: hasMore,
       });
@@ -318,9 +305,11 @@ const searchProducts = async (req, res) => {
   } catch (error) {
     console.error('Search error:', error);
     if (req.xhr) {
-      return res.status(500).json({ error: 'Internal server error' });
+      return res.status(StatusCode.INTERNAL_SERVER).json({
+        error: Messages.INTERNAL_ERROR,
+      });
     }
-    res.redirect('/pageNotFound');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/pageNotFound');
   }
 };
 
@@ -335,10 +324,10 @@ const getFilteredProducts = async (req, res) => {
     const referer = req.headers.referer;
     const gender = referer.includes('women') ? 'Women' : 'Men';
 
-    // Base query with gender filter
+  
     let query = {
       isBlocked: false,
-      gender: gender, // Dynamically set based on the page
+      gender: gender, 
     };
 
     // Add category filter if selected
@@ -346,7 +335,7 @@ const getFilteredProducts = async (req, res) => {
       query.category = { $in: categories };
     }
 
-    // Add size filter if selected
+
     if (sizes && sizes.length > 0) {
       const sizeQueries = sizes.map((size) => ({
         [`stock.${size}`]: { $gt: 0 },
@@ -409,11 +398,10 @@ const getFilteredProducts = async (req, res) => {
       ? wishlist.products.map((item) => item.productId.toString())
       : [];
 
-    // Fetch filtered products
     const products = await Product.find(query).sort(sortCriteria);
 
-    // Send only the data, no HTML
-    res.json({
+    
+    res.status(StatusCode.OK).json({
       success: true,
       products: products.map((product) => ({
         _id: product._id,
@@ -422,14 +410,13 @@ const getFilteredProducts = async (req, res) => {
         regularPrice: product.regularPrice,
         salePrice: product.salePrice,
         offer: product.offer,
-        // Add any other necessary product data
       })),
     });
   } catch (error) {
     console.error('Filter error:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Error filtering products',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -439,7 +426,7 @@ const filterSearchResults = async (req, res) => {
     const { categories, sizes, priceRanges, sort, searchQuery } = req.body;
     const user = req.session.user;
 
-    // Base query with search
+    
     let query = {
       isBlocked: false,
       $or: [
@@ -448,12 +435,11 @@ const filterSearchResults = async (req, res) => {
       ],
     };
 
-    // Add category filter
     if (categories && categories.length > 0) {
       query.category = { $in: categories };
     }
 
-    // Add size filter
+  
     if (sizes && sizes.length > 0) {
       const sizeQueries = sizes.map((size) => ({
         [`stock.${size}`]: { $gt: 0 },
@@ -462,7 +448,6 @@ const filterSearchResults = async (req, res) => {
       query.$and.push({ $or: sizeQueries });
     }
 
-    // Add price range filter
     if (priceRanges && priceRanges.length > 0) {
       const priceQuery = priceRanges
         .map((range) => {
@@ -511,7 +496,6 @@ const filterSearchResults = async (req, res) => {
     // Fetch filtered products
     const products = await Product.find(query).sort(sortCriteria);
 
-    // Get wishlist
     let wishlistProducts = [];
     if (user) {
       const wishlist = await Wishlist.findOne({ userId: user });

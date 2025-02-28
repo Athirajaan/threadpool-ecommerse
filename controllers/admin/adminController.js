@@ -6,6 +6,7 @@ const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
+const { StatusCode, Messages } = require('../../utils/statusCodes');
 
 //load login
 const loadLogin = (req, res) => {
@@ -26,7 +27,7 @@ const login = async (req, res) => {
     }
 
     if (!admin.isAdmin) {
-      return res.render('admin-login', {
+      return res.status(StatusCode.FORBIDDEN).render('admin-login', {
         message: 'Access denied. Not an admin account',
       });
     }
@@ -34,15 +35,17 @@ const login = async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, admin.password);
 
     if (!passwordMatch) {
-      return res.render('admin-login', { message: 'Incorrect password' });
+      return res.status(StatusCode.UNAUTHORIZED).render('admin-login', {
+        message: 'Incorrect password',
+      });
     }
 
     req.session.admin = admin;
     return res.redirect('/admin');
   } catch (error) {
     console.log('Login error:', error);
-    return res.render('admin-login', {
-      message: 'An unexpected error occurred',
+    return res.status(StatusCode.INTERNAL_SERVER).render('admin-login', {
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -117,18 +120,17 @@ const loadDashboard = async (req, res) => {
         0
       );
 
-      // Calculate average order value
+           
       const averageOrderValue =
-        totalSales > 0 ? (totalAmount / totalSales).toFixed(2) : '0.00'; // Return '0.00' as string when there are no orders
+        totalSales > 0 ? (totalAmount / totalSales).toFixed(2) : '0.00';
 
-      // If no orders found, render with empty data
       if (totalOrders === 0) {
         return res.render('dashboard', {
           orders: [],
           totalSales: 0,
           totalAmount: 0,
           totalDiscount: 0,
-          averageOrderValue: '0.00', // Consistent string format
+          averageOrderValue: '0.00',
           currentPeriod: period || 'all',
           dateRange: {
             startDate: startDate || '',
@@ -147,7 +149,7 @@ const loadDashboard = async (req, res) => {
 
       const totalPages = Math.ceil(totalOrders / limit);
 
-      // Fetch filtered orders with pagination
+      
       const orders = await Order.find(dateFilter)
         .populate('orderedItems.product')
         .populate('user')
@@ -177,7 +179,7 @@ const loadDashboard = async (req, res) => {
       });
     } catch (error) {
       console.log('Dashboard error:', error);
-      res.redirect('/admin/pageerror');
+      res.status(StatusCode.INTERNAL_SERVER).redirect('/admin/pageerror');
     }
   }
 };
@@ -189,24 +191,24 @@ const logout = async (req, res) => {
     res.redirect('/admin/login');
   } catch (error) {
     console.log('unexpected error during logout', error);
-    res.redirect('/admin/pageerror');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/admin/pageerror');
   }
 };
 
 //pageerror
 const pageerror = async (req, res) => {
   try {
-    res.render('error', {
+    res.status(StatusCode.INTERNAL_SERVER).render('error', {
       title: 'Error Page',
-      message: 'An unexpected error occurred',
+      message: Messages.INTERNAL_ERROR,
       error: {
-        status: 500,
+        status: StatusCode.INTERNAL_SERVER,
         stack: process.env.NODE_ENV === 'development' ? err?.stack : '',
       },
     });
   } catch (error) {
     console.error('Error rendering error page:', error);
-    res.status(500).send('Internal Server Error');
+    res.status(StatusCode.INTERNAL_SERVER).send(Messages.INTERNAL_ERROR);
   }
 };
 
@@ -216,7 +218,7 @@ const exportToExcel = async (req, res) => {
     const { period, startDate, endDate } = req.query;
     let dateFilter = {};
 
-    // Handle date range filter
+    
     if (startDate && endDate) {
       dateFilter = {
         createdOn: {
@@ -225,7 +227,7 @@ const exportToExcel = async (req, res) => {
         },
       };
     }
-    // Handle period filter
+    
     else if (period) {
       const now = new Date();
       switch (period) {
@@ -303,7 +305,6 @@ const exportToExcel = async (req, res) => {
       fgColor: { argb: 'FFE0E0E0' },
     };
 
-    // Set response headers
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'

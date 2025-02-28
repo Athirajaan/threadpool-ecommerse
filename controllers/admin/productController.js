@@ -5,6 +5,7 @@ const cloudinary = require('cloudinary').v2;
 const upload = require('../../config/cloudinary');
 const multer = require('multer');
 const { deleteModel } = require('mongoose');
+const { StatusCode, Messages } = require('../../utils/statusCodes');
 
 // product listing
 
@@ -70,7 +71,6 @@ const getVarients = async (req, res) => {
           variantPrice = product.salePrice + product.regularPrice * 0.1;
         }
 
-        // Create the variant object
         const variant = {
           size,
           quantity: stock[size],
@@ -105,7 +105,7 @@ const getProductAddPage = async (req, res) => {
 
 const addProducts = async (req, res) => {
   try {
-    // First validate if files exist
+  
     if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
       return res.status(400).json({
         success: false,
@@ -126,7 +126,6 @@ const addProducts = async (req, res) => {
       sizeXLQty,
     } = req.body;
 
-    // Input validation
     const validationErrors = [];
     const MAX_PRICE = 100000;
     const regularPriceNum = parseFloat(regularPrice);
@@ -149,7 +148,7 @@ const addProducts = async (req, res) => {
       validationErrors.push('Regular price must be greater than sale price');
     }
 
-    // Stock validation
+    
     const stock = {
       S: parseInt(sizeSQty, 10) || 0,
       M: parseInt(sizeMQty, 10) || 0,
@@ -161,13 +160,11 @@ const addProducts = async (req, res) => {
       validationErrors.push('At least one size must have a quantity');
     }
 
-    // Category validation
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
       validationErrors.push('Invalid category ID');
     }
 
-    // Check if product already exists
     const productExists = await Product.findOne({
       productName: { $regex: new RegExp(`^${productName}$`, 'i') },
     });
@@ -187,7 +184,6 @@ const addProducts = async (req, res) => {
       });
     }
 
-    // Return if there are validation errors
     if (validationErrors.length > 0) {
       return res.status(400).json({
         success: false,
@@ -195,7 +191,7 @@ const addProducts = async (req, res) => {
       });
     }
 
-    // Image upload section
+
     const images = [];
     try {
       for (const file of req.files) {
@@ -231,7 +227,7 @@ const addProducts = async (req, res) => {
       });
     }
 
-    // Calculate total quantity
+    
     const totalQuantity = Object.values(stock).reduce((a, b) => a + b, 0);
 
     // Create new product
@@ -270,17 +266,15 @@ const getProductForEdit = async (req, res) => {
   try {
     const productId = req.params.id;
 
-    // Find the product by ID and populate its category
+  
     const product = await Product.findById(productId).populate('category');
 
-    // Check if the product exists
     if (!product) {
       return res.status(404).render('error', {
         message: 'Product not found',
       });
     }
 
-    // Render the edit page and pass the product details
     const categories = await Category.find();
     res.render('edit-product', {
       title: 'Edit Product',
@@ -296,7 +290,7 @@ const getProductForEdit = async (req, res) => {
 
 const blockProduct = async (req, res) => {
   try {
-    const { productId } = req.body; // Retrieve productId from request body
+    const { productId } = req.body; 
     await Product.updateOne({ _id: productId }, { $set: { isBlocked: true } });
     res.status(200).send({ message: 'Product blocked successfully' });
   } catch (error) {
@@ -306,7 +300,7 @@ const blockProduct = async (req, res) => {
 
 const unblockProduct = async (req, res) => {
   try {
-    const { productId } = req.body; // Retrieve productId from request body
+    const { productId } = req.body; 
     await Product.updateOne({ _id: productId }, { $set: { isBlocked: false } });
     res.status(200).send({ message: 'Product unblocked successfully' });
   } catch (error) {
@@ -331,7 +325,7 @@ const editProduct = async (req, res) => {
       deletedImages,
     } = req.body;
 
-    // Find existing product
+    
     const existingProduct = await Product.findById(productId);
     if (!existingProduct) {
       return res.status(404).json({
@@ -376,7 +370,7 @@ const editProduct = async (req, res) => {
     }
 
     // Handle image updates
-    let productImages = [...existingProduct.productImage]; // Start with existing images
+    let productImages = [...existingProduct.productImage]; 
 
     // Parse deletedImages if it's a string
     let deletedImagesList = [];
@@ -388,7 +382,7 @@ const editProduct = async (req, res) => {
       }
     }
 
-    // Remove deleted images from Cloudinary and the array
+    
     if (deletedImagesList.length > 0) {
       for (const imageUrl of deletedImagesList) {
         try {
@@ -400,7 +394,7 @@ const editProduct = async (req, res) => {
           // Delete from Cloudinary
           await cloudinary.uploader.destroy(publicId);
 
-          // Remove from productImages array
+          
           productImages = productImages.filter((img) => img !== imageUrl);
         } catch (error) {
           console.error('Error deleting image from Cloudinary:', error);
@@ -408,7 +402,7 @@ const editProduct = async (req, res) => {
       }
     }
 
-    // Upload new images
+    
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         try {

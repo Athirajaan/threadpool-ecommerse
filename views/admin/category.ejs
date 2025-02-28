@@ -75,8 +75,8 @@
           </tr>
         </thead>
         <tbody id="categoryTable">
-          <% if (cat.length > 0) { %>
-            <% cat.forEach((category, index) => { %>
+          <% if ( categoryData.length > 0) { %>
+            <%  categoryData.forEach((category, index) => { %>
               <tr class="border-b hover:bg-yellow-50">
                 <td class="p-4"><%= (currentPage - 1) * 5 + index + 1 %></td>
                 <td class="p-4"><%= category.name %></td>

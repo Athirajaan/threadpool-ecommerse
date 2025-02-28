@@ -1,18 +1,17 @@
 const Offer = require('../../models/offerSchema');
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
+const { StatusCode, Messages } = require('../../utils/statusCodes');
 
 const getOffers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 5; // Items per page
+    const limit = 5;
     const skip = (page - 1) * limit;
 
-    // Get total count for pagination
     const totalOffers = await Offer.countDocuments();
     const totalPages = Math.ceil(totalOffers / limit);
 
-    // Fetch offers with pagination
     const offers = await Offer.find()
       .populate({
         path: 'applicableFor',
@@ -22,7 +21,6 @@ const getOffers = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    // Fetch products and categories for the modal dropdowns
     const products = await Product.find({ isBlocked: false }).select(
       'productName _id gender'
     );
@@ -43,7 +41,7 @@ const getOffers = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching offers:', error);
-    res.status(500).send('Server Error');
+    res.status(StatusCode.INTERNAL_SERVER).send(Messages.INTERNAL_ERROR);
   }
 };
 
@@ -55,7 +53,7 @@ const createOffer = async (req, res) => {
     // Check if offer name already exists
     const existingOffer = await Offer.findOne({ name: name });
     if (existingOffer) {
-      return res.status(400).json({
+      return res.status(StatusCode.CONFLICT).json({
         success: false,
         message: 'An offer with this name already exists',
       });
@@ -73,15 +71,15 @@ const createOffer = async (req, res) => {
 
     await newOffer.save();
 
-    res.status(201).json({
+    res.status(StatusCode.CREATED).json({
       success: true,
-      message: 'Offer created successfully',
+      message: Messages.CREATED,
     });
   } catch (error) {
     console.error('Error creating offer:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: error.message || 'Error creating offer',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -92,26 +90,26 @@ const toggleOfferStatus = async (req, res) => {
 
     const offer = await Offer.findById(offerId);
     if (!offer) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Offer not found',
       });
     }
 
-    // Toggle the status
+  
     offer.isActive = !offer.isActive;
     await offer.save();
 
-    res.status(200).json({
+    res.status(StatusCode.OK).json({
       success: true,
       message: `Offer ${offer.isActive ? 'activated' : 'deactivated'} successfully`,
       isActive: offer.isActive,
     });
   } catch (error) {
     console.error('Error toggling offer status:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Error updating offer status',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -125,21 +123,21 @@ const getOfferById = async (req, res) => {
     );
 
     if (!offer) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Offer not found',
       });
     }
 
-    res.status(200).json({
+    res.status(StatusCode.OK).json({
       success: true,
       offer,
     });
   } catch (error) {
     console.error('Error fetching offer:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Error fetching offer details',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
@@ -157,7 +155,7 @@ const updateOffer = async (req, res) => {
     });
 
     if (existingOffer) {
-      return res.status(400).json({
+      return res.status(StatusCode.CONFLICT).json({
         success: false,
         message: 'An offer with this name already exists',
       });
@@ -177,21 +175,21 @@ const updateOffer = async (req, res) => {
     );
 
     if (!updatedOffer) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
         message: 'Offer not found',
       });
     }
 
-    res.status(200).json({
+    res.status(StatusCode.OK).json({
       success: true,
-      message: 'Offer updated successfully',
+      message: Messages.UPDATED,
     });
   } catch (error) {
     console.error('Error updating offer:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: error.message || 'Error updating offer',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };

@@ -885,6 +885,74 @@ document.getElementById('closeModalBtn').addEventListener('click', () => {
     if (addressIdInput) addressIdInput.remove();
 });
 
+// Function to handle default address checkbox
+function handleDefaultAddressCheckbox() {
+  // This function can be empty if you just need to prevent the error
+  // or add any specific logic you need for the default address checkbox
+}
+
+// Function to validate the address form
+function validateForm(event) {
+  const form = event.target;
+  let isValid = true;
+
+  // Reset all error messages
+  document.querySelectorAll('[id$="Error"]').forEach(element => {
+    element.classList.add('hidden');
+    element.textContent = '';
+  });
+
+  // Validate Name
+  const name = form.name.value.trim();
+  if (name.length < 3 || name.length > 50) {
+    document.getElementById('nameError').textContent = 'Name must be between 3 and 50 characters';
+    document.getElementById('nameError').classList.remove('hidden');
+    isValid = false;
+  }
+
+  // Validate City
+  const city = form.city.value.trim();
+  if (city.length < 2 || city.length > 100) {
+    document.getElementById('cityError').textContent = 'City must be between 2 and 100 characters';
+    document.getElementById('cityError').classList.remove('hidden');
+    isValid = false;
+  }
+
+  // Validate State
+  const state = form.state.value.trim();
+  if (!state) {
+    document.getElementById('stateError').textContent = 'State is required';
+    document.getElementById('stateError').classList.remove('hidden');
+    isValid = false;
+  }
+
+  // Validate Landmark
+  const landMark = form.landMark.value.trim();
+  if (!landMark || landMark.length > 100) {
+    document.getElementById('landMarkError').textContent = 'Landmark is required and must not exceed 100 characters';
+    document.getElementById('landMarkError').classList.remove('hidden');
+    isValid = false;
+  }
+
+  // Validate Pincode
+  const pincode = form.pincode.value;
+  if (!pincode || pincode.length !== 6 || !/^\d{6}$/.test(pincode)) {
+    document.getElementById('pincodeError').textContent = 'Please enter a valid 6-digit pincode';
+    document.getElementById('pincodeError').classList.remove('hidden');
+    isValid = false;
+  }
+
+  // Validate Address Type
+  const addressType = form.addressType.value;
+  if (!addressType) {
+    document.getElementById('addressTypeError').textContent = 'Please select an address type';
+    document.getElementById('addressTypeError').classList.remove('hidden');
+    isValid = false;
+  }
+
+  return isValid;
+}
+
   </script>
   </div>
 </body>

@@ -1,8 +1,9 @@
-const User = require("../../models/userSchema");
+const User = require('../../models/userSchema');
+const { StatusCode, Messages } = require('../../utils/statusCodes');
 
 const coustomerInfo = async (req, res) => {
   try {
-    let search = "";
+    let search = '';
     if (req.query.search) {
       search = req.query.search;
     }
@@ -16,8 +17,8 @@ const coustomerInfo = async (req, res) => {
     const userData = await User.find({
       isAdmin: false,
       $or: [
-        { name: { $regex: ".*" + search + ".* " } },
-        { email: { $regex: ".*" + search + ".*" } },
+        { name: { $regex: '.*' + search + '.* ' } },
+        { email: { $regex: '.*' + search + '.*' } },
       ],
     })
       .limit(limit * 1)
@@ -27,38 +28,38 @@ const coustomerInfo = async (req, res) => {
     const count = await User.find({
       isAdmin: false,
       $or: [
-        { name: { $regex: ".*" + search + ".* " } },
-        { email: { $regex: ".*" + search + ".*" } },
+        { name: { $regex: '.*' + search + '.* ' } },
+        { email: { $regex: '.*' + search + '.*' } },
       ],
     }).countDocuments();
 
-    res.render("customers", {
+    res.render('customers', {
       data: userData,
       totalPages: Math.ceil(count / limit),
       currentPage: page,
     });
   } catch (error) {
-    res.redirect('/admin/pageerror');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/admin/pageerror');
   }
 };
 
 const customerBlocked = async (req, res) => {
   try {
-    let id = req.query.id;
-    await User.updateOne({ _id: id }, { $set: { isBlocked: true } });
-    res.redirect("/admin/customers");
+    let userId = req.query.id;
+    await User.updateOne({ _id: userId }, { $set: { isBlocked: true } });
+    res.redirect('/admin/customers');
   } catch (error) {
-    res.redirect('/admin/pageerror');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/admin/pageerror');
   }
 };
 
 const customerunBlocked = async (req, res) => {
   try {
-    let id = req.query.id;
-    await User.updateOne({ _id: id }, { $set: { isBlocked: false } });
-    res.redirect("/admin/customers");
+    let userId = req.query.id;
+    await User.updateOne({ _id: userId }, { $set: { isBlocked: false } });
+    res.redirect('/admin/customers');
   } catch (error) {
-    res.redirect('/admin/pageerror');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/admin/pageerror');
   }
 };
 

@@ -2,6 +2,7 @@ const User = require('../../models/userSchema');
 const Wallet = require('../../models/walletSchema');
 const crypto = require('crypto');
 const razorpay = require('../../config/razorpay');
+const { StatusCode, Messages } = require('../../utils/statusCodes');
 
 const getWallet = async (req, res) => {
   try {
@@ -14,8 +15,8 @@ const getWallet = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in getWallet controller:', error);
-    res.status(500).render('pageNotFound', {
-      message: 'Error loading wallet page',
+    res.status(StatusCode.INTERNAL_SERVER).render('pageNotFound', {
+      message: Messages.INTERNAL_ERROR,
       error: error,
     });
   }
@@ -26,14 +27,13 @@ const verifyPayment = async (req, res) => {
     const { payment, order } = req.body;
     const userId = req.session.user._id;
 
-    // Create signature hash to verify payment
     const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
     hmac.update(order.id + '|' + payment.razorpay_payment_id);
     const generated_signature = hmac.digest('hex');
 
-    // Verify signature
+  
     if (generated_signature === payment.razorpay_signature) {
-      // Find or create wallet for the user
+      
       let wallet = await Wallet.findOne({ userId: userId });
 
       if (!wallet) {
@@ -48,7 +48,7 @@ const verifyPayment = async (req, res) => {
       const amount = order.amount / 100; // Convert from paise to rupees
       wallet.balance += amount;
 
-      // Add transaction record
+      
       wallet.transactions.push({
         type: 'credit',
         amount: amount,
@@ -58,18 +58,18 @@ const verifyPayment = async (req, res) => {
 
       await wallet.save();
 
-      res.json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: 'Payment verified and wallet updated successfully',
+        message: Messages.SUCCESS,
       });
     } else {
       throw new Error('Payment verification failed');
     }
   } catch (error) {
     console.error('Payment verification error:', error);
-    res.status(400).json({
+    res.status(StatusCode.BAD_REQUEST).json({
       success: false,
-      message: error.message || 'Payment verification failed',
+      message: Messages.INVALID_REQUEST,
     });
   }
 };
@@ -80,31 +80,31 @@ const initiateAddMoney = async (req, res) => {
 
     // Validate amount
     if (!amount || amount < 5) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
-        message: 'Amount must be at least ₹5',
+        message: Messages.VALIDATION_ERROR,
       });
     }
 
     // Create Razorpay order
     const options = {
-      amount: amount * 100, // Convert to paise
+      amount: amount * 100, 
       currency: 'INR',
       receipt: 'wallet_' + Date.now(),
     };
 
     const order = await razorpay.orders.create(options);
 
-    res.status(200).json({
+    res.status(StatusCode.OK).json({
       success: true,
       order,
       key_id: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
     console.error('Error initiating add money:', error);
-    res.status(500).json({
+    res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Failed to initiate payment',
+      message: Messages.INTERNAL_ERROR,
     });
   }
 };
