@@ -66,7 +66,7 @@ const productSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["Available", "out of stock","limited stock"],
+      enum: ["Available", "out of stock","limited stock","Unavailable"],
       default: "Available",
     },
     isBlocked: {

@@ -96,7 +96,6 @@ const CancelOrder = async (req, res) => {
     const { orderId, productId, quantity, size } = req.body;
     const userId = req.session.user._id;
 
-    // Find the order by orderId
     const order = await Order.findOne({ orderId: orderId }).populate(
       'orderedItems.product'
     );

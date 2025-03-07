@@ -120,7 +120,6 @@ const loadDashboard = async (req, res) => {
         0
       );
 
-           
       const averageOrderValue =
         totalSales > 0 ? (totalAmount / totalSales).toFixed(2) : '0.00';
 
@@ -149,7 +148,6 @@ const loadDashboard = async (req, res) => {
 
       const totalPages = Math.ceil(totalOrders / limit);
 
-      
       const orders = await Order.find(dateFilter)
         .populate('orderedItems.product')
         .populate('user')
@@ -218,7 +216,6 @@ const exportToExcel = async (req, res) => {
     const { period, startDate, endDate } = req.query;
     let dateFilter = {};
 
-    
     if (startDate && endDate) {
       dateFilter = {
         createdOn: {
@@ -226,9 +223,7 @@ const exportToExcel = async (req, res) => {
           $lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
         },
       };
-    }
-    
-    else if (period) {
+    } else if (period) {
       const now = new Date();
       switch (period) {
         case 'today':
@@ -444,8 +439,7 @@ const exportToPDF = async (req, res) => {
       .text('Customer', 105, startY + 5)
       .text('Products', 205, startY + 5)
       .text('Amount', 385, startY + 5)
-      .text('Discount', 455, startY + 5)
-      .text('Status', 525, startY + 5);
+      .text('Discount', 455, startY + 5);
 
     let y = startY + 25;
 
@@ -481,8 +475,7 @@ const exportToPDF = async (req, res) => {
         .text(order.user.name, 105, y)
         .text(productsText, 205, y, { width: 170 })
         .text(`₹${Math.round(order.finalAmount)}`, 385, y)
-        .text(`₹${Math.round(orderDiscount)}`, 455, y)
-        .text(order.orderedItems[0]?.status || 'Pending', 525, y);
+        .text(`₹${Math.round(orderDiscount)}`, 455, y);
 
       y += 25;
     });
@@ -495,7 +488,7 @@ const exportToPDF = async (req, res) => {
     doc.end();
   } catch (error) {
     console.error('PDF export error:', error);
-    res.redirect('/admin/pageerror');
+    res.status(StatusCode.INTERNAL_SERVER).redirect('/admin/pageerror');
   }
 };
 

@@ -186,7 +186,7 @@
         <p id="totalAmount">₹<%= finalAmount %></p>
       </div>
       <!-- Place Order Button Section -->
-      <% if (hasOutOfStockItems) { %>
+      <% if (hasUnavailableProducts) { %>
         <button disabled class="mt-6 w-full bg-gray-400 text-white py-3 rounded-lg font-semibold cursor-not-allowed opacity-60">
           REMOVE OUT OF STOCK ITEMS TO PLACE ORDER
         </button>

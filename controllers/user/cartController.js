@@ -48,11 +48,18 @@ const getCart = async (req, res) => {
 
     let hasOutOfStockItems = false;
     let totalMRP = 0;
+    let hasUnavailableProducts = false;
 
     for (let item of cart.items) {
-      const product = await Product.findById(item.productId._id);
+      const product = await Product.findById(item.productId._id).populate(
+        'category'
+      );
       const stockAvailable = product.stock[item.size] || 0;
-      if (stockAvailable < item.quantity) {
+
+      if (product.isBlocked || !product.category.isListed) {
+        hasUnavailableProducts = true;
+        item.isOutOfStock = true;
+      } else if (stockAvailable < item.quantity) {
         hasOutOfStockItems = true;
         item.isOutOfStock = true;
       } else {
@@ -68,7 +75,6 @@ const getCart = async (req, res) => {
       item.totalPrice = priceDetails.finalPrice * item.quantity;
       item.offer = priceDetails.offer;
 
-      // Add to total MRP
       totalMRP += item.productId.regularPrice * item.quantity;
     }
 
@@ -92,6 +98,7 @@ const getCart = async (req, res) => {
       couponDiscount: cart.couponDiscount || 0,
       appliedCoupon: cart.appliedCoupon,
       hasOutOfStockItems: hasOutOfStockItems,
+      hasUnavailableProducts: hasUnavailableProducts,
     });
   } catch (error) {
     console.error('Error fetching cart:', error);
@@ -112,7 +119,6 @@ const addToCart = async (req, res) => {
       });
     }
 
-    // Check if the product has stock information
     if (!product.stock || !product.stock[selectedSize]) {
       return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
@@ -669,11 +675,9 @@ const createOrder = async (req, res) => {
               ? 'limited stock'
               : 'Available';
 
-        // Increment product sales count
         product.salesCount += item.quantity;
         await product.save();
 
-        // Increment category sales count
         await Category.findByIdAndUpdate(
           product.category,
           { $inc: { salesCount: item.quantity } },
@@ -696,14 +700,12 @@ const createOrder = async (req, res) => {
       });
 
       if (couponUsage) {
-        // Increment existing usage
         await CouponUsage.findByIdAndUpdate(couponUsage._id, {
           $inc: { usageCount: 1 },
           lastUsed: Date.now(),
           orderId: newOrder._id,
         });
       } else {
-        // Create first usage record
         couponUsage = new CouponUsage({
           userId: userId,
           couponId: userCart.appliedCoupon,
@@ -808,7 +810,7 @@ const createRazorpayOrder = async (req, res) => {
     }
 
     const options = {
-      amount: Math.round(amount), 
+      amount: Math.round(amount),
       currency: 'INR',
       receipt: 'order_' + Date.now(),
     };
@@ -834,11 +836,9 @@ const createRazorpayOrder = async (req, res) => {
 const verifyRazorpayPayment = async (req, res) => {
   try {
     const { payment_failed, orderDetails } = req.body;
-
-    // Check if an order was already created in the last minute
     const recentOrder = await Order.findOne({
       user: req.session.user,
-      createdAt: { $gt: new Date(Date.now() - 60000) }, 
+      createdAt: { $gt: new Date(Date.now() - 60000) },
       paymentMethod: 'Razorpay',
       paymentStatus: 'Failed',
     });
@@ -871,14 +871,12 @@ const verifyRazorpayPayment = async (req, res) => {
       });
     }
 
-    // Calculate total discount
     const totalMRP = userCart.items.reduce(
       (total, item) => total + item.productId.regularPrice * item.quantity,
       0
     );
     const totalDiscount = totalMRP - userCart.finalAmount;
 
-  
     const stockUpdatePromises = userCart.items.map(async (item) => {
       try {
         const product = await Product.findById(item.productId._id);
@@ -899,11 +897,9 @@ const verifyRazorpayPayment = async (req, res) => {
               ? 'limited stock'
               : 'Available';
 
-      
         product.salesCount += item.quantity;
         await product.save();
 
-        
         await Category.findByIdAndUpdate(
           product.category,
           { $inc: { salesCount: item.quantity } },
@@ -976,12 +972,12 @@ const verifyRazorpayPayment = async (req, res) => {
 
 const getEligibleCoupons = async (req, res) => {
   try {
-    const cartTotal = req.body.cartTotal; 
+    const cartTotal = req.body.cartTotal;
 
     const eligibleCoupons = await Coupon.find({
       isActive: true,
       minPurchase: { $lte: cartTotal },
-      expireOn: { $gt: new Date() }, 
+      expireOn: { $gt: new Date() },
     }).select('name couponType discountPrice maximumPrice');
 
     res.json({
@@ -1001,7 +997,6 @@ const applyCoupon = async (req, res) => {
     const { couponCode, cartTotal } = req.body;
     const userId = req.session.user;
 
-    
     const cart = await Cart.findOne({ userId });
     const coupon = await Coupon.findOne({
       name: couponCode,
@@ -1030,7 +1025,6 @@ const applyCoupon = async (req, res) => {
 
     const finalAmount = Math.round(cartTotal - discountAmount);
 
-    
     await Cart.findOneAndUpdate(
       { userId },
       {
@@ -1075,7 +1069,7 @@ const removeCoupon = async (req, res) => {
         $unset: { appliedCoupon: '' },
         $set: {
           couponDiscount: 0,
-          finalAmount: cart.totalCartPrice, 
+          finalAmount: cart.totalCartPrice,
         },
       },
       { new: true }
@@ -1101,8 +1095,6 @@ const loadCart = async (req, res) => {
     const cart = await Cart.findOne({ userId })
       .populate('items.productId')
       .populate('appliedCoupon');
-
-    
 
     res.render('cart', {
       items: cart.items,

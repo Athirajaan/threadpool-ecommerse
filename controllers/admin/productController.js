@@ -7,8 +7,6 @@ const multer = require('multer');
 const { deleteModel } = require('mongoose');
 const { StatusCode, Messages } = require('../../utils/statusCodes');
 
-// product listing
-
 const getAllProducts = async (req, res) => {
   try {
     const searchQuery = req.query.search || '';
@@ -45,10 +43,15 @@ const getAllProducts = async (req, res) => {
         searchQuery: searchQuery,
       });
     } else {
-      res.render('page-404');
+      return res.status(StatusCode.NOT_FOUND).render('page-404', {
+        message: Messages.NOT_FOUND,
+      });
     }
   } catch (error) {
-    res.redirect('/admin/pageerror');
+    console.error('Error fetching products:', error);
+    return res.status(StatusCode.INTERNAL_SERVER).render('error', {
+      message: Messages.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -105,7 +108,6 @@ const getProductAddPage = async (req, res) => {
 
 const addProducts = async (req, res) => {
   try {
-  
     if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
       return res.status(400).json({
         success: false,
@@ -148,7 +150,6 @@ const addProducts = async (req, res) => {
       validationErrors.push('Regular price must be greater than sale price');
     }
 
-    
     const stock = {
       S: parseInt(sizeSQty, 10) || 0,
       M: parseInt(sizeMQty, 10) || 0,
@@ -185,12 +186,11 @@ const addProducts = async (req, res) => {
     }
 
     if (validationErrors.length > 0) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: validationErrors.join(', '),
       });
     }
-
 
     const images = [];
     try {
@@ -227,7 +227,6 @@ const addProducts = async (req, res) => {
       });
     }
 
-    
     const totalQuantity = Object.values(stock).reduce((a, b) => a + b, 0);
 
     // Create new product
@@ -247,16 +246,16 @@ const addProducts = async (req, res) => {
 
     await newProduct.save();
 
-    return res.status(200).json({
+    return res.status(StatusCode.CREATED).json({
       success: true,
-      message: 'Product added successfully',
+      message: Messages.CREATED,
       redirectUrl: '/admin/products',
     });
   } catch (error) {
     console.error('Error saving product:', error);
-    return res.status(500).json({
+    return res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Internal server error',
+      message: Messages.INTERNAL_ERROR,
       error: error.message,
     });
   }
@@ -266,7 +265,6 @@ const getProductForEdit = async (req, res) => {
   try {
     const productId = req.params.id;
 
-  
     const product = await Product.findById(productId).populate('category');
 
     if (!product) {
@@ -290,20 +288,47 @@ const getProductForEdit = async (req, res) => {
 
 const blockProduct = async (req, res) => {
   try {
-    const { productId } = req.body; 
-    await Product.updateOne({ _id: productId }, { $set: { isBlocked: true } });
+    const { productId } = req.body;
+    await Product.updateOne(
+      { _id: productId },
+      { $set: { isBlocked: true, status: 'Unavailable' } }
+    );
     res.status(200).send({ message: 'Product blocked successfully' });
   } catch (error) {
+    console.error('Error blocking product:', error);
     res.status(500).send({ error: 'Something went wrong' });
   }
 };
 
 const unblockProduct = async (req, res) => {
   try {
-    const { productId } = req.body; 
-    await Product.updateOne({ _id: productId }, { $set: { isBlocked: false } });
-    res.status(200).send({ message: 'Product unblocked successfully' });
+    const { productId } = req.body;
+    const product = await Product.findById(productId).populate('category');
+
+    if (product.category.isBlocked) {
+      await Product.updateOne(
+        { _id: productId },
+        { $set: { isBlocked: false } }
+      );
+      return res
+        .status(200)
+        .send({
+          message:
+            'Product unblocked, but category is blocked. Status remains Unavailable.',
+        });
+    }
+    await Product.updateOne(
+      { _id: productId },
+      { $set: { isBlocked: false, status: 'Available' } }
+    );
+    res
+      .status(200)
+      .send({
+        message:
+          'Product unblocked successfully and status updated to Available.',
+      });
   } catch (error) {
+    console.error('Error unblocking product:', error);
     res.status(500).send({ error: 'Something went wrong' });
   }
 };
@@ -325,12 +350,11 @@ const editProduct = async (req, res) => {
       deletedImages,
     } = req.body;
 
-    
     const existingProduct = await Product.findById(productId);
     if (!existingProduct) {
-      return res.status(404).json({
+      return res.status(StatusCode.NOT_FOUND).json({
         success: false,
-        message: 'Product not found',
+        message: Messages.NOT_FOUND,
       });
     }
 
@@ -363,16 +387,15 @@ const editProduct = async (req, res) => {
     }
 
     if (validationErrors.length > 0) {
-      return res.status(400).json({
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: validationErrors.join(', '),
       });
     }
 
     // Handle image updates
-    let productImages = [...existingProduct.productImage]; 
+    let productImages = [...existingProduct.productImage];
 
-    // Parse deletedImages if it's a string
     let deletedImagesList = [];
     if (deletedImages) {
       try {
@@ -382,19 +405,15 @@ const editProduct = async (req, res) => {
       }
     }
 
-    
     if (deletedImagesList.length > 0) {
       for (const imageUrl of deletedImagesList) {
         try {
-          // Extract public_id from Cloudinary URL
           const urlParts = imageUrl.split('/');
           const publicIdWithExtension = urlParts[urlParts.length - 1];
           const publicId = `product-images/${publicIdWithExtension.split('.')[0]}`;
 
-          // Delete from Cloudinary
           await cloudinary.uploader.destroy(publicId);
 
-          
           productImages = productImages.filter((img) => img !== imageUrl);
         } catch (error) {
           console.error('Error deleting image from Cloudinary:', error);
@@ -402,7 +421,6 @@ const editProduct = async (req, res) => {
       }
     }
 
-    
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         try {
@@ -433,7 +451,6 @@ const editProduct = async (req, res) => {
       });
     }
 
-    // Update product
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
       {
@@ -450,16 +467,16 @@ const editProduct = async (req, res) => {
       { new: true }
     );
 
-    return res.status(200).json({
+    return res.status(StatusCode.OK).json({
       success: true,
-      message: 'Product updated successfully',
+      message: Messages.UPDATED,
       redirectUrl: '/admin/products',
     });
   } catch (error) {
     console.error('Error updating product:', error);
-    return res.status(500).json({
+    return res.status(StatusCode.INTERNAL_SERVER).json({
       success: false,
-      message: 'Internal server error',
+      message: Messages.INTERNAL_ERROR,
       error: error.message,
     });
   }

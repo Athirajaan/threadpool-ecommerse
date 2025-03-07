@@ -66,12 +66,23 @@ const addCategory = async (req, res) => {
     });
   }
 };
+
 const getListCategory = async (req, res) => {
   try {
     const categoryId = req.query.id;
-    await Category.updateOne({ _id: categoryId }, { $set: { isListed: false } });
+    await Category.updateOne(
+      { _id: categoryId },
+      { $set: { isListed: false } }
+    );
+
+    await Product.updateMany(
+      { category: categoryId },
+      { $set: { status: 'Unavailable' } }
+    );
+
     res.redirect('/admin/category');
   } catch (error) {
+    console.error('Error in blocking category:', error);
     res.status(StatusCode.INTERNAL_SERVER).redirect('/admin/pageerror');
   }
 };
@@ -79,9 +90,16 @@ const getListCategory = async (req, res) => {
 const getUnListCategory = async (req, res) => {
   try {
     const categoryId = req.query.id;
+
     await Category.updateOne({ _id: categoryId }, { $set: { isListed: true } });
+    await Product.updateMany(
+      { category: categoryId, isBlocked: false },
+      { $set: { status: 'Available' } }
+    );
+
     res.redirect('/admin/category');
   } catch (error) {
+    console.error('Error in unblocking category:', error);
     res.status(StatusCode.INTERNAL_SERVER).redirect('/admin/pageerror');
   }
 };

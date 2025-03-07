@@ -20,7 +20,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      maxAge: 24 * 60 * 60 * 1000, 
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
     },
@@ -53,6 +53,17 @@ app.use(cartQuantityMiddleware);
 
 app.use('/', userRouter);
 app.use('/admin', adminRouter);
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+
+  res.status(err.status || 500);
+  res.render('error', { 
+    message: err.message || 'Internal Server Error',
+    status: err.status || 500
+  });
+});
+
 
 connectDb()
   .then(() => {

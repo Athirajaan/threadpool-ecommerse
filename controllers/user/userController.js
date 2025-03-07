@@ -77,13 +77,11 @@ const loadHomepage = async (req, res) => {
         ? wishlist.products.map((item) => item.productId.toString())
         : [];
 
-  
       newArrivals = newArrivals.map((product) => ({
         ...product.toObject(),
         inWishlist: wishlistProducts.includes(product._id.toString()),
       }));
 
-      
       featuredProducts = featuredProducts.map((product) => ({
         ...product.toObject(),
         inWishlist: wishlistProducts.includes(product._id.toString()),
@@ -194,11 +192,9 @@ const signup = async (req, res) => {
       return res.json('Email-error');
     }
 
-    
     req.session.userOtp = otp;
     req.session.otpTimestamp = Date.now();
     req.session.userData = { name, phone, email, password };
-
 
     req.session.save((err) => {
       if (err) {
@@ -711,6 +707,13 @@ const handleForgotPassword = async (req, res) => {
     if (!user) {
       return res.render('enterEmail', {
         message: 'User with this email cannot be found.',
+      });
+    }
+    
+    if (user.googleId) {
+      return res.render('enterEmail', {
+        message:
+          'You signed up using Google. Please log in with Google instead of resetting your password.',
       });
     }
 
